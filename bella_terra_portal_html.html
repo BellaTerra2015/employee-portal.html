@@ -122,8 +122,34 @@
             `;
         }
 
-        function renderComingSoon(section) {
-            return `
+    function renderHydroseedingSection() {
+    return `
+        <div class="min-h-screen bg-white">
+            <div class="bg-green-700 text-white p-4 shadow-lg">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <button
+                        onclick="handleBackToHome()"
+                        class="flex items-center gap-2 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg transition-colors"
+                    >
+                        ← Back to Portal
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <div style="transform: scale(0.5);">
+                            ${renderLogo()}
+                        </div>
+                        <h1 class="text-xl font-bold">Bella Terra LLC - Hydroseeding</h1>
+                    </div>
+                </div>
+            </div>
+            <iframe
+                src="https://bellaterra2015.github.io/employee-portal.html/hydroseed_platform_policy.html"
+                class="w-full"
+                style="height: calc(100vh - 80px);"
+                title="Hydroseeding Platform Policy"
+            ></iframe>
+        </div>
+    `;
+}
                 <div class="min-h-screen bg-white">
                     <div class="bg-green-700 text-white p-4 shadow-lg">
                         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -206,7 +232,10 @@
                 app.innerHTML = renderNurserySection();
                 return;
             }
-
+if (currentSection === 'hydroseeding') {
+    app.innerHTML = renderHydroseedingSection();
+    return;
+}
             if (currentSection) {
                 const section = sections.find(s => s.id === currentSection);
                 app.innerHTML = renderComingSoon(section);
