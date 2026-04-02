@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Terra LLC - Hydroseeding Platform Operations Policy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            border-bottom: 3px solid #2c5f2d;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c5f2d;
+            margin-bottom: 5px;
+        }
+        
+        .doc-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+        
+        .effective-date {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        h2 {
+            color: #2c5f2d;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        
+        h3 {
+            color: #333;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        p, li {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .safety-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .critical-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 30px 0;
+            border: 2px solid #2c5f2d;
+            border-radius: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .btn {
+            background: #2c5f2d;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: #1e4620;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #333;
+            width: 300px;
+            margin: 30px 0 5px 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .btn, .form-section {
+                display: none;
+            }
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn print-btn" onclick="window.print()">Print/Save PDF</button>
+    
+    <div class="container">
+        <div class="header">
+            <div class="company-name">BELLA TERRA LLC</div>
+            <div class="doc-title">Hydroseeding Platform Operations Safety Policy</div>
+            <div class="effective-date">Effective Date: April 2, 2026 | Document Version: 2.0</div>
+        </div>
+
+        <h2>PURPOSE</h2>
+        <p>This policy establishes Bella Terra LLC's safety standards for hydroseeding platform operations during jobsite application work. Our primary obligation is to complete contracted work safely and efficiently while protecting our crew from preventable injury.</p>
+
+        <h2>SCOPE</h2>
+        <p>This policy applies to all Bella Terra LLC hydroseeding operations and supersedes verbal directives from jobsite personnel unless supported by specific OSHA regulation. All crew members operating hydroseed equipment must understand and follow these procedures.</p>
+
+        <h2>HAZARD ASSESSMENT</h2>
+        
+        <div class="critical-box">
+            CRITICAL FINDING: Tackifier products used in hydroseeding operations create extremely slippery conditions. Product SDS sheets explicitly warn: "Wet spills are very slippery."
+        </div>
+
+        <p>Our comprehensive hazard analysis identifies the following risk hierarchy for hydroseeding operations:</p>
+
+        <h3>Primary Hazard: Ladder Access/Egress</h3>
+        <p><strong>Risk Level: HIGH</strong></p>
+        <ul>
+            <li>Near-vertical ladder angle (approximately 75-80° from horizontal)</li>
+            <li>No slip-resistant surface at ground level (ladder base area)</li>
+            <li>Wet work environment with tackifier creating film on boots and gloves</li>
+            <li>SDS-documented slip hazard from acrylamide/sodium acrylate copolymer blend tackifier</li>
+            <li>Repeated climbing cycles (up to 20+ times per day on fragmented spray areas)</li>
+            <li>Hands contaminated with slippery product during ascent/descent</li>
+        </ul>
+
+        <h3>Secondary Hazard: Platform Operations During Slow-Speed Movement</h3>
+        <p><strong>Risk Level: LOW TO MODERATE (when conducted within established parameters)</strong></p>
+        <ul>
+            <li>Controlled by operator maintaining proper stance and contact points</li>
+            <li>Platform equipped with perimeter railing and solid deck with slip-resistant surface</li>
+            <li>Speed restricted to ≤10 mph maximum, typically ≤3 mph in Low-Low gear during active spraying</li>
+            <li>Terrain assessment by both CDL Tanker driver and cannon master</li>
+        </ul>
+
+        <div class="warning-box">
+            <strong>Engineering Assessment:</strong> Requiring repeated ladder access/egress substitutes a documented high-risk activity (ladder climbing in wet/slippery conditions) for a controllable moderate-risk activity (platform riding during slow-speed positioning).
+        </div>
+
+        <h2>OPERATIONAL PROCEDURES</h2>
+
+        <h3>1. Transit to Spray Areas</h3>
+        <p><strong>Cannon master MUST ride in cab</strong> when:</p>
+        <ul>
+            <li>Traveling on public roads</li>
+            <li>Traveling to first spray location from water source</li>
+            <li>Tank is fully loaded (>95% capacity)</li>
+            <li>Tank is empty (<5% capacity or returning to water source)</li>
+            <li>Speeds exceed 10 mph</li>
+        </ul>
+
+        <h3>2. Initial Platform Access for Application</h3>
+        <p>Upon arrival at spray area:</p>
+        <ol>
+            <li>Driver positions truck at first application point</li>
+            <li>Cannon master exits passenger cab</li>
+            <li>Cannon master ascends ladder maintaining 3 points of contact at all times</li>
+            <li>Once on platform, cannon master establishes secure position before beginning application</li>
+        </ol>
+
+        <h3>3. Platform Operations During Application</h3>
+        
+        <div class="safety-box">
+            <strong>APPROVED PRACTICE:</strong> Cannon master may remain on platform while truck moves slowly between spray positions within the active work area.
+        </div>
+
+        <p><strong>Required Safety Conditions:</strong></p>
+        <ul>
+            <li><strong>Stance:</strong> Two feet squarely planted on deck at all times</li>
+            <li><strong>Hand Contact:</strong> One hand maintaining contact with cannon controls, platform rail, or secured mulch bales</li>
+            <li><strong>Speed Limit:</strong> Maximum 10 mph; typically ≤3 mph in Low-Low gear during active spraying</li>
+            <li><strong>Load Conditions:</strong> Tank must be at partial load (5-95% capacity)</li>
+            <li><strong>Terrain Assessment:</strong> Both driver and cannon master evaluate slope, grade, and lateral lean before movement</li>
+        </ul>
+
+        <h3>4. Positioning Between Spray Areas</h3>
+        <p>When moving between separate spray zones (distances up to 0.25 miles or more):</p>
+        
+        <div class="safety-box">
+            <strong>SAFETY RATIONALE:</strong> Given the documented slip hazard from tackifier contamination on boots and gloves, requiring cannon master to descend and re-ascend the near-vertical ladder multiple times presents greater fall risk than controlled platform riding at restricted speeds.
+        </div>
+        
+        <p><strong>Joint Decision Authority:</strong> Both CDL Tanker driver and cannon master must agree on the safest method for repositioning:</p>
+        
+        <p><strong>Option A - Platform Riding (Preferred when conditions allow):</strong></p>
+        <ul>
+            <li>Cannon master shuts down spray equipment</li>
+            <li>Cannon master remains seated on secured mulch bales during transit</li>
+            <li>Load must be partial (5-95% capacity)</li>
+            <li>Speed must not exceed 10 mph</li>
+            <li>Terrain must be evaluated as safe by both operators</li>
+        </ul>
+        
+        <p><strong>Option B - Cab Riding (Required when conditions warrant):</strong></p>
+        <ul>
+            <li>Terrain requires speed >10 mph</li>
+            <li>Either driver or cannon master deems platform operation unsafe</li>
+            <li>Tank is fully loaded (>95%) or nearly empty (<5%)</li>
+            <li>Weather conditions (high wind, ice, etc.) create instability</li>
+        </ul>
+
+        <h3>5. Terrain-Specific Protocols</h3>
+        
+        <p><strong>Slopes and Hills:</strong></p>
+        <p>CDL Tanker driver and cannon master jointly assess whether it is safer to:</p>
+        <ul>
+            <li><strong>Option A:</strong> Cannon master boards platform at bottom of slope before truck ascends in Low-Low gear, OR</li>
+            <li><strong>Option B:</strong> Truck ascends slope, stops, then cannon master boards platform at top</li>
+        </ul>
+        <p>Decision factors include: slope angle, surface traction, load weight, weather conditions, and visibility.</p>
+
+        <p><strong>Lateral Lean/Cross-Slope:</strong></p>
+        <ul>
+            <li>CDL Tanker driver makes final determination on platform operation safety</li>
+            <li>Cannon master must concur with driver's assessment</li>
+            <li>If either operator deems platform operation unsafe, hose deployment method is used instead</li>
+        </ul>
+
+        <h3>6. Prohibited Practices</h3>
+        
+        <div class="critical-box">
+            NEVER tie off or tether cannon master to platform. In rollover scenarios, being secured to the platform dramatically increases injury severity.
+        </div>
+
+        <ul>
+            <li>No fall protection lanyards, harnesses, or tie-offs to platform</li>
+            <li>No platform riding when tank is fully loaded (>95%) or empty (<5%)</li>
+            <li>No platform riding at speeds >10 mph</li>
+            <li>No platform operations when either driver or cannon master objects to terrain/conditions</li>
+        </ul>
+
+        <h2>REGULATORY ANALYSIS</h2>
+
+        <h3>OSHA Standards Review</h3>
+        <p><strong>No Specific Prohibition Exists:</strong> OSHA regulations do not contain a specific standard prohibiting personnel from riding on vehicle-mounted work platforms during slow-speed operational movements for equipment application purposes.</p>
+
+        <p><strong>Relevant Standards:</strong></p>
+        <ul>
+            <li><strong>29 CFR 1926.451 (Scaffolds):</strong> Our platform configuration with perimeter railing and solid deck is comparable to mobile scaffold platforms used in construction.</li>
+            <li><strong>29 CFR 1926.1053 (Ladders):</strong> Requires safe access/egress. Excessive climbing in hazardous conditions (wet, slippery) may violate the intent of safe access requirements.</li>
+            <li><strong>29 CFR 1926.501 (Fall Protection):</strong> Our platform operations do not constitute unprotected edges or fall hazards when personnel maintain proper stance and contact.</li>
+            <li><strong>29 CFR 1910.1200 (Hazard Communication):</strong> Wood dust and tackifier products are documented hazardous substances. SDS sheets identify slip hazards.</li>
+        </ul>
+
+        <h3>Industry Standard Practice</h3>
+        <p>Platform operation during hydroseeding application is standard practice across the erosion control industry, particularly on DOT (Department of Transportation) projects where inspectors routinely observe this method without citation.</p>
+
+        <h2>JOBSITE INTERACTION PROTOCOL</h2>
+
+        <p>If a general contractor, foreman, or site safety inspector directs you to cease platform operations:</p>
+
+        <ol>
+            <li><strong>Remain Professional:</strong> Do not argue or debate on-site.</li>
+            <li><strong>Request Documentation:</strong> Politely ask: "Can you provide the specific OSHA CFR standard you're citing, preferably in writing?"</li>
+            <li><strong>Contact Management Immediately:</strong> Call Bella Terra LLC management before altering work methods.</li>
+            <li><strong>Comply Temporarily:</strong> If the directive is firm, comply in the moment to avoid confrontation.</li>
+            <li><strong>Document the Incident:</strong> Complete the Safety Directive Report Form (below) as soon as possible.</li>
+        </ol>
+
+        <div class="safety-box">
+            <strong>Employee Protection:</strong> No crew member will face discipline for complying with a jobsite safety directive. However, compliance does not mean the directive is correct. We will address each situation with documentation and formal response if necessary.
+        </div>
+
+        <h2>MANAGEMENT RESPONSE</h2>
+
+        <p>Upon receiving a Safety Directive Report, Bella Terra LLC management will:</p>
+        <ol>
+            <li>Review the claimed OSHA citation (if provided)</li>
+            <li>Contact the general contractor's safety department with this policy document</li>
+            <li>Provide SDS documentation of tackifier slip hazard</li>
+            <li>Request a formal written directive citing specific regulatory authority</li>
+            <li>If necessary, submit a formal contest through appropriate regulatory channels</li>
+        </ol>
+
+        <h2>SAFETY DIRECTIVE INCIDENT REPORT</h2>
+
+        <div class="form-section">
+            <h3 style="margin-top:0; color: #2c5f2d;">Complete This Form When Directed to Stop Platform Operations</h3>
+            <p style="margin-bottom: 20px;"><em>This form documents jobsite safety directives for management review and response.</em></p>
+
+            <form id="safetyForm">
+                <div class="form-group">
+                    <label>Date of Incident <span class="required">*</span></label>
+                    <input type="date" id="incidentDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Time of Incident <span class="required">*</span></label>
+                    <input type="time" id="incidentTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Jobsite Name/Project <span class="required">*</span></label>
+                    <input type="text" id="jobsiteName" placeholder="e.g., Bull Run Water Filtration Site" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Jobsite Address <span class="required">*</span></label>
+                    <input type="text" id="jobsiteAddress" placeholder="Street address, city, state, ZIP" required>
+                </div>
+
+                <div class="form-group">
+                    <label>General Contractor Name <span class="required">*</span></label>
+                    <input type="text" id="gcName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Safety Contact Name (person who issued directive) <span class="required">*</span></label>
+                    <input type="text" id="safetyContact" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Safety Contact Title/Role</label>
+                    <input type="text" id="safetyTitle" placeholder="e.g., Site Safety Manager, Foreman">
+                </div>
+
+                <div class="form-group">
+                    <label>OSHA Citation Provided? <span class="required">*</span></label>
+                    <select id="citationProvided" required>
+                        <option value="">Select...</option>
+                        <option value="yes_written">Yes - Written documentation provided</option>
+                        <option value="yes_verbal">Yes - Verbally cited specific CFR</option>
+                        <option value="no">No - General safety concern only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>If OSHA Citation Was Provided, Specify CFR Number</label>
+                    <input type="text" id="cfrNumber" placeholder="e.g., 29 CFR 1926.501">
+                </div>
+
+                <div class="form-group">
+                    <label>Incident Description <span class="required">*</span></label>
+                    <textarea id="incidentDescription" placeholder="Describe what you were doing, what the safety contact said, and how the situation was resolved." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Bella Terra Crew Members Present <span class="required">*</span></label>
+                    <input type="text" id="crewMembers" placeholder="List all crew member names" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Did you comply with the directive? <span class="required">*</span></label>
+                    <select id="compliance" required>
+                        <option value="">Select...</option>
+                        <option value="yes_immediate">Yes - Immediately stopped platform operations</option>
+                        <option value="yes_after_contact">Yes - After contacting management</option>
+                        <option value="no">No - Continued operations</option>
+                        <option value="other">Other (explain in notes)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Employee Name (completing this form) <span class="required">*</span></label>
+                    <input type="text" id="employeeName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Employee Email <span class="required">*</span></label>
+                    <input type="email" id="employeeEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Notes/Comments</label>
+                    <textarea id="additionalNotes" placeholder="Any additional information that would help management respond to this situation"></textarea>
+                </div>
+
+                <button type="submit" class="btn">Generate Report Email</button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('safetyForm').reset()">Clear Form</button>
+            </form>
+        </div>
+
+        <div class="signature-section">
+            <p><strong>Policy Acknowledgment:</strong></p>
+            <p>I have received, read, and understand Bella Terra LLC's Hydroseeding Platform Operations Safety Policy. I agree to follow these procedures and will immediately report any jobsite directives that conflict with this policy.</p>
+            
+            <div class="signature-line"></div>
+            <p>Employee Signature</p>
+            
+            <div class="signature-line"></div>
+            <p>Date</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Bella Terra LLC</strong> | Hydroseeding Platform Operations Safety Policy | Version 2.0 | April 2026</p>
+            <p>Questions? Contact: [Your Contact Information]</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('safetyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                incidentDate: document.getElementById('incidentDate').value,
+                incidentTime: document.getElementById('incidentTime').value,
+                jobsiteName: document.getElementById('jobsiteName').value,
+                jobsiteAddress: document.getElementById('jobsiteAddress').value,
+                gcName: document.getElementById('gcName').value,
+                safetyContact: document.getElementById('safetyContact').value,
+                safetyTitle: document.getElementById('safetyTitle').value,
+                citationProvided: document.getElementById('citationProvided').value,
+                cfrNumber: document.getElementById('cfrNumber').value,
+                incidentDescription: document.getElementById('incidentDescription').value,
+                crewMembers: document.getElementById('crewMembers').value,
+                compliance: document.getElementById('compliance').value,
+                employeeName: document.getElementById('employeeName').value,
+                employeeEmail: document.getElementById('employeeEmail').value,
+                additionalNotes: document.getElementById('additionalNotes').value
+            };
+
+            // Generate email body
+            const emailSubject = `SAFETY DIRECTIVE REPORT: ${formData.jobsiteName} - ${formData.incidentDate}`;
+            const emailBody = `BELLA TERRA LLC - SAFETY DIRECTIVE INCIDENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INCIDENT DETAILS
+Date: ${formData.incidentDate}
+Time: ${formData.incidentTime}
+Jobsite: ${formData.jobsiteName}
+Address: ${formData.jobsiteAddress}
+
+GENERAL CONTRACTOR INFORMATION
+Company: ${formData.gcName}
+Safety Contact: ${formData.safetyContact}
+Title: ${formData.safetyTitle || 'Not provided'}
+
+DIRECTIVE DETAILS
+OSHA Citation Status: ${formData.citationProvided}
+CFR Number (if provided): ${formData.cfrNumber || 'None provided'}
+
+INCIDENT DESCRIPTION
+${formData.incidentDescription}
+
+CREW INFORMATION
+Crew Members Present: ${formData.crewMembers}
+Compliance Status: ${formData.compliance}
+
+REPORTING EMPLOYEE
+Name: ${formData.employeeName}
+Email: ${formData.employeeEmail}
+
+ADDITIONAL NOTES
+${formData.additionalNotes || 'None'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This report was generated from Bella Terra LLC's Safety Directive Incident Report form.
+Management will review and respond to this incident within 24 hours.`;
+
+            // Create mailto link
+            const mailtoLink = `mailto:Admin@1BellaTerra.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            // Show confirmation
+            alert('Email draft has been generated. Please review and send from your email client.\n\nIf your email client did not open automatically, you can copy the form data and email it manually.');
+        });
+    </script>
+</body>
+</html>
