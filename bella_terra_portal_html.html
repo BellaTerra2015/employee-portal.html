@@ -226,72 +226,11 @@ body { font-family: 'Source Sans 3', sans-serif; background: var(--gray-light); 
           <h3>Nursery</h3>
           <p>Nursery operations, plant inventory, and growing resources.</p>
         </a>
-        <div class="tile" onclick="showHydroMenu()">
+        <a class="tile" href="https://bellaterra2015.github.io/Hydroseeding-Platform-Operations-Safety-Policy/" target="_blank">
           <div class="tile-icon">💧</div>
           <h3>Hydroseeding</h3>
           <p>Platform operations, safety policies, and equipment guidelines.</p>
-        </div>
-
-        <!-- HYDROSEEDING POPUP MODAL -->
-        <div id="hydro-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:999;align-items:center;justify-content:center;">
-          <div style="background:white;border-radius:16px;padding:2rem;width:90%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-              <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">💧 Hydroseeding</h3>
-              <button onclick="closeHydroMenu()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;line-height:1;">&times;</button>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
-
-              <a href="https://bellaterra2015.github.io/employee-portal.html/hydroseeder_calculator.html" target="_blank" style="display:block;background:#f5f5f2;border-radius:10px;padding:1.25rem;text-decoration:none;color:#2a2a2a;border:2px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='transparent'">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">🧮</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Load Calculator</div>
-                <div style="font-size:0.8rem;color:#888;">Mix rates, loads, and field logging.</div>
-              </a>
-
-              <a href="https://bellaterra2015.github.io/Hydroseeding-Platform-Operations-Safety-Policy/" target="_blank" style="display:block;background:#f5f5f2;border-radius:10px;padding:1.25rem;text-decoration:none;color:#2a2a2a;border:2px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='transparent'">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Platform Policy</div>
-                <div style="font-size:0.8rem;color:#888;">Operations and safety policy.</div>
-              </a>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📻</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">How to Use Comms</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">🔧</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">End of Day Greasing</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">✅</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Preload Checklist</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📌</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Coming Soon</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📌</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Coming Soon</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-              <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
-                <div style="font-size:2rem;margin-bottom:0.5rem;">📌</div>
-                <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Coming Soon</div>
-                <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
-              </div>
-
-            </div>
-          </div>
-        </div>
+        </a>
         <a class="tile" href="https://bellaterra2015.github.io/fleet-inspections/" target="_blank">
           <div class="tile-icon">🚛</div>
           <h3>Fleet Inspections</h3>
@@ -325,6 +264,7 @@ body { font-family: 'Source Sans 3', sans-serif; background: var(--gray-light); 
           ✍️ Required Signatures <span class="badge" id="sig-badge">2</span>
         </button>
         <button class="res-tab" onclick="showSubPanel('sub-contacts')">📋 Contacts</button>
+        <button class="res-tab" onclick="showSubPanel('sub-directory')">👷 Team Directory</button>
       </div>
 
       <!-- OVERVIEW -->
@@ -733,6 +673,155 @@ body { font-family: 'Source Sans 3', sans-serif; background: var(--gray-light); 
         </div>
       </div><!-- end contacts -->
 
+      <!-- TEAM DIRECTORY -->
+      <div class="sub-panel" id="sub-directory">
+        <div class="section-header"><h3>👷 Team Directory</h3><div class="divider"></div></div>
+        <p style="font-size:0.85rem;color:var(--gray-mid);margin-bottom:1.5rem;">Tap a card to call. Listed alphabetically.</p>
+        <div class="resource-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
+
+          <!-- Alholinna, Elynn -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🌱 🌿</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Elynn Alholinna</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Nursery Lead · Field Crew</p>
+            <a href="tel:9063701837" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (906) 370-1837</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Plant layout specialist · Commercial native installs</p>
+          </div>
+
+          <!-- Bellika, Brydon -->
+          <div class="resource-card" style="border-left:3px solid var(--green-dark);">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚛 🚚 🚜 🔧 💧 🌬️ 🐛</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Brydon Bellika</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">VP · Co-Owner · Class A CDL</p>
+            <a href="tel:3605609860" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 560-9860</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Semi · Dump Truck · Excavator · Loader · Trencher · Hydroseeder · Bark Blower · Pesticide Applicator</p>
+            <p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Call Brydon before Rena for field issues</p>
+          </div>
+
+          <!-- Bellika, Rena -->
+          <div class="resource-card" style="border-left:3px solid var(--green-dark);">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚜 💧 🔧 🐛</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Rena Bellika</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Owner · Class B CDL · Employee Scheduling</p>
+            <a href="tel:3606065616" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 606-5616</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Dump Truck · Hydroseeder · Loader · Skidsteer · Dingo · Pesticide Applicator</p>
+            <p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Call Rena only if no one else can help</p>
+          </div>
+
+          <!-- Booker, Garrett -->
+          <div class="resource-card" style="border-left:3px solid var(--green-dark);">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚛 🚚 🚜 💧 🌿 💦 🐛</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Garrett Booker</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Superintendent · Class A CDL · Native Restoration</p>
+            <a href="tel:3605602290" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 560-2290</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Semi · Dump Truck · Hydroseeder · Irrigation · Loader · Pesticide Applicator</p>
+          </div>
+
+          <!-- Gonzalez, Juan -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">💦 🔧 🌱 🇲🇽🇺🇸</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Juan Gonzalez</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Field Crew · Bilingual EN/ES</p>
+            <a href="tel:3602067159" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 206-7159</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Irrigation · Maintenance · Planting</p>
+          </div>
+
+          <!-- Greer, Emily -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">💵 👥</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Emily Greer</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Payroll · Onboarding · Part-time</p>
+            <a href="tel:3609072420" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 907-2420</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Payroll questions · New hire paperwork</p>
+          </div>
+
+          <!-- Hooper, Heather -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">📋 🔍</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Heather Hooper</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Office/Admin · Wed–Fri</p>
+            <a href="tel:9712607063" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (971) 260-7063</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Job specs · Contract details</p>
+            <p style="font-size:0.78rem;color:var(--green-mid);font-style:italic;margin-top:0.5rem;">Word nerd — thrives in buried details</p>
+          </div>
+
+          <!-- Jumalon, Joe -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🌬️ 🌱</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Joe Jumalon</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Head Laborer · Bark Blowing</p>
+            <a href="tel:5038576952" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (503) 857-6952</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Bark Blowing · Planting</p>
+            <p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Crew with Robert when possible</p>
+          </div>
+
+          <!-- Kludt-Painter, Ethan -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">📅 🌬️ 💧</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Ethan Kludt-Painter</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Sales &amp; Logistics</p>
+            <a href="tel:9075184130" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (907) 518-4130</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Bark Blowing &amp; Hydroseeding scheduling go-to</p>
+          </div>
+
+          <!-- Lopez, Evaristo -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚜 💦 🔧 🐛 🔍</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Evaristo Lopez</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Field Crew · Equipment Operator in Training</p>
+            <a href="tel:3607236463" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 723-6463</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Irrigation · Maintenance · Skidsteer · Dingo · Trencher · Pesticide Applicator · Detail-oriented</p>
+          </div>
+
+          <!-- North, Adriane -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚛 🚚 🚜 💧 🌬️</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Adriane North</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Class A CDL · Field Crew · Wednesdays Only</p>
+            <a href="tel:13609214013" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 921-4013</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Semi · Dump Truck · Hydroseeder · Bark Blower</p>
+          </div>
+
+          <!-- Prather, Elizabeth -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">📊 👥</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Elizabeth (Liz) Prather</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Accounting &amp; HR · Onboarding</p>
+            <a href="tel:3609802969" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 980-2969</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">HR · Employment verification · W-2 · New hire paperwork</p>
+          </div>
+
+          <!-- Schmeusser, Randy -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚛 🚚 🚜 🔧</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Randy Schmeusser</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Class A CDL · Field Crew</p>
+            <a href="tel:3606013173" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 601-3173</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Semi · Dump Truck · Loader · Skidsteer · Excavator · Learning Bark Blowing &amp; Hydroseeding</p>
+          </div>
+
+          <!-- Serna, Robert -->
+          <div class="resource-card" style="border-left:3px solid var(--green-dark);">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">🚛 🚚 🚜 🌬️ ⛏️ 🔧 🇲🇽🇺🇸</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Robert Serna</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Head Bark Blower · Class A CDL · Bilingual EN/ES</p>
+            <a href="tel:9712372452" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (971) 237-2452</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">Semi · Dump Truck · Best Bark Blower · Excavator · Equipment Operator</p>
+            <p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Crew with Joe when possible</p>
+          </div>
+
+          <!-- Willbur, Kevin -->
+          <div class="resource-card">
+            <div style="font-size:1.6rem;margin-bottom:0.4rem;">📊</div>
+            <h4 style="font-family:'Playfair Display',serif;color:var(--green-dark);">Kevin Willbur</h4>
+            <p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Lead Estimator · Landscaping Bids</p>
+            <a href="tel:3607986759" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 798-6759</a>
+            <p style="font-size:0.8rem;color:var(--gray-mid);">All division estimates · Landscaping bids</p>
+          </div>
+
+        </div>
+      </div><!-- end directory -->
+
     </div><!-- end panel-content -->
   </div><!-- end panel-resources -->
 
@@ -903,14 +992,6 @@ function initCanvas(id) {
 
 function clearSig(id) { var c = document.getElementById(id); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
 function hasSignature(canvas) { var d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data; for (var i = 3; i < d.length; i += 4) { if (d[i] > 0) return true; } return false; }
-
-function showHydroMenu() {
-  var m = document.getElementById('hydro-modal');
-  m.style.display = 'flex';
-}
-function closeHydroMenu() {
-  document.getElementById('hydro-modal').style.display = 'none';
-}
 
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('login-btn').addEventListener('click', doLogin);
