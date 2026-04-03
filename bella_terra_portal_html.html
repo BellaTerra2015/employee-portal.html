@@ -509,7 +509,7 @@
       <input type="password" id="login-pass" placeholder="Enter password">
     </div>
     <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
-    <button class="btn-primary" style="margin-top:1.25rem" onclick="doLogin()">Access Portal</button>
+    <button class="btn-primary" style="margin-top:1.25rem" id="login-btn">Access Portal</button>
   </div>
 </div>
 
@@ -522,7 +522,7 @@
     <h2>Employee Portal</h2>
     <div class="header-right">
       <span class="employee-badge" id="employee-badge">👤 Employee</span>
-      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+      <button class="btn-logout" id="logout-btn">Sign Out</button>
     </div>
   </div>
 
@@ -721,7 +721,7 @@
           <p>Accrued, unused sick leave balances of 40 hours or less carry over each calendar year. Balances over 40 hours are paid out at the start of the new year.</p>
           <h4>Employer-Funded Medical Care</h4>
           <p>Bella Terra covers up to 4 visits per year at <strong>Vital Care Primary &amp; Urgent Care</strong>, 1207 SE Rasmussen Blvd, Suite 119, Battle Ground, WA 98604 · (360) 723-0528 · www.vitalcarewa.com</p>
-          <p style="margin-top:0.5rem">Questions? Contact Liz Prather at office@1BellaTerra.com or call L&amp;I at 1-866-219-7321.</p>
+          <p style="margin-top:0.5rem">Questions? Contact Liz Prather at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c131a1a151f193c4d3e1910101d28190e0e1d521f1311">[email&#160;protected]</a> or call L&amp;I at 1-866-219-7321.</p>
         </div>
       </div>
     </div>
@@ -1007,10 +1007,10 @@
         <h4>Vital Care Urgent Care</h4>
         <p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p>
       </a>
-      <a class="resource-card" href="mailto:office@1BellaTerra.com">
+      <a class="resource-card" href="/cdn-cgi/l/email-protection#9bf4fdfdf2f8fedbaad9fef7f7facffee9e9fab5f8f4f6">
         <div class="resource-icon">📧</div>
         <h4>HR / Office</h4>
-        <p>Liz Prather<br>office@1BellaTerra.com<br><span style="font-size:0.78rem">HR · Employment Verification · W-2</span></p>
+        <p>Liz Prather<br><span class="__cf_email__" data-cfemail="95faf3f3fcf6f0d5a4d7f0f9f9f4c1f0e7e7f4bbf6faf8">[email&#160;protected]</span><br><span style="font-size:0.78rem">HR · Employment Verification · W-2</span></p>
       </a>
       <a class="resource-card" href="tel:3606065616">
         <div class="resource-icon">📞</div>
@@ -1032,7 +1032,7 @@
 
 </div><!-- end portal -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 // IMPORTANT: Replace YOUR_FORM_ID with your Formspree form ID after signing up at formspree.io
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
@@ -1070,6 +1070,8 @@ function doLogout() {
   location.reload();
 }
 
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('logout-btn').addEventListener('click', doLogout);
 document.getElementById('login-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
 
 // ─── NAV ──────────────────────────────────────────────────────────────────────
@@ -1210,13 +1212,4 @@ function initCanvas(id) {
   }
 
   ctx.strokeStyle = '#1a1a1a';
-  ctx.lineWidth = 2;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
-  canvas.addEventListener('mousemove', e => {
-    if (!drawing) return;
-    const p = getPos(e);
-    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
-    lastX 
+  
