@@ -146,20 +146,62 @@
                            src="https://bellaterra2015.github.io/bella-terra-nursery/bella_terra_nursery.html"
                         ></iframe>
                     </div>`;
-            } else if (section === 'hydroseeding') {
-                contentArea.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
-                            <h1 class="text-xl font-bold text-gray-800">Bella Terra LLC - Hydroseeding</h1>
-                        </div>
-                        <iframe 
-                            src="https://bellaterra2015.github.io/employee-portal.html/hydroseed_platform_policy.html"
-                            class="w-full"
-                            style="height: calc(100vh - 80px);"
-                            title="Hydroseeding Platform Policy"
-                        ></iframe>
-                    </div>`;
+        
+             } else if (section === 'hydroseeding') {
+    contentArea.innerHTML = `
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
+                    <h1 class="text-xl font-bold text-gray-800">Hydroseeding Resources</h1>
+                </div>
+                <button onclick="handleBackToHome()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">← Back to Portal</button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <button onclick="showHydroSubsection('platform')" class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200 hover:border-green-400 transition-all text-left">
+                    <div class="text-3xl mb-2">📋</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Platform Operations Policy</h3>
+                    <p class="text-gray-600 text-sm">Safety guidelines and procedures</p>
+                </button>
+                
+                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
+                    <div class="text-3xl mb-2">🗺️</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Hydrant Locations Map</h3>
+                    <p class="text-gray-600 text-sm">Find water sources</p>
+                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                </button>
+                
+                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
+                    <div class="text-3xl mb-2">✅</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Training Progress Tracker</h3>
+                    <p class="text-gray-600 text-sm">Track employee benchmarks</p>
+                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                </button>
+                
+                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Pre-Trip Checklist</h3>
+                    <p class="text-gray-600 text-sm">Nozzles, hookup tools, etc.</p>
+                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                </button>
+                
+                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
+                    <div class="text-3xl mb-2">🎧</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Sonetics Comms Guide</h3>
+                    <p class="text-gray-600 text-sm">How to use communication system</p>
+                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                </button>
+                
+                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
+                    <div class="text-3xl mb-2">🧮</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Mix Calculator</h3>
+                    <p class="text-gray-600 text-sm">Calculate materials needed</p>
+                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                </button>
+            </div>
+            
+            <div id="hydroSubse       </div>`;
             } else if (section === 'employee') {
                 contentArea.innerHTML = `
                     <div class="min-h-screen bg-white">
@@ -244,6 +286,22 @@
                 </text>
             </svg>`;
         }
+function showHydroSubsection(subsection) {
+            const hydroSubsection = document.getElementById('hydroSubsection');
+            
+            if (subsection === 'platform') {
+                hydroSubsection.innerHTML = `
+                    <div class="bg-white border-2 border-green-200 rounded-lg p-4">
+                        <iframe 
+                            src="https://bellaterra2015.github.io/employee-portal.html/hydroseed_platform_policy.html"
+                            class="w-full"
+                            style="height: 600px;"
+                            title="Platform Operations Policy"
+                        ></iframe>
+                    </div>`;
+            }
+        }
+        
     </script>
 
 </body>
