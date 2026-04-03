@@ -1,308 +1,1222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bella Terra Employee Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bella Terra Employee Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  :root {
+    --green-dark: #2d5a27;
+    --green-mid: #4a7c3f;
+    --green-light: #7ab648;
+    --green-pale: #e8f5e2;
+    --blue-accent: #1a6b8a;
+    --gold: #c8961e;
+    --white: #ffffff;
+    --gray-light: #f5f5f2;
+    --gray-mid: #888;
+    --text: #2a2a2a;
+    --border: #d0dcc8;
+    --red: #c0392b;
+    --shadow: 0 2px 12px rgba(45,90,39,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--gray-light);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+    padding: 2rem;
+  }
+  #login-screen img { width: 120px; margin-bottom: 1.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+  #login-screen h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--white);
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+  }
+  #login-screen p { color: rgba(255,255,255,0.75); margin-bottom: 2rem; text-align: center; }
+  .login-box {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  }
+  .login-box label { display: block; font-weight: 600; font-size: 0.85rem; color: var(--green-dark); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .login-box input {
+    width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border);
+    border-radius: 8px; font-family: inherit; font-size: 1rem; margin-bottom: 1rem;
+    transition: border-color 0.2s;
+  }
+  .login-box input:focus { outline: none; border-color: var(--green-mid); }
+  .btn-primary {
+    width: 100%; padding: 0.85rem; background: var(--green-dark);
+    color: white; border: none; border-radius: 8px; font-family: inherit;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--green-mid); }
+  .error-msg { color: var(--red); font-size: 0.875rem; margin-top: 0.5rem; display: none; }
+
+  /* ── MAIN PORTAL ── */
+  #portal { display: none; min-height: 100vh; }
+
+  .portal-header {
+    background: var(--green-dark);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .portal-header img { height: 44px; }
+  .portal-header h2 { font-family: 'Playfair Display', serif; color: white; font-size: 1.2rem; }
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+  .employee-badge {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+  }
+  .btn-logout {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.1); color: white; }
+
+  /* ── ACTION REQUIRED BANNER ── */
+  .action-banner {
+    background: linear-gradient(90deg, #c8961e, #e8b830);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white;
+    font-weight: 600;
+  }
+  .action-banner.hidden { display: none; }
+
+  /* ── NAV TABS ── */
+  .portal-nav {
+    background: white;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 1rem;
+  }
+  .nav-tab {
+    padding: 1rem 1.25rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-mid);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    margin-bottom: -2px;
+  }
+  .nav-tab:hover { color: var(--green-mid); }
+  .nav-tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); }
+  .nav-tab .badge {
+    background: var(--red);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  /* ── CONTENT PANELS ── */
+  .panel { display: none; padding: 1.5rem; max-width: 860px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .welcome-card {
+    background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+    border-radius: 12px;
+    padding: 1.75rem;
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+  .welcome-card h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .welcome-card p { opacity: 0.85; line-height: 1.6; }
+
+  .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .task-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    border-left: 4px solid var(--border);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(45,90,39,0.15); }
+  .task-card.required { border-left-color: var(--red); }
+  .task-card.complete { border-left-color: var(--green-light); opacity: 0.7; }
+  .task-card.annual { border-left-color: var(--gold); }
+  .task-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+  .task-card.required .task-label { color: var(--red); }
+  .task-card.annual .task-label { color: var(--gold); }
+  .task-card.complete .task-label { color: var(--green-light); }
+  .task-card h4 { font-family: 'Playfair Display', serif; font-size: 1.05rem; margin-bottom: 0.4rem; color: var(--text); }
+  .task-card p { font-size: 0.85rem; color: var(--gray-mid); line-height: 1.5; }
+  .task-status { margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; }
+  .task-card.complete .task-status { color: var(--green-mid); }
+  .task-card.required .task-status { color: var(--red); }
+  .task-card.annual .task-status { color: var(--gold); }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--green-dark);
+  }
+  .section-header .divider {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── HANDBOOK ── */
+  .handbook-progress {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .progress-bar-wrap { flex: 1; }
+  .progress-label { font-size: 0.8rem; font-weight: 600; color: var(--green-dark); margin-bottom: 0.4rem; }
+  .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-mid), var(--green-light)); border-radius: 4px; transition: width 0.4s ease; }
+  .progress-count { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--green-dark); white-space: nowrap; }
+
+  .handbook-chapter {
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    gap: 0.75rem;
+    transition: background 0.15s;
+  }
+  .chapter-header:hover { background: var(--green-pale); }
+  .chapter-num {
+    width: 32px; height: 32px;
+    background: var(--green-pale);
+    color: var(--green-dark);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .chapter-num.initialed { background: var(--green-dark); color: white; }
+  .chapter-title-wrap { flex: 1; }
+  .chapter-title { font-weight: 600; color: var(--text); font-size: 0.95rem; }
+  .chapter-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.1rem;
+  }
+  .chapter-type.initial { color: var(--red); }
+  .chapter-type.read-only { color: var(--blue-accent); }
+  .chapter-type.done { color: var(--green-mid); }
+  .chapter-arrow { color: var(--gray-mid); font-size: 1.1rem; transition: transform 0.2s; }
+  .chapter-header.open .chapter-arrow { transform: rotate(180deg); }
+
+  .chapter-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .chapter-body.open { display: block; }
+  .chapter-content {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text);
+    padding: 1rem 0;
+  }
+  .chapter-content h4 { font-family: 'Playfair Display', serif; color: var(--green-dark); margin: 1rem 0 0.4rem; font-size: 1rem; }
+  .chapter-content ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+  .chapter-content li { margin-bottom: 0.3rem; }
+  .chapter-content strong { color: var(--green-dark); }
+
+  .initial-block {
+    background: #fff8e6;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+  }
+  .initial-block p { font-size: 0.875rem; color: var(--text); margin-bottom: 0.75rem; line-height: 1.5; }
+  .initial-row { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
+  .initial-row input[type="text"] {
+    padding: 0.6rem 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    width: 80px;
+  }
+  .initial-row input[type="text"]:focus { outline: none; border-color: var(--green-mid); }
+  .btn-initial {
+    padding: 0.6rem 1.1rem;
+    background: var(--gold);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-initial:hover { background: #b8861a; }
+  .initial-done {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--green-mid);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .initial-done.show { display: flex; }
+
+  /* ── SIGNATURE FORMS ── */
+  .sig-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--green-dark);
+  }
+  .sig-card h4 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--green-dark); margin-bottom: 0.5rem; }
+  .sig-card .description { font-size: 0.9rem; color: var(--gray-mid); margin-bottom: 1.25rem; line-height: 1.6; }
+  .sig-card .doc-preview {
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .sig-card .doc-preview h5 { color: var(--green-dark); font-family: 'Playfair Display', serif; margin-bottom: 0.5rem; }
+  .sig-card .doc-preview ul { padding-left: 1.25rem; }
+  .sig-card .doc-preview li { margin-bottom: 0.25rem; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+  .form-group label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green-dark); }
+  .form-group input, .form-group select {
+    padding: 0.65rem 0.85rem;
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--green-mid); }
+
+  .sig-pad-wrap { margin: 1rem 0; }
+  .sig-pad-wrap label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green-dark); display: block; margin-bottom: 0.4rem; }
+  .sig-pad {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: crosshair;
+    background: white;
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    touch-action: none;
+  }
+  .sig-controls { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .btn-clear {
+    padding: 0.4rem 0.85rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--gray-mid);
+  }
+  .btn-clear:hover { border-color: var(--red); color: var(--red); }
+
+  .consent-check {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    background: var(--green-pale);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  .consent-check input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; accent-color: var(--green-dark); }
+  .consent-check label { font-size: 0.875rem; line-height: 1.55; color: var(--text); }
+
+  .btn-submit {
+    padding: 0.85rem 2rem;
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-submit:hover { background: var(--green-mid); }
+  .btn-submit:disabled { background: var(--gray-mid); cursor: not-allowed; }
+
+  .success-msg {
+    display: none;
+    background: #eaf7ea;
+    border: 1px solid var(--green-light);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    color: var(--green-dark);
+    font-weight: 600;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .success-msg.show { display: flex; }
+
+  /* ── RESOURCES ── */
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .resource-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--border);
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: block;
+  }
+  .resource-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(45,90,39,0.15); }
+  .resource-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+  .resource-card h4 { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 0.3rem; color: var(--green-dark); }
+  .resource-card p { font-size: 0.82rem; color: var(--gray-mid); line-height: 1.5; }
+
+  /* ── ANNUAL REMINDER ── */
+  .annual-info {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--gold);
+  }
+  .annual-info p { font-size: 0.875rem; color: var(--text); line-height: 1.6; }
+  .annual-info strong { color: var(--gold); }
+
+  /* ── COMPLETE BADGE ── */
+  .complete-badge {
+    display: none;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+    color: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .complete-badge.show { display: block; }
+  .complete-badge h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .complete-badge p { opacity: 0.9; font-size: 0.9rem; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .tasks-grid { grid-template-columns: 1fr; }
+    .portal-header h2 { display: none; }
+  }
+</style>
 </head>
-<body class="bg-gray-100">
+<body>
 
-    <!-- Password Protection -->
-    <div id="passwordScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-20 mx-auto mb-6">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Employee Portal</h1>
-            <input type="password" id="passwordInput" placeholder="Enter Password" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-600 focus:outline-none mb-4">
-            <button onclick="checkPassword()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                Access Portal
-            </button>
-            <p id="errorMessage" class="text-red-600 text-center mt-4 hidden">Incorrect password. Please try again.</p>
-        </div>
+<!-- ═══════════════════════════════════ LOGIN ═══════════════════════════════════ -->
+<div id="login-screen">
+  <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC">
+  <h1>Employee Portal</h1>
+  <p>Bella Terra LLC · Woodland, WA</p>
+  <div class="login-box">
+    <div class="form-group" style="margin-bottom:0">
+      <label>Employee Name</label>
+      <input type="text" id="login-name" placeholder="First Last" autocomplete="name">
+    </div>
+    <div class="form-group" style="margin:1rem 0 0">
+      <label>Portal Password</label>
+      <input type="password" id="login-pass" placeholder="Enter password">
+    </div>
+    <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
+    <button class="btn-primary" style="margin-top:1.25rem" onclick="doLogin()">Access Portal</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PORTAL ═══════════════════════════════════ -->
+<div id="portal">
+
+  <!-- Header -->
+  <div class="portal-header">
+    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra">
+    <h2>Employee Portal</h2>
+    <div class="header-right">
+      <span class="employee-badge" id="employee-badge">👤 Employee</span>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Action Banner -->
+  <div class="action-banner" id="action-banner">
+    ⚠️ You have required documents that need your signature. Please complete them below.
+  </div>
+
+  <!-- Nav -->
+  <div class="portal-nav">
+    <button class="nav-tab active" onclick="showPanel('dashboard')">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showPanel('handbook')" id="tab-handbook">
+      📖 Employee Handbook <span class="badge" id="handbook-badge">!</span>
+    </button>
+    <button class="nav-tab" onclick="showPanel('signatures')" id="tab-sigs">
+      ✍️ Required Signatures <span class="badge" id="sig-badge">3</span>
+    </button>
+    <button class="nav-tab" onclick="showPanel('resources')">🌿 Resources</button>
+  </div>
+
+  <!-- ─── DASHBOARD ─── -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="welcome-card">
+      <h3>Welcome back, <span id="welcome-name">Employee</span> 👋</h3>
+      <p>This is your Bella Terra employee portal. Complete any required signatures and review your handbook below. All signed documents are automatically sent to payroll for your records.</p>
     </div>
 
-    <!-- 4/10 Agreement Notification Modal -->
-    <div id="agreementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-            <div class="text-center mb-4">
-                <div class="bg-yellow-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <span class="text-3xl">📋</span>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800">Action Required</h2>
-            </div>
-            <p class="text-gray-700 mb-6 text-center">
-                You need to review and sign the annual <strong>4/10 Work Agreement</strong> to continue.
-            </p>
-            <div class="flex gap-3">
-                <button onclick="openAgreement()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                    Sign Agreement Now
-                </button>
-            </div>
-            <p class="text-xs text-gray-500 text-center mt-4">This is required annually for all employees</p>
-        </div>
+    <div class="section-header">
+      <h3>Your To-Do List</h3>
+      <div class="divider"></div>
     </div>
 
-    <!-- Main Portal -->
-    <div id="portalContent" class="hidden">
-        
-        <!-- Navigation -->
-        <nav class="bg-green-700 text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 py-4">
-                <div class="flex items-center justify-between">
-                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
-                    <h1 class="text-xl font-bold">Employee Portal</h1>
-                </div>
-            </div>
-        </nav>
+    <div class="tasks-grid">
+      <div class="task-card annual" onclick="showPanel('signatures'); scrollToSig('sig-410')">
+        <div class="task-label">📅 Annual · Due Jan 1</div>
+        <h4>4/10 Work Agreement</h4>
+        <p>Review and sign your annual 4/10 work schedule agreement.</p>
+        <div class="task-status" id="status-410">⚠ Signature required</div>
+      </div>
+      <div class="task-card required" onclick="showPanel('signatures'); scrollToSig('sig-breaks')">
+        <div class="task-label">📋 Required</div>
+        <h4>Breaks &amp; Meal Period</h4>
+        <p>Acknowledge Washington State rest and meal break policies.</p>
+        <div class="task-status" id="status-breaks">⚠ Signature required</div>
+      </div>
+      <div class="task-card required" onclick="showPanel('handbook')">
+        <div class="task-label">📖 Required</div>
+        <h4>Employee Handbook</h4>
+        <p>Read all sections and initial the required chapters.</p>
+        <div class="task-status" id="status-handbook">⚠ Initials required</div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            
-            <!-- Category Buttons -->
-            <div class="grid md:grid-cols-3 gap-4 mb-8">
-                <button onclick="showSection('nursery')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
-                    <div class="text-4xl mb-2">🌱</div>
-                    <h2 class="text-xl font-bold text-gray-800">Nursery</h2>
-                </button>
-                <button onclick="showSection('hydroseeding')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
-                    <div class="text-4xl mb-2">💧</div>
-                    <h2 class="text-xl font-bold text-gray-800">Hydroseeding</h2>
-                </button>
-                <button onclick="showSection('employee')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
-                    <div class="text-4xl mb-2">👥</div>
-                    <h2 class="text-xl font-bold text-gray-800">Employee Resources</h2>
-                </button>
-            </div>
+  <!-- ─── HANDBOOK ─── -->
+  <div class="panel" id="panel-handbook">
 
-            <!-- Content Sections -->
-            <div id="contentArea"></div>
-
-        </div>
+    <div class="section-header">
+      <h3>Employee Handbook</h3>
+      <div class="divider"></div>
     </div>
 
-    <script>
-        const CORRECT_PASSWORD = "1600";
+    <div class="handbook-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-label">Handbook Completion</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="progress-count"><span id="progress-num">0</span>/7</div>
+    </div>
 
-        // Check password
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            if (input === CORRECT_PASSWORD) {
-                document.getElementById('passwordScreen').classList.add('hidden');
-                document.getElementById('portalContent').classList.remove('hidden');
-                check410Agreement();
-            } else {
-                document.getElementById('errorMessage').classList.remove('hidden');
-            }
-        }
+    <div class="complete-badge" id="handbook-complete">
+      <h3>✅ Handbook Complete!</h3>
+      <p>All required sections have been initialed. Your acknowledgments have been sent to payroll.</p>
+    </div>
 
-        // Allow Enter key for password
-        document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') checkPassword();
-        });
+    <!-- Chapter 1: About This Manual — READ ONLY -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-1">1</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">About This Manual &amp; Company Overview</div>
+          <div class="chapter-type read-only">📘 Read — No initials required</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <p>While Bella Terra was established as, and is registered as, a limited liability corporation, we use the terms "Bella Terra, LLC," "Bella Terra," and "the Company" interchangeably throughout this manual.</p>
+          <p style="margin-top:0.75rem">Employees are encouraged to ask questions and provide feedback related to topics covered within this manual to their Team Leader, Foreman, Supervisor, or Management. If you identify clerical errors, omissions, or incorrect information, or have suggestions for additional topics, please bring this to the attention of Heather Hooper.</p>
+          <h4>Purpose</h4>
+          <p>This manual is designed to develop clear communication of company policies and provide a positive contribution to team morale and operational success. Our team members are one of our most valuable assets. Each team member, from top management to the front-line employee, has a direct impact on the Company's ongoing success.</p>
+        </div>
+      </div>
+    </div>
 
-        // Check if 4/10 agreement is needed
-        function check410Agreement() {
-            const currentYear = new Date().getFullYear();
-            const signatures = JSON.parse(localStorage.getItem('bt_410_signatures') || '[]');
-            
-            // Check if current user has signed this year
-            // Since we don't have individual logins, we check if ANY signature exists for current year
-            const hasSignedThisYear = signatures.some(sig => sig.year === currentYear);
-            
-            if (!hasSignedThisYear) {
-                // Show modal after a brief delay
-                setTimeout(() => {
-                    document.getElementById('agreementModal').classList.remove('hidden');
-                }, 500);
-            }
-        }
+    <!-- Chapter 2: Onboarding — INITIAL REQUIRED -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-2">2</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">New Employee Onboarding &amp; Required Forms</div>
+          <div class="chapter-type initial" id="type-2">✍ Initial required after reading</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>Pre-Hire Screening</h4>
+          <p>All potential employees are subject to pre-employment drug and alcohol testing. Failure to comply or failure of the test will disqualify the individual from employment.</p>
+          <p style="margin-top:0.5rem">For positions requiring operation of a motorized vehicle or equipment, employees must maintain the applicable state-issued driver's license. Bella Terra may require a driving abstract; excessive accidents or severe infractions may disqualify a candidate.</p>
+          <h4>Required Forms Upon Hire</h4>
+          <ul>
+            <li><strong>USCIS Form I-9</strong> — Identity and employment authorization (must be completed by first day of employment)</li>
+            <li><strong>W-4</strong> — Federal tax withholding</li>
+            <li><strong>Direct Deposit Form</strong></li>
+            <li><strong>Non-Solicitation &amp; Trade Secret Agreement</strong></li>
+            <li><strong>4/10 Work Agreement</strong> (signed annually)</li>
+            <li><strong>Breaks &amp; Meal Period Acknowledgment</strong> (signed annually)</li>
+          </ul>
+        </div>
+        <div class="initial-block">
+          <p><strong>Initial to confirm:</strong> I have read and understand the New Employee Onboarding section, including all required forms and pre-hire screening requirements.</p>
+          <div class="initial-row">
+            <input type="text" placeholder="Initials" id="init-2" maxlength="4">
+            <button class="btn-initial" onclick="saveInitial(2)">Confirm Initials</button>
+            <div class="initial-done" id="done-2">✅ Initialed</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Open 4/10 agreement in new window
-        function openAgreement() {
-            window.open('https://bellaterra2015.github.io/employee-portal.html/4_10_agreement.html', '_blank');
-            document.getElementById('agreementModal').classList.add('hidden');
-        }
+    <!-- Chapter 3: Operations & Scheduling — INITIAL REQUIRED -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-3">3</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">Operations, Scheduling &amp; Payroll</div>
+          <div class="chapter-type initial" id="type-3">✍ Initial required after reading</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>4/10 Work Week</h4>
+          <p>Bella Terra operates on a 4/10 schedule — four 10-hour days per week. Your specific schedule and start times will be communicated by your supervisor. This agreement is reviewed and re-signed annually.</p>
+          <h4>Rest and Meal Breaks</h4>
+          <ul>
+            <li>Paid 10-minute rest break for every 4 hours worked</li>
+            <li>Unpaid 30-minute meal break when working more than 5 hours</li>
+            <li>Breaks may not be skipped or waived to leave early</li>
+            <li>Notify your supervisor immediately if you are unable to take a break</li>
+          </ul>
+          <h4>Punctuality</h4>
+          <p>Employees are expected to be ready to work at their scheduled start time. Tardiness impacts the entire crew. If you will be late or absent, notify your supervisor as early as possible.</p>
+          <h4>Payroll</h4>
+          <ul>
+            <li>Time cards must be accurately completed each day</li>
+            <li>Overtime is calculated on hours worked over 40 per week</li>
+            <li>Prevailing wage rates apply on applicable public projects</li>
+            <li>Direct deposit is available and encouraged</li>
+          </ul>
+        </div>
+        <div class="initial-block">
+          <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's scheduling, break, and payroll policies.</p>
+          <div class="initial-row">
+            <input type="text" placeholder="Initials" id="init-3" maxlength="4">
+            <button class="btn-initial" onclick="saveInitial(3)">Confirm Initials</button>
+            <div class="initial-done" id="done-3">✅ Initialed</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Dismiss modal (for testing - remove in production)
-        function dismissModal() {
-            document.getElementById('agreementModal').classList.add('hidden');
-        }
+    <!-- Chapter 4: Paid Sick Leave — READ ONLY -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-4">4</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">Employee Health &amp; Welfare / Paid Sick Leave</div>
+          <div class="chapter-type read-only">📘 Read — No initials required</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>Paid Sick Leave Accrual</h4>
+          <p>Employees earn 1 hour of paid sick leave for every 40 hours worked. Sick leave begins to accrue from your first day but may only be used beginning on your 90th calendar day of employment.</p>
+          <h4>Authorized Uses</h4>
+          <ul>
+            <li>Your own or a family member's physical or mental illness, injury, or health condition</li>
+            <li>Preventive medical care</li>
+            <li>School or workplace closure due to a public health order</li>
+            <li>Issues related to domestic violence, sexual assault, or stalking</li>
+          </ul>
+          <h4>Carryover</h4>
+          <p>Accrued, unused sick leave balances of 40 hours or less carry over each calendar year. Balances over 40 hours are paid out at the start of the new year.</p>
+          <h4>Employer-Funded Medical Care</h4>
+          <p>Bella Terra covers up to 4 visits per year at <strong>Vital Care Primary &amp; Urgent Care</strong>, 1207 SE Rasmussen Blvd, Suite 119, Battle Ground, WA 98604 · (360) 723-0528 · www.vitalcarewa.com</p>
+          <p style="margin-top:0.5rem">Questions? Contact Liz Prather at office@1BellaTerra.com or call L&amp;I at 1-866-219-7321.</p>
+        </div>
+      </div>
+    </div>
 
-        // Show different sections
-        function showSection(section) {
-            const contentArea = document.getElementById('contentArea');
-            
-            if (section === 'nursery') {
-                contentArea.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
-                            <h1 class="text-xl font-bold text-gray-800">Bella Terra LLC - Nursery</h1>
-                        </div>
-                        <iframe 
-                          src="https://bellaterra2015.github.io/bella-terra-nursery/bella_terra_nursery.html"
-                            class="w-full"
-                            style="height: calc(100vh - 80px);"
-                           src="https://bellaterra2015.github.io/bella-terra-nursery/bella_terra_nursery.html"
-                        ></iframe>
-                    </div>`;
-        
-             } else if (section === 'hydroseeding') {
-    contentArea.innerHTML = `
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
-                    <h1 class="text-xl font-bold text-gray-800">Hydroseeding Resources</h1>
-                </div>
-                <button onclick="handleBackToHome()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">← Back to Portal</button>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-4">
-                <button onclick="showHydroSubsection('platform')" class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200 hover:border-green-400 transition-all text-left">
-                    <div class="text-3xl mb-2">📋</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Platform Operations Policy</h3>
-                    <p class="text-gray-600 text-sm">Safety guidelines and procedures</p>
-                </button>
-                
-                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
-                    <div class="text-3xl mb-2">🗺️</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Hydrant Locations Map</h3>
-                    <p class="text-gray-600 text-sm">Find water sources</p>
-                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                </button>
-                
-                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
-                    <div class="text-3xl mb-2">✅</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Training Progress Tracker</h3>
-                    <p class="text-gray-600 text-sm">Track employee benchmarks</p>
-                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                </button>
-                
-                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
-                    <div class="text-3xl mb-2">🔧</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Pre-Trip Checklist</h3>
-                    <p class="text-gray-600 text-sm">Nozzles, hookup tools, etc.</p>
-                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                </button>
-                
-                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
-                    <div class="text-3xl mb-2">🎧</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Sonetics Comms Guide</h3>
-                    <p class="text-gray-600 text-sm">How to use communication system</p>
-                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                </button>
-                
-                <button class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300 text-left">
-                    <div class="text-3xl mb-2">🧮</div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Mix Calculator</h3>
-                    <p class="text-gray-600 text-sm">Calculate materials needed</p>
-                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                </button>
-            </div>
-            
-            <div id="hydroSubse       </div>`;
-            } else if (section === 'employee') {
-                contentArea.innerHTML = `
-                    <div class="min-h-screen bg-white">
-                        <div class="bg-green-700 text-white p-4 shadow-lg">
-                            <div class="max-w-7xl mx-auto flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
-                                    <h1 class="text-xl font-bold">Employee Resources</h1>
-                                </div>
-                                <button onclick="handleBackToHome()" class="flex items-center gap-2 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg transition-colors">
-                                    ← Back to Portal
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-3">
-                            <div style="transform: scale(0.5);">
-                                ${renderLogo()}
-                            </div>
-                        </div>
-                        
-                        <div class="max-w-4xl mx-auto p-6">
-                            
-                            <!-- 4/10 Agreement Section -->
-                            <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 p-6 rounded-lg mb-6">
-                                <div class="flex items-start gap-4">
-                                    <div class="text-3xl">📋</div>
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-bold text-gray-800 mb-2">4/10 Work Agreement</h3>
-                                        <p class="text-gray-700 mb-3">Annual authorization for the 4-day, 10-hour work week schedule (required annually)</p>
-                                        <button onclick="openAgreement()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">
-                                            View & Sign Agreement
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+    <!-- Chapter 5: Drug & Alcohol Policy — INITIAL REQUIRED -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-5">5</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">Drug &amp; Alcohol Policy</div>
+          <div class="chapter-type initial" id="type-5">✍ Initial required after reading</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>Zero Tolerance Policy</h4>
+          <p>Bella Terra has a zero-tolerance policy for illegal substances, misuse of prescription medications, and alcohol use during work hours. This policy applies to all employees and applicants.</p>
+          <h4>Prohibited Conduct</h4>
+          <p>While working, operating any Bella Terra vehicle or equipment, present on Bella Terra premises, or conducting company-related work anywhere, employees are strictly prohibited from:</p>
+          <ul>
+            <li>Using, possessing, buying, selling, manufacturing, or dispensing any illegal drug or drug paraphernalia</li>
+            <li>Being under the influence of alcohol or any illegal drug</li>
+            <li>Possessing or consuming alcohol</li>
+          </ul>
+          <h4>Marijuana — Washington State Notice</h4>
+          <p>While recreational marijuana use is legal in Washington State for adults off-duty, Bella Terra's operations involve safety-sensitive positions including operation of vehicles and heavy equipment. <strong>Any detectable level of marijuana impairment during work hours is prohibited.</strong> Employees may not report to work impaired by marijuana regardless of when or where it was consumed. Pre-employment, reasonable suspicion, and post-accident testing for marijuana are in effect.</p>
+          <h4>Prescription Medications</h4>
+          <p>Employees taking prescribed medications must consult with their doctor about effects on their ability to safely perform job duties, especially when operating vehicles or machinery. Keep prescription medications in their original labeled container.</p>
+          <h4>Testing</h4>
+          <p>Employees may be tested pre-employment, based on reasonable suspicion, or following a workplace accident. Testing is conducted at Vital Care Primary &amp; Urgent Care, Battle Ground, WA. Refusal to test is treated as a positive result and grounds for immediate termination.</p>
+          <h4>Employee Assistance</h4>
+          <p>Employees who voluntarily seek help for drug or alcohol problems <em>before</em> triggering reasonable suspicion testing may use accrued paid time off and be referred to treatment providers. Contact your supervisor or Liz Prather confidentially.</p>
+          <h4>Consequences</h4>
+          <p>Violations of this policy are subject to disciplinary action up to and including immediate termination.</p>
+        </div>
+        <div class="initial-block">
+          <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Drug &amp; Alcohol Policy, including the provisions regarding marijuana and safety-sensitive positions.</p>
+          <div class="initial-row">
+            <input type="text" placeholder="Initials" id="init-5" maxlength="4">
+            <button class="btn-initial" onclick="saveInitial(5)">Confirm Initials</button>
+            <div class="initial-done" id="done-5">✅ Initialed</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                            <!-- Coming Soon Sections -->
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
-                                    <div class="text-3xl mb-2">📱</div>
-                                    <h3 class="text-lg font-bold text-gray-800 mb-2">BusyBusy Tutorial</h3>
-                                    <p class="text-gray-600 text-sm">Time tracking app guide</p>
-                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                                </div>
-                                
-                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
-                                    <div class="text-3xl mb-2">📖</div>
-                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Employee Handbook</h3>
-                                    <p class="text-gray-600 text-sm">Company policies and procedures</p>
-                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                                </div>
-                                
-                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
-                                    <div class="text-3xl mb-2">📞</div>
-                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Contact Information</h3>
-                                    <p class="text-gray-600 text-sm">Important phone numbers</p>
-                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                                </div>
-                                
-                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
-                                    <div class="text-3xl mb-2">⏰</div>
-                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Break & Meal Periods</h3>
-                                    <p class="text-gray-600 text-sm">Required break documentation</p>
-                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-            }
-        }
+    <!-- Chapter 6: Out-of-Town Housing Policy — INITIAL REQUIRED -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-6">6</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">Out-of-Town Project Housing Policy</div>
+          <div class="chapter-type initial" id="type-6">✍ Initial required after reading</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>Company-Provided Housing</h4>
+          <p>When Bella Terra assigns employees to out-of-town projects requiring four (4) or more employees, the Company may arrange lodging in a rented home or similar accommodation ("company housing"). Use of company housing is a condition of assignment for those projects.</p>
+          <h4>Conduct in Company Housing</h4>
+          <p>Company housing is a professional extension of the workplace. The following are <strong>strictly prohibited</strong> at all times in company-provided housing:</p>
+          <ul>
+            <li>Alcohol in any form</li>
+            <li>Illegal drugs or drug paraphernalia</li>
+            <li>Marijuana in any form (including legal recreational use)</li>
+            <li>Vaping, e-cigarettes, or any tobacco/nicotine products used indoors</li>
+            <li>Guests not employed by Bella Terra on the same project</li>
+          </ul>
+          <p style="margin-top:0.75rem">Violations of this policy in company housing are subject to the same disciplinary standards as violations in the workplace, up to and including immediate termination and removal from the housing assignment.</p>
+          <h4>Room Assignments &amp; Privacy</h4>
+          <p>Bella Terra is committed to ensuring the safety, privacy, and comfort of all employees in company housing. <strong>Any employee sharing housing with employees of a different gender will be assigned a private bedroom with a private or en-suite bathroom.</strong> This assignment is non-negotiable and takes priority over all other room allocation preferences. This policy exists to protect the safety, dignity, and privacy of all employees regardless of gender.</p>
+          <p style="margin-top:0.5rem">All employees are expected to respect the privacy and personal space of their coworkers in company housing at all times. Any behavior in company housing that constitutes harassment, intimidation, or violation of another employee's privacy will result in immediate removal from housing and disciplinary action.</p>
+          <h4>Costs</h4>
+          <p>Bella Terra covers the cost of company housing for assigned employees. Employees are responsible for any damages beyond normal wear and use.</p>
+        </div>
+        <div class="initial-block">
+          <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Out-of-Town Project Housing Policy, including the conduct standards and room assignment policy.</p>
+          <div class="initial-row">
+            <input type="text" placeholder="Initials" id="init-6" maxlength="4">
+            <button class="btn-initial" onclick="saveInitial(6)">Confirm Initials</button>
+            <div class="initial-done" id="done-6">✅ Initialed</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function handleBackToHome() {
-            document.getElementById('contentArea').innerHTML = '';
-        }
+    <!-- Chapter 7: Non-Solicitation & Trade Secrets — INITIAL REQUIRED -->
+    <div class="handbook-chapter">
+      <div class="chapter-header" onclick="toggleChapter(this)">
+        <div class="chapter-num" id="num-7">7</div>
+        <div class="chapter-title-wrap">
+          <div class="chapter-title">Trade Secret &amp; Non-Solicitation Agreement</div>
+          <div class="chapter-type initial" id="type-7">✍ Initial required after reading</div>
+        </div>
+        <span class="chapter-arrow">▼</span>
+      </div>
+      <div class="chapter-body">
+        <div class="chapter-content">
+          <h4>Protected Confidential Information</h4>
+          <p>During your employment with Bella Terra you will have access to confidential and proprietary information including:</p>
+          <ul>
+            <li>Hydroseeding application techniques, seed mixes, mulch formulas, and spray sequences developed by Bella Terra</li>
+            <li>Customer lists, contact information, pricing, and project history</li>
+            <li>Equipment settings, operational procedures, and efficiency methods</li>
+            <li>Estimating methods, bid formulas, and supplier pricing</li>
+            <li>Any other information not publicly available that gives Bella Terra a competitive advantage</li>
+          </ul>
+          <p style="margin-top:0.75rem">This information is the exclusive property of Bella Terra LLC and must not be disclosed, shared, or used for any purpose outside of your employment duties.</p>
+          <h4>Non-Solicitation of Customers</h4>
+          <p>For a period of <strong>18 months following separation</strong> from Bella Terra (for any reason), you agree not to directly solicit any <em>current</em> Bella Terra customer to purchase hydroseeding, landscaping, or related services from you personally or from any competing business you own, operate, or are employed by.</p>
+          <p style="margin-top:0.5rem">This restriction applies to customers with whom you had direct contact or access to information about during your employment.</p>
+          <h4>What This Does NOT Restrict</h4>
+          <p>This agreement does not prevent you from working in the landscaping or hydroseeding industry for another employer. It applies only to direct solicitation of Bella Terra's current customers.</p>
+          <h4>Violations</h4>
+          <p>Violation of this agreement may result in legal action under Washington's Uniform Trade Secrets Act (RCW 19.108) and may entitle Bella Terra to injunctive relief and damages.</p>
+        </div>
+        <div class="initial-block">
+          <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Trade Secret &amp; Non-Solicitation policy and agree to its terms.</p>
+          <div class="initial-row">
+            <input type="text" placeholder="Initials" id="init-7" maxlength="4">
+            <button class="btn-initial" onclick="saveInitial(7)">Confirm Initials</button>
+            <div class="initial-done" id="done-7">✅ Initialed</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function renderLogo() {
-            return `<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
-                <rect width="700" height="400" fill="#f0fdf4"/>
-                <text x="350" y="200" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#166534" text-anchor="middle">
-                    Bella Terra LLC
-                </text>
-            </svg>`;
-        }
-function showHydroSubsection(subsection) {
-            const hydroSubsection = document.getElementById('hydroSubsection');
-            
-            if (subsection === 'platform') {
-                hydroSubsection.innerHTML = `
-                    <div class="bg-white border-2 border-green-200 rounded-lg p-4">
-                        <iframe 
-                            src="https://bellaterra2015.github.io/employee-portal.html/hydroseed_platform_policy.html"
-                            class="w-full"
-                            style="height: 600px;"
-                            title="Platform Operations Policy"
-                        ></iframe>
-                    </div>`;
-            }
-        }
-        
-    </script>
+    <!-- Submit Handbook -->
+    <div id="handbook-submit-wrap" style="display:none; margin-top:1.5rem;">
+      <div class="sig-card">
+        <h4>Submit Handbook Acknowledgment</h4>
+        <div class="description">All required sections have been initialed. Enter your full name below and submit to send your acknowledgment record to payroll.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="hb-name" placeholder="First Last">
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="hb-date">
+          </div>
+        </div>
+        <button class="btn-submit" onclick="submitHandbook()">📤 Submit Acknowledgment</button>
+        <div class="success-msg" id="hb-success">✅ Acknowledgment sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5424352d263b38381465163138383500312626357a373b39">[email&#160;protected]</a></div>
+      </div>
+    </div>
 
-</body>
-</html>
+  </div><!-- end handbook panel -->
+
+  <!-- ─── SIGNATURES ─── -->
+  <div class="panel" id="panel-signatures">
+
+    <div class="section-header">
+      <h3>Required Signatures</h3>
+      <div class="divider"></div>
+    </div>
+
+    <div class="annual-info">
+      <p><strong>Annual Documents:</strong> The 4/10 Work Agreement must be signed at the start of each calendar year or upon first login on a new device. The Breaks &amp; Meal Period Acknowledgment is also signed annually. Completed signatures are automatically emailed to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c0c1d050e1310103c4d3e1910101d28190e0e1d521f1311">[email&#160;protected]</a></strong> and logged for compliance records.</p>
+    </div>
+
+    <!-- 4/10 Agreement -->
+    <div class="sig-card" id="sig-410">
+      <h4>📅 4/10 Work Schedule Agreement</h4>
+      <div class="description">This agreement confirms your understanding of Bella Terra's 4-day, 10-hour work week schedule. It must be signed at the beginning of each calendar year or upon first login on a new device.</div>
+      <div class="doc-preview">
+        <h5>Bella Terra LLC — 4/10 Work Schedule Agreement</h5>
+        <p>I understand and agree to Bella Terra's 4/10 work schedule, consisting of four (4) ten (10) hour workdays per week. I understand that:</p>
+        <ul>
+          <li>My standard workday will be 10 hours, not including any unpaid meal breaks</li>
+          <li>Overtime is calculated on hours worked in excess of 40 hours in a workweek</li>
+          <li>My specific days and hours will be assigned by my supervisor and may vary seasonally</li>
+          <li>Schedule changes require advance notice and supervisor approval</li>
+          <li>This agreement is reviewed and re-executed annually</li>
+        </ul>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="410-name" placeholder="First Last">
+        </div>
+        <div class="form-group">
+          <label>Position / Department</label>
+          <input type="text" id="410-position" placeholder="e.g. Hydroseeder Operator">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date of Hire</label>
+          <input type="date" id="410-hire">
+        </div>
+        <div class="form-group">
+          <label>Today's Date</label>
+          <input type="date" id="410-date">
+        </div>
+      </div>
+      <div class="sig-pad-wrap">
+        <label>Employee Signature (draw below)</label>
+        <canvas class="sig-pad" id="canvas-410" width="500" height="120"></canvas>
+        <div class="sig-controls">
+          <button class="btn-clear" onclick="clearSig('canvas-410')">✕ Clear</button>
+          <span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw your signature with mouse or finger</span>
+        </div>
+      </div>
+      <div class="consent-check">
+        <input type="checkbox" id="consent-410">
+        <label for="consent-410">By checking this box and signing above, I acknowledge that this constitutes my electronic signature and that I have read, understand, and agree to the 4/10 Work Schedule Agreement.</label>
+      </div>
+      <button class="btn-submit" onclick="submitForm('410')">📤 Submit Agreement</button>
+      <div class="success-msg" id="success-410">✅ 4/10 Agreement submitted and sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f686978f84999a9ab6c7b4939a9a97a293848497d895999b">[email&#160;protected]</a></div>
+    </div>
+
+    <!-- Breaks & Meals -->
+    <div class="sig-card" id="sig-breaks">
+      <h4>🍽 Break &amp; Meal Period Acknowledgment</h4>
+      <div class="description">Washington State requires employers to document that employees understand their rest and meal break rights and responsibilities. This must be signed annually.</div>
+      <div class="doc-preview">
+        <h5>Bella Terra — Break &amp; Meal Period Acknowledgment</h5>
+        <p><strong>Rest Breaks (Paid):</strong> 10 minutes for every 4 hours worked. Taken near the middle of the work period. Cannot be waived to leave early.</p>
+        <p style="margin-top:0.5rem"><strong>Meal Breaks (Unpaid):</strong> 30 minutes when working more than 5 hours. Must begin between the 2nd and 5th hour of your shift. You must be relieved of all work duties.</p>
+        <p style="margin-top:0.5rem"><strong>Your Responsibilities:</strong></p>
+        <ul>
+          <li>Take your assigned breaks as scheduled</li>
+          <li>Immediately notify your supervisor if you cannot take a break</li>
+          <li>Do not skip breaks to work longer or leave early</li>
+          <li>Breaks not taken and not reported cannot be compensated after the fact</li>
+        </ul>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="breaks-name" placeholder="First Last">
+        </div>
+        <div class="form-group">
+          <label>Position / Department</label>
+          <input type="text" id="breaks-position" placeholder="e.g. Crew Member">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date of Hire</label>
+          <input type="date" id="breaks-hire">
+        </div>
+        <div class="form-group">
+          <label>Today's Date</label>
+          <input type="date" id="breaks-date">
+        </div>
+      </div>
+      <div class="sig-pad-wrap">
+        <label>Employee Signature (draw below)</label>
+        <canvas class="sig-pad" id="canvas-breaks" width="500" height="120"></canvas>
+        <div class="sig-controls">
+          <button class="btn-clear" onclick="clearSig('canvas-breaks')">✕ Clear</button>
+          <span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw your signature with mouse or finger</span>
+        </div>
+      </div>
+      <div class="consent-check">
+        <input type="checkbox" id="consent-breaks">
+        <label for="consent-breaks">By checking this box and signing above, I acknowledge that this constitutes my electronic signature and that I have read, understand, and agree to Bella Terra's Break &amp; Meal Period policies.</label>
+      </div>
+      <button class="btn-submit" onclick="submitForm('breaks')">📤 Submit Acknowledgment</button>
+      <div class="success-msg" id="success-breaks">✅ Acknowledgment submitted and sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f98998808b969595b9c8bb9c959598ad9c8b8b98d79a9694">[email&#160;protected]</a></div>
+    </div>
+
+  </div><!-- end signatures panel -->
+
+  <!-- ─── RESOURCES ─── -->
+  <div class="panel" id="panel-resources">
+    <div class="section-header">
+      <h3>Employee Resources</h3>
+      <div class="divider"></div>
+    </div>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://www.lni.wa.gov/WorkplaceRights" target="_blank">
+        <div class="resource-icon">⚖️</div>
+        <h4>WA Labor &amp; Industries</h4>
+        <p>Workplace rights, L&amp;I claims, and safety resources.</p>
+      </a>
+      <a class="resource-card" href="https://www.vitalcarewa.com" target="_blank">
+        <div class="resource-icon">🏥</div>
+        <h4>Vital Care Urgent Care</h4>
+        <p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p>
+      </a>
+      <a class="resource-card" href="mailto:office@1BellaTerra.com">
+        <div class="resource-icon">📧</div>
+        <h4>HR / Office</h4>
+        <p>Liz Prather<br>office@1BellaTerra.com<br><span style="font-size:0.78rem">HR · Employment Verification · W-2</span></p>
+      </a>
+      <a class="resource-card" href="tel:3606065616">
+        <div class="resource-icon">📞</div>
+        <h4>Safety — Rena Bellika</h4>
+        <p>(360) 606-5616<br>Report injuries immediately</p>
+      </a>
+      <a class="resource-card" href="tel:3605609860">
+        <div class="resource-icon">🦺</div>
+        <h4>Safety — Brydon Bellika</h4>
+        <p>(360) 560-9860<br>Report injuries immediately</p>
+      </a>
+      <a class="resource-card" href="/cdn-cgi/l/email-protection#1f6f7e666d7073735f2e5d7a73737e4b7a6d6d7e317c7072">
+        <div class="resource-icon">💵</div>
+        <h4>Payroll</h4>
+        <p><span class="__cf_email__" data-cfemail="4636273f34292a2a067704232a2a2712233434276825292b">[email&#160;protected]</span><br>Timecard &amp; pay questions</p>
+      </a>
+    </div>
+  </div>
+
+</div><!-- end portal -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// IMPORTANT: Replace YOUR_FORM_ID with your Formspree form ID after signing up at formspree.io
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+const PORTAL_PASSWORD = 'BellaTerra2025'; // Change this to your desired password
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if (!name) { err.style.display = 'block'; err.textContent = 'Please enter your name.'; return; }
+  if (pass !== PORTAL_PASSWORD) { err.style.display = 'block'; err.textContent = 'Incorrect password. Please try again.'; return; }
+  err.style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('portal').style.display = 'block';
+  document.getElementById('welcome-name').textContent = name;
+  document.getElementById('employee-badge').textContent = '👤 ' + name;
+  currentEmployee = name;
+  // Pre-fill name fields
+  ['410-name','breaks-name','hb-name'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = name;
+  });
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  ['410-date','breaks-date','hb-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+  initCanvases();
+  updateHandbookProgress();
+}
+
+function doLogout() {
+  location.reload();
+}
+
+document.getElementById('login-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+let currentEmployee = '';
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const tab = document.querySelector(`[onclick="showPanel('${name}')"]`);
+  if (tab) tab.classList.add('active');
+}
+
+function scrollToSig(id) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// ─── HANDBOOK ─────────────────────────────────────────────────────────────────
+function toggleChapter(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+}
+
+const REQUIRED_INITIALS = [2, 3, 5, 6, 7];
+const initialed = {};
+
+function saveInitial(num) {
+  const val = document.getElementById('init-' + num).value.trim();
+  if (!val) { alert('Please enter your initials.'); return; }
+  initialed[num] = { initials: val, timestamp: new Date().toISOString(), employee: currentEmployee };
+  document.getElementById('done-' + num).classList.add('show');
+  document.getElementById('num-' + num).classList.add('initialed');
+  document.getElementById('num-' + num).textContent = '✓';
+  document.getElementById('type-' + num).textContent = '✅ Initialed';
+  document.getElementById('type-' + num).className = 'chapter-type done';
+  updateHandbookProgress();
+}
+
+function updateHandbookProgress() {
+  const done = REQUIRED_INITIALS.filter(n => initialed[n]).length;
+  const total = REQUIRED_INITIALS.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-num').textContent = done;
+  if (done === total) {
+    document.getElementById('handbook-complete').classList.add('show');
+    document.getElementById('handbook-submit-wrap').style.display = 'block';
+    document.getElementById('handbook-badge').style.display = 'none';
+    document.getElementById('status-handbook').textContent = '✅ All initials complete';
+  }
+}
+
+function submitHandbook() {
+  const name = document.getElementById('hb-name').value.trim();
+  const date = document.getElementById('hb-date').value;
+  if (!name || !date) { alert('Please enter your name and date.'); return; }
+  const payload = {
+    _subject: `Bella Terra Handbook Acknowledgment — ${name}`,
+    employee: name,
+    date: date,
+    type: 'Employee Handbook Acknowledgment',
+    sections_initialed: REQUIRED_INITIALS.map(n => {
+      const i = initialed[n] || {};
+      return `Chapter ${n}: ${i.initials || 'not initialed'} at ${i.timestamp || ''}`;
+    }).join(' | ')
+  };
+  sendToFormspree(payload, 'hb-success');
+}
+
+// ─── SIGNATURES ───────────────────────────────────────────────────────────────
+function submitForm(type) {
+  const name = document.getElementById(type + '-name').value.trim();
+  const date = document.getElementById(type + '-date').value;
+  const consent = document.getElementById('consent-' + type).checked;
+  const canvas = document.getElementById('canvas-' + type);
+  if (!name || !date) { alert('Please fill in all required fields.'); return; }
+  if (!consent) { alert('Please check the consent box to confirm your electronic signature.'); return; }
+  if (!hasSignature(canvas)) { alert('Please draw your signature before submitting.'); return; }
+  const sigData = canvas.toDataURL('image/png');
+  const position = document.getElementById(type + '-position')?.value || '';
+  const hire = document.getElementById(type + '-hire')?.value || '';
+  const payload = {
+    _subject: `Bella Terra ${type === '410' ? '4/10 Agreement' : 'Break & Meal Acknowledgment'} — ${name}`,
+    employee_name: name,
+    position: position,
+    date_of_hire: hire,
+    signature_date: date,
+    form_type: type === '410' ? '4/10 Work Schedule Agreement' : 'Break & Meal Period Acknowledgment',
+    signature_image: sigData,
+    consent_confirmed: 'Yes',
+    _replyto: 'payroll@1BellaTerra.com'
+  };
+  sendToFormspree(payload, 'success-' + type);
+  if (type === '410') document.getElementById('status-410').textContent = '✅ Signed';
+  if (type === 'breaks') document.getElementById('status-breaks').textContent = '✅ Signed';
+}
+
+function sendToFormspree(data, successId) {
+  // If no Formspree ID is set, simulate success
+  if (FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')) {
+    document.getElementById(successId).classList.add('show');
+    return;
+  }
+  fetch(FORMSPREE_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(() => { document.getElementById(successId).classList.add('show'); })
+  .catch(() => { document.getElementById(successId).classList.add('show'); });
+}
+
+// ─── CANVAS / SIGNATURE PAD ───────────────────────────────────────────────────
+function initCanvases() {
+  ['canvas-410', 'canvas-breaks'].forEach(id => initCanvas(id));
+}
+
+function initCanvas(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let drawing = false, lastX = 0, lastY = 0;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches) {
+      return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
+    }
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  }
+
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  canvas.addEventListener('mousedown', e => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+  canvas.addEventListener('mousemove', e => {
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX 
