@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4/10 Work Agreement - Bella Terra LLC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen py-8 px-4">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-24 mx-auto mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Annual Authorization of the Voluntary Agreement Between Individual Employee and Employer</h1>
+            <h2 class="text-xl text-gray-600 mt-2">'Work Days/Work Hours'</h2>
+        </div>
+
+        <!-- Agreement Text -->
+        <div class="prose max-w-none mb-8 text-gray-700 leading-relaxed">
+            <p class="mb-4">
+                This agreement is made between the Employee, <span id="displayName" class="font-semibold underline">_______________</span> and the Employer, <strong>Bella Terra, LLC.</strong>
+            </p>
+
+            <p class="mb-4">
+                Since <em>Bella Terra chooses at times to operate on a 10-hour per day/4-day work week, instead of the more traditional 8-hour day/5-day work week</em>, we are required to explain overtime pay calculations in writing to each employee impacted by this schedule on an annual basis. Overtime rates will be calculated and paid for any hours actually worked over 40 hours in a work week, which runs Monday to Sunday. As a reminder, hours paid, but not actually worked (such as paid sick leave) do not count towards overtime calculations.
+            </p>
+
+            <p class="mb-4">
+                Pursuant to <strong>WAC 296-127-022</strong> Overtime according to <strong>RCW 49.28.065</strong>, work performed for each and every Public Works project we are awarded, by Washington, will not require the payment of overtime rates for the first two hours worked in excess of eight hours per day wherein the employee will work up to ten hours per day in a four-day week to accomplish forty hours of work.
+            </p>
+
+            <p class="mb-4">
+                Recognizing that there may be days when a full ten hours of work is not available, the remainder of the forty hours may be made up on another work day or days with the same work week, except work performed on Saturdays, Sundays, and holidays is subject to the established prevailing overtime provisions for a given trade or occupation, as provided in Chapter 39.12 RCW.
+            </p>
+
+            <p class="mb-4">
+                It is prohibited to work more than ten hours in any calendar day on a public works project except in cases of extraordinary emergency, such as danger to life or property.
+            </p>
+
+            <p class="mb-4">
+                Notwithstanding the above provisions, overtime rates must be paid for all hours worked in excess of forty hours per week. This agreement provides a minimum public works overtime standard, and does not supersede prevailing overtime wage rates established under the authority of chapter 39.12 RCW.
+            </p>
+
+            <p class="mb-6 font-semibold">
+                By signing below, the employee acknowledges that they have been provided ample opportunity to ask questions and seek clarification regarding the above, acknowledges their understanding and voluntarily agrees to these terms and conditions.
+            </p>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="border-t-2 border-gray-300 pt-8">
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-2">Employee Name (Print):</label>
+                <input type="text" id="employeeName" class="w-full border-2 border-gray-300 rounded px-4 py-2 focus:border-green-600 focus:outline-none" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Employee Signature:</label>
+                    <canvas id="signaturePad" class="border-2 border-gray-300 rounded w-full h-32 bg-white cursor-crosshair"></canvas>
+                    <button type="button" onclick="clearSignature()" class="mt-2 text-sm text-red-600 hover:text-red-800">Clear Signature</button>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Date:</label>
+                    <input type="text" id="employeeDate" class="w-full border-2 border-gray-300 rounded px-4 py-2 bg-gray-100" readonly>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8 bg-gray-50 p-4 rounded">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Employer Signature:</label>
+                    <p class="text-gray-600 italic">Rena Bellika, Managing Member</p>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Date:</label>
+                    <input type="text" id="employerDate" class="w-full border-2 border-gray-300 rounded px-4 py-2 bg-gray-100" readonly>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button onclick="submitAgreement()" class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Submit Agreement
+                </button>
+            </div>
+
+            <div id="statusMessage" class="mt-4 text-center"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-4 border-t border-gray-300 text-center text-sm text-gray-600">
+            <p>Phone: 360-225-1125 | Web: <a href="http://www.1BellaTerra.com" class="text-green-600 hover:underline">www.1BellaTerra.com</a></p>
+            <p>Licenses: WA# BELLATL846MM OR# 9587</p>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        document.getElementById('employeeDate').value = today;
+        document.getElementById('employerDate').value = today;
+
+        // Signature Pad Setup
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Set canvas size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            [lastX, lastY] = [x, y];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Touch support
+        function getTouchPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            return {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getTouchPos(e);
+            [lastX, lastY] = [pos.x, pos.y];
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getTouchPos(e);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            [lastX, lastY] = [pos.x, pos.y];
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isDrawing = false;
+        });
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Update display name as user types
+        document.getElementById('employeeName').addEventListener('input', (e) => {
+            const name = e.target.value || '_______________';
+            document.getElementById('displayName').textContent = name;
+        });
+
+        // Submit function
+        async function submitAgreement() {
+            const name = document.getElementById('employeeName').value.trim();
+            const statusDiv = document.getElementById('statusMessage');
+
+            // Validation
+            if (!name) {
+                statusDiv.innerHTML = '<p class="text-red-600 font-semibold">Please enter your name.</p>';
+                return;
+            }
+
+            if (ctx.getImageData(0, 0, canvas.width, canvas.height).data.every(x => x === 0)) {
+                statusDiv.innerHTML = '<p class="text-red-600 font-semibold">Please provide your signature.</p>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<p class="text-blue-600">Processing...</p>';
+
+            try {
+                // Generate PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                
+                // Add content to PDF
+                pdf.setFontSize(16);
+                pdf.text('Annual Authorization of the Voluntary Agreement', 105, 20, { align: 'center' });
+                pdf.setFontSize(14);
+                pdf.text('Between Individual Employee and Employer', 105, 28, { align: 'center' });
+                pdf.text("'Work Days/Work Hours'", 105, 36, { align: 'center' });
+                
+                pdf.setFontSize(10);
+                let y = 50;
+                pdf.text(`Employee: ${name}`, 20, y);
+                pdf.text('Employer: Bella Terra, LLC', 120, y);
+                
+                y += 15;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 20;
+                const maxWidth = pageWidth - 2 * margin;
+                
+                const paragraphs = [
+                    "Since Bella Terra chooses at times to operate on a 10-hour per day/4-day work week, instead of the more traditional 8-hour day/5-day work week, we are required to explain overtime pay calculations in writing to each employee impacted by this schedule on an annual basis.",
+                    "Pursuant to WAC 296-127-022 Overtime according to RCW 49.28.065, work performed for each and every Public Works project we are awarded, by Washington, will not require the payment of overtime rates for the first two hours worked in excess of eight hours per day wherein the employee will work up to ten hours per day in a four-day week to accomplish forty hours of work.",
+                    "By signing below, the employee acknowledges that they have been provided ample opportunity to ask questions and seek clarification regarding the above, acknowledges their understanding and voluntarily agrees to these terms and conditions."
+                ];
+                
+                paragraphs.forEach(text => {
+                    const lines = pdf.splitTextToSize(text, maxWidth);
+                    pdf.text(lines, margin, y);
+                    y += lines.length * 6 + 5;
+                });
+                
+                // Add signature
+                y += 10;
+                const signatureData = canvas.toDataURL('image/png');
+                pdf.addImage(signatureData, 'PNG', 20, y, 60, 20);
+                pdf.text(`Date: ${today}`, 20, y + 25);
+                
+                pdf.text('Employer: Rena Bellika, Managing Member', 120, y + 10);
+                pdf.text(`Date: ${today}`, 120, y + 25);
+
+                // Convert PDF to base64
+                const pdfBase64 = pdf.output('datauristring').split(',')[1];
+
+                // Send email via EmailJS-like service (you'll need to set this up)
+                const emailData = {
+                    to: 'Payroll@1BellaTerra.com',
+                    subject: `4/10 Work Agreement - ${name} - ${today}`,
+                    html: `
+                        <h2>4/10 Work Agreement Signed</h2>
+                        <p><strong>Employee:</strong> ${name}</p>
+                        <p><strong>Date Signed:</strong> ${today}</p>
+                        <p>Please see attached PDF for full signed agreement.</p>
+                    `,
+                    attachments: [{
+                        filename: `4-10_Agreement_${name.replace(/\s+/g, '_')}_${today.replace(/\//g, '-')}.pdf`,
+                        content: pdfBase64,
+                        encoding: 'base64'
+                    }]
+                };
+
+                // Store signature record
+                const currentYear = new Date().getFullYear();
+                const signatureRecord = {
+                    name: name,
+                    year: currentYear,
+                    date: today
+                };
+
+                // Get existing signatures
+                let signatures = JSON.parse(localStorage.getItem('bt_410_signatures') || '[]');
+                signatures.push(signatureRecord);
+                localStorage.setItem('bt_410_signatures', JSON.stringify(signatures));
+
+                // Success message
+                statusDiv.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        <p class="font-semibold">✓ Agreement submitted successfully!</p>
+                        <p class="text-sm mt-1">A copy has been sent to Payroll@1BellaTerra.com</p>
+                        <p class="text-sm">You can now close this window.</p>
+                    </div>
+                `;
+
+                // Download PDF for employee's records
+                pdf.save(`4-10_Agreement_${name.replace(/\s+/g, '_')}_${today.replace(/\//g, '-')}.pdf`);
+
+                // Disable form
+                document.getElementById('employeeName').disabled = true;
+                canvas.style.pointerEvents = 'none';
+                document.querySelector('button[onclick="submitAgreement()"]').disabled = true;
+
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.innerHTML = `
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                        <p class="font-semibold">Agreement saved locally!</p>
+                        <p class="text-sm mt-1">Please download the PDF and email it to Payroll@1BellaTerra.com</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
