@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Terra Employee Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Password Protection -->
+    <div id="passwordScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-20 mx-auto mb-6">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Employee Portal</h1>
+            <input type="password" id="passwordInput" placeholder="Enter Password" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-600 focus:outline-none mb-4">
+            <button onclick="checkPassword()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                Access Portal
+            </button>
+            <p id="errorMessage" class="text-red-600 text-center mt-4 hidden">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- 4/10 Agreement Notification Modal -->
+    <div id="agreementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <div class="text-center mb-4">
+                <div class="bg-yellow-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">📋</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Action Required</h2>
+            </div>
+            <p class="text-gray-700 mb-6 text-center">
+                You need to review and sign the annual <strong>4/10 Work Agreement</strong> to continue.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="openAgreement()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Sign Agreement Now
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 text-center mt-4">This is required annually for all employees</p>
+        </div>
+    </div>
+
+    <!-- Main Portal -->
+    <div id="portalContent" class="hidden">
+        
+        <!-- Navigation -->
+        <nav class="bg-green-700 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
+                    <h1 class="text-xl font-bold">Employee Portal</h1>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            
+            <!-- Category Buttons -->
+            <div class="grid md:grid-cols-3 gap-4 mb-8">
+                <button onclick="showSection('nursery')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
+                    <div class="text-4xl mb-2">🌱</div>
+                    <h2 class="text-xl font-bold text-gray-800">Nursery</h2>
+                </button>
+                <button onclick="showSection('hydroseeding')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
+                    <div class="text-4xl mb-2">💧</div>
+                    <h2 class="text-xl font-bold text-gray-800">Hydroseeding</h2>
+                </button>
+                <button onclick="showSection('employee')" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-center">
+                    <div class="text-4xl mb-2">👥</div>
+                    <h2 class="text-xl font-bold text-gray-800">Employee Resources</h2>
+                </button>
+            </div>
+
+            <!-- Content Sections -->
+            <div id="contentArea"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = "1600";
+
+        // Check password
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === CORRECT_PASSWORD) {
+                document.getElementById('passwordScreen').classList.add('hidden');
+                document.getElementById('portalContent').classList.remove('hidden');
+                check410Agreement();
+            } else {
+                document.getElementById('errorMessage').classList.remove('hidden');
+            }
+        }
+
+        // Allow Enter key for password
+        document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        // Check if 4/10 agreement is needed
+        function check410Agreement() {
+            const currentYear = new Date().getFullYear();
+            const signatures = JSON.parse(localStorage.getItem('bt_410_signatures') || '[]');
+            
+            // Check if current user has signed this year
+            // Since we don't have individual logins, we check if ANY signature exists for current year
+            const hasSignedThisYear = signatures.some(sig => sig.year === currentYear);
+            
+            if (!hasSignedThisYear) {
+                // Show modal after a brief delay
+                setTimeout(() => {
+                    document.getElementById('agreementModal').classList.remove('hidden');
+                }, 500);
+            }
+        }
+
+        // Open 4/10 agreement in new window
+        function openAgreement() {
+            window.open('https://bellaterra2015.github.io/employee-portal.html/4_10_agreement.html', '_blank');
+            document.getElementById('agreementModal').classList.add('hidden');
+        }
+
+        // Dismiss modal (for testing - remove in production)
+        function dismissModal() {
+            document.getElementById('agreementModal').classList.add('hidden');
+        }
+
+        // Show different sections
+        function showSection(section) {
+            const contentArea = document.getElementById('contentArea');
+            
+            if (section === 'nursery') {
+                contentArea.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
+                            <h1 class="text-xl font-bold text-gray-800">Bella Terra LLC - Nursery</h1>
+                        </div>
+                        <iframe 
+                            src="https://bellaterra2015.github.io/employee-portal.html/nursery_platform_policy.html"
+                            class="w-full"
+                            style="height: calc(100vh - 80px);"
+                            title="Nursery Platform Policy"
+                        ></iframe>
+                    </div>`;
+            } else if (section === 'hydroseeding') {
+                contentArea.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
+                            <h1 class="text-xl font-bold text-gray-800">Bella Terra LLC - Hydroseeding</h1>
+                        </div>
+                        <iframe 
+                            src="https://bellaterra2015.github.io/employee-portal.html/hydroseed_platform_policy.html"
+                            class="w-full"
+                            style="height: calc(100vh - 80px);"
+                            title="Hydroseeding Platform Policy"
+                        ></iframe>
+                    </div>`;
+            } else if (section === 'employee') {
+                contentArea.innerHTML = `
+                    <div class="min-h-screen bg-white">
+                        <div class="bg-green-700 text-white p-4 shadow-lg">
+                            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://static.wixstatic.com/media/413ca4_d44a52d14a6243fb94d0daabe64f0fbd~mv2.png" alt="Bella Terra LLC" class="h-12">
+                                    <h1 class="text-xl font-bold">Employee Resources</h1>
+                                </div>
+                                <button onclick="handleBackToHome()" class="flex items-center gap-2 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg transition-colors">
+                                    ← Back to Portal
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div style="transform: scale(0.5);">
+                                ${renderLogo()}
+                            </div>
+                        </div>
+                        
+                        <div class="max-w-4xl mx-auto p-6">
+                            
+                            <!-- 4/10 Agreement Section -->
+                            <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 p-6 rounded-lg mb-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="text-3xl">📋</div>
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold text-gray-800 mb-2">4/10 Work Agreement</h3>
+                                        <p class="text-gray-700 mb-3">Annual authorization for the 4-day, 10-hour work week schedule (required annually)</p>
+                                        <button onclick="openAgreement()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">
+                                            View & Sign Agreement
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Coming Soon Sections -->
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-3xl mb-2">📱</div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2">BusyBusy Tutorial</h3>
+                                    <p class="text-gray-600 text-sm">Time tracking app guide</p>
+                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-3xl mb-2">📖</div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Employee Handbook</h3>
+                                    <p class="text-gray-600 text-sm">Company policies and procedures</p>
+                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-3xl mb-2">📞</div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Contact Information</h3>
+                                    <p class="text-gray-600 text-sm">Important phone numbers</p>
+                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-3xl mb-2">⏰</div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2">Break & Meal Periods</h3>
+                                    <p class="text-gray-600 text-sm">Required break documentation</p>
+                                    <p class="text-xs text-gray-400 mt-2">Coming Soon</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function handleBackToHome() {
+            document.getElementById('contentArea').innerHTML = '';
+        }
+
+        function renderLogo() {
+            return `<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+                <rect width="700" height="400" fill="#f0fdf4"/>
+                <text x="350" y="200" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#166534" text-anchor="middle">
+                    Bella Terra LLC
+                </text>
+            </svg>`;
+        }
+    </script>
+
+</body>
+</html>
