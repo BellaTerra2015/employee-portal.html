@@ -509,7 +509,7 @@
       <input type="password" id="login-pass" placeholder="Enter password">
     </div>
     <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
-    <button class="btn-primary" style="margin-top:1.25rem" id="login-btn">Access Portal</button>
+    <button class="btn-primary" style="margin-top:1.25rem" id="login-btn" onclick="doLogin()">Access Portal</button>
   </div>
 </div>
 
@@ -522,7 +522,7 @@
     <h2>Employee Portal</h2>
     <div class="header-right">
       <span class="employee-badge" id="employee-badge">👤 Employee</span>
-      <button class="btn-logout" id="logout-btn">Sign Out</button>
+      <button class="btn-logout" id="logout-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
 
@@ -1070,9 +1070,11 @@ function doLogout() {
   location.reload();
 }
 
-document.getElementById('login-btn').addEventListener('click', doLogin);
-document.getElementById('logout-btn').addEventListener('click', doLogout);
-document.getElementById('login-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('login-btn').addEventListener('click', doLogin);
+  document.getElementById('logout-btn').addEventListener('click', doLogout);
+  document.getElementById('login-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') doLogin(); });
+});
 
 // ─── NAV ──────────────────────────────────────────────────────────────────────
 let currentEmployee = '';
@@ -1213,3 +1215,40 @@ function initCanvas(id) {
 
   ctx.strokeStyle = '#1a1a1a';
   
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  canvas.addEventListener('mousedown', function(e) { drawing = true; var p = getPos(e); lastX = p.x; lastY = p.y; });
+  canvas.addEventListener('mousemove', function(e) {
+    if (!drawing) return;
+    var p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  });
+  canvas.addEventListener('mouseup', function() { drawing = false; });
+  canvas.addEventListener('mouseleave', function() { drawing = false; });
+  canvas.addEventListener('touchstart', function(e) { e.preventDefault(); drawing = true; var p = getPos(e); lastX = p.x; lastY = p.y; }, { passive: false });
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    var p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }, { passive: false });
+  canvas.addEventListener('touchend', function() { drawing = false; });
+}
+
+function clearSig(id) {
+  var canvas = document.getElementById(id);
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function hasSignature(canvas) {
+  var data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+  for (var i = 3; i < data.length; i += 4) { if (data[i] > 0) return true; }
+  return false;
+}
+</script>
+</body>
+</html>
