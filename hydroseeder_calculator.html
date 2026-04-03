@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bella Terra Hydroseeder Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+:root {
+  --green-dark: #2d5a27; --green-mid: #4a7c3f; --green-light: #7ab648;
+  --green-pale: #e8f5e2; --gold: #c8961e; --gold-light: #fff8e6;
+  --blue: #1a6b8a; --blue-light: #e8f4f8; --red: #c0392b; --red-light: #fdf0ee;
+  --orange: #e67e22; --orange-light: #fef5ec;
+  --white: #ffffff; --gray-light: #f5f5f2; --gray-mid: #888;
+  --text: #2a2a2a; --border: #d0dcc8; --shadow: 0 2px 12px rgba(45,90,39,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--gray-light); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.app-header { background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); color: white; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 12px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 50; }
+.app-header h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+.app-header p { font-size: 0.78rem; opacity: 0.8; }
+.header-icon { font-size: 1.8rem; }
+
+/* SCREENS */
+.screen { display: none; max-width: 700px; margin: 0 auto; padding: 1rem; }
+.screen.active { display: block; }
+
+/* CARDS */
+.card { background: white; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--green-dark); margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--green-pale); display: flex; align-items: center; gap: 0.5rem; }
+
+/* FORMS */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.form-group label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green-dark); }
+.form-group input, .form-group select { padding: 0.6rem 0.8rem; border: 2px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; background: white; width: 100%; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--green-mid); }
+.form-group.full { grid-column: 1 / -1; }
+
+/* BUTTON GROUPS */
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.toggle-btn { padding: 0.55rem 1rem; border: 2px solid var(--border); border-radius: 8px; background: white; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--gray-mid); }
+.toggle-btn:hover { border-color: var(--green-mid); color: var(--green-mid); }
+.toggle-btn.active { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+.toggle-btn.blue.active { background: var(--blue); border-color: var(--blue); }
+.toggle-btn.gold.active { background: var(--gold); border-color: var(--gold); }
+.toggle-btn.red.active { background: var(--red); border-color: var(--red); }
+
+/* TRUCK BUTTONS */
+.truck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
+.truck-btn { padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; background: white; font-family: inherit; cursor: pointer; transition: all 0.15s; text-align: left; }
+.truck-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+.truck-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+.truck-num { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+.truck-desc { font-size: 0.7rem; opacity: 0.8; margin-top: 0.15rem; line-height: 1.3; }
+
+/* PRODUCT BUTTONS */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
+.product-btn { padding: 0.65rem; border: 2px solid var(--border); border-radius: 8px; background: white; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center; }
+.product-btn:hover { border-color: var(--green-light); background: var(--green-pale); }
+.product-btn.active { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+.product-sub { font-size: 0.68rem; font-weight: 400; opacity: 0.75; display: block; margin-top: 0.15rem; }
+
+/* BIG ACTION BUTTONS */
+.btn-primary { width: 100%; padding: 0.95rem; background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); margin-bottom: 0.75rem; }
+.btn-secondary { width: 100%; padding: 0.85rem; background: white; color: var(--text); border: 2px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-bottom: 0.75rem; }
+.btn-secondary:hover { border-color: var(--green-mid); }
+.btn-blue { background: var(--blue); color: white; border: none; }
+.btn-red { background: var(--red); color: white; border: none; }
+.btn-gold { background: var(--gold); color: white; border: none; }
+
+/* NOTE BOX */
+.note-box { background: var(--blue-light); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; font-size: 0.82rem; margin-bottom: 0.85rem; line-height: 1.5; }
+.warn-box { background: var(--orange-light); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; font-size: 0.82rem; margin-bottom: 0.85rem; line-height: 1.5; }
+.success-box { background: var(--green-pale); border-left: 3px solid var(--green-light); border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; font-size: 0.82rem; margin-bottom: 0.85rem; }
+
+/* LOAD LOGGER - big tap targets for field use */
+.load-logger { background: white; border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; margin-bottom: 1rem; }
+.load-logger-header { background: var(--green-dark); color: white; padding: 1rem 1.25rem; }
+.load-logger-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+.load-logger-header p { font-size: 0.8rem; opacity: 0.85; margin-top: 0.2rem; }
+
+.log-section { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+.log-section:last-child { border-bottom: none; }
+.log-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-mid); margin-bottom: 0.6rem; }
+
+/* BIG TAP BUTTON */
+.tap-btn-complete {
+  width: 100%; padding: 1.25rem; background: var(--green-dark); color: white;
+  border: none; border-radius: 10px; font-family: inherit; font-size: 1.1rem;
+  font-weight: 700; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 0.5rem; box-shadow: var(--shadow);
+  transition: background 0.15s;
+}
+.tap-btn-complete:hover { background: var(--green-mid); }
+.tap-btn-complete:active { transform: scale(0.98); }
+
+/* HOSE BUTTONS - large for field */
+.hose-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.hose-btn { padding: 0.85rem 0.5rem; border: 2px solid var(--border); border-radius: 8px; background: white; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.3; }
+.hose-btn:hover { border-color: var(--blue); }
+.hose-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+.hose-btn .hose-time { font-size: 0.7rem; font-weight: 400; opacity: 0.8; display: block; margin-top: 0.15rem; }
+
+/* WAIT BUTTONS */
+.wait-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+.wait-btn { padding: 0.75rem 0.4rem; border: 2px solid var(--border); border-radius: 8px; background: white; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; }
+.wait-btn.active.none { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+.wait-btn.active.short { background: var(--gold); color: white; border-color: var(--gold); }
+.wait-btn.active.long { background: var(--red); color: white; border-color: var(--red); }
+
+/* LOAD LOG LIST */
+.load-log-list { margin-bottom: 1rem; }
+.load-entry { background: white; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; box-shadow: var(--shadow); border-left: 4px solid var(--green-light); display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.load-entry.has-wait { border-left-color: var(--orange); }
+.load-entry.has-long-wait { border-left-color: var(--red); }
+.load-entry-main { flex: 1; }
+.load-entry-num { font-weight: 700; font-size: 0.95rem; color: var(--green-dark); }
+.load-entry-detail { font-size: 0.78rem; color: var(--gray-mid); margin-top: 0.15rem; line-height: 1.4; }
+.load-entry-time { font-size: 0.72rem; color: var(--gray-mid); white-space: nowrap; }
+.delete-load { background: none; border: none; cursor: pointer; color: var(--gray-mid); font-size: 1rem; padding: 0.2rem; }
+.delete-load:hover { color: var(--red); }
+
+/* PROGRESS BAR */
+.progress-wrap { margin-bottom: 1rem; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: var(--green-dark); margin-bottom: 0.3rem; }
+.progress-bar { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-mid), var(--green-light)); border-radius: 5px; transition: width 0.3s; }
+
+/* SUMMARY GRID */
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.summary-box { background: white; border-radius: 10px; padding: 0.85rem; text-align: center; box-shadow: var(--shadow); border-top: 3px solid var(--green-light); }
+.summary-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--green-dark); }
+.summary-label { font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+.summary-box.warn { border-top-color: var(--orange); }
+.summary-box.warn .summary-num { color: var(--orange); }
+.summary-box.alert { border-top-color: var(--red); }
+.summary-box.alert .summary-num { color: var(--red); }
+
+/* RESULTS */
+.lift-section { border-radius: 12px; margin-bottom: 1rem; overflow: hidden; box-shadow: var(--shadow); }
+.lift-header { padding: 0.75rem 1.1rem; font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: white; }
+.lift-header.lift1 { background: var(--green-dark); }
+.lift-header.lift2 { background: var(--blue); }
+.lift-header.lift3 { background: #6b4f2a; }
+.lift-meta { font-size: 0.75rem; font-weight: 400; opacity: 0.85; margin-top: 0.1rem; }
+.load-card { background: white; border-bottom: 1px solid var(--border); padding: 0.85rem 1.1rem; }
+.load-card:last-child { border-bottom: none; }
+.load-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.load-badge { background: var(--green-pale); color: var(--green-dark); font-size: 0.68rem; padding: 0.12rem 0.45rem; border-radius: 10px; font-weight: 700; }
+.load-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.4rem; }
+.load-item { background: var(--gray-light); border-radius: 6px; padding: 0.45rem 0.65rem; font-size: 0.82rem; }
+.load-item-label { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-mid); }
+.load-item-val { font-weight: 700; color: var(--text); }
+.load-coverage { margin-top: 0.5rem; font-size: 0.78rem; color: var(--green-mid); font-weight: 600; }
+
+/* TOTALS TABLE */
+.totals-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+.totals-table th { background: var(--green-pale); color: var(--green-dark); padding: 0.55rem 0.8rem; text-align: left; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.totals-table td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--border); }
+.totals-table tr:last-child td { border-bottom: none; font-weight: 700; background: var(--green-pale); }
+
+/* BILLING CARD */
+.billing-card { background: var(--red-light); border: 2px solid var(--red); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+.billing-title { font-family: 'Playfair Display', serif; color: var(--red); font-size: 1rem; margin-bottom: 0.6rem; }
+.billing-line { display: flex; justify-content: space-between; font-size: 0.87rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(192,57,43,0.15); }
+.billing-line:last-child { border-bottom: none; font-weight: 700; font-size: 0.95rem; }
+
+/* ACTION ROW */
+.action-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.btn-action { flex: 1; min-width: 120px; padding: 0.8rem 1rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+.btn-print { background: var(--green-dark); color: white; }
+.btn-email { background: var(--blue); color: white; }
+.btn-back { background: white; color: var(--text); border: 2px solid var(--border); }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .card, .lift-section, .summary-box { box-shadow: none; border: 1px solid #ccc; }
+}
+@media (max-width: 480px) {
+  .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+  .hose-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-header no-print">
+  <div class="header-icon">💧</div>
+  <div>
+    <h1>Hydroseeder Calculator</h1>
+    <p>Bella Terra LLC · Woodland, WA</p>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 1: JOB SETUP ═══════════════ -->
+<div class="screen active" id="screen-setup">
+  <div style="padding:1rem;max-width:700px;margin:0 auto">
+
+  <div class="card">
+    <div class="card-title">📋 Job Information</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Job Name / Location</label><input type="text" id="job-name" placeholder="e.g. Spokane I-90"></div>
+      <div class="form-group"><label>General Contractor</label><input type="text" id="gc-name" placeholder="e.g. Granite Construction"></div>
+      <div class="form-group"><label>Seeding Type</label><input type="text" id="seeding-type" placeholder="e.g. Upland Seeding, Riparian..."></div>
+      <div class="form-group"><label>Date</label><input type="date" id="job-date"></div>
+      <div class="form-group"><label>Truck Driver</label><input type="text" id="crew-driver" placeholder="First Last"></div>
+      <div class="form-group"><label>Cannon Master</label><input type="text" id="crew-cannon" placeholder="First Last"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🚛 Select Truck</div>
+    <div class="truck-grid">
+      <button class="truck-btn" onclick="selectTruck(this,'102',3000)">
+        <div class="truck-num">102</div><div class="truck-desc">Kenworth W900B<br>Bowie · 3,000 gal</div>
+      </button>
+      <button class="truck-btn" onclick="selectTruck(this,'103',1500)">
+        <div class="truck-num">103</div><div class="truck-desc">Freightliner HS2<br>Bowie 1.5 · 1,500 gal</div>
+      </button>
+      <button class="truck-btn" onclick="selectTruck(this,'116',3000)">
+        <div class="truck-num">116</div><div class="truck-desc">Peterbilt 357<br>Easy Lawn · 3,000 gal</div>
+      </button>
+      <button class="truck-btn" onclick="selectTruck(this,'204',500)">
+        <div class="truck-num">204</div><div class="truck-desc">Finn 0.5<br>500 gal</div>
+      </button>
+      <button class="truck-btn" onclick="selectTruck(this,'310',1000)">
+        <div class="truck-num">310</div><div class="truck-desc">Lil Bowie<br>1,000 gal</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🌿 Mulch Product</div>
+    <div class="product-grid">
+      <button class="product-btn" onclick="selectProduct(this,'EFM')">EFM<span class="product-sub">Extended Fiber<br>50 lb bales</span></button>
+      <button class="product-btn" onclick="selectProduct(this,'5050')">50/50<span class="product-sub">Paper/Wood Blend<br>50 lb bales</span></button>
+      <button class="product-btn" onclick="selectProduct(this,'BFM')">BFM<span class="product-sub">Bonded Fiber Matrix<br>50 lb bales</span></button>
+      <button class="product-btn" onclick="selectProduct(this,'FlexTerra')">FlexTerra<span class="product-sub">HP-FGM Profile<br>50 lb bales</span></button>
+      <button class="product-btn" onclick="selectProduct(this,'ProGanics')">ProGanics<span class="product-sub">Biotic Soil Amend.<br>50 lb bags</span></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📐 Specifications</div>
+    <div class="note-box">Enter specs exactly as shown on the job specification sheet.</div>
+    <div class="form-grid" style="margin-bottom:0.85rem">
+      <div class="form-group"><label>Total Area</label><input type="number" id="area-size" placeholder="e.g. 2.5" step="0.01" min="0"></div>
+      <div class="form-group"><label>Units</label><select id="area-unit"><option value="acres">Acres</option><option value="sqft">Square Feet</option></select></div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Number of Lifts</label>
+      <div class="btn-group">
+        <button class="toggle-btn" onclick="selectLifts(this,1)">1 Lift</button>
+        <button class="toggle-btn" onclick="selectLifts(this,2)">2 Lifts</button>
+        <button class="toggle-btn" onclick="selectLifts(this,3)">3 Lifts (ProGanics)</button>
+      </div>
+    </div>
+    <div id="lift-inputs"></div>
+    <div class="form-grid-3" style="margin-top:0.85rem">
+      <div class="form-group"><label>Seed (lbs/acre)</label><input type="number" id="seed-rate" placeholder="e.g. 350" min="0" step="0.1"></div>
+      <div class="form-group"><label>Fertilizer (lbs/acre)</label><input type="number" id="fert-rate" placeholder="e.g. 1800" min="0"></div>
+      <div class="form-group"><label>Fertilizer Name</label><input type="text" id="fert-name" placeholder="e.g. BioForte"></div>
+    </div>
+    <div class="form-group" style="margin-top:0.85rem">
+      <label>Application Method</label>
+      <div class="btn-group">
+        <button class="toggle-btn" id="method-cannon" onclick="selectMethod(this,'cannon')">💨 Cannon Only</button>
+        <button class="toggle-btn" id="method-hose" onclick="selectMethod(this,'hose')">🚿 Hose Only</button>
+        <button class="toggle-btn" id="method-both" onclick="selectMethod(this,'both')">Both</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="startJob()">⚙️ Calculate &amp; Start Job</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 2: FIELD LOGGER ═══════════════ -->
+<div class="screen" id="screen-logger">
+  <div style="padding:1rem;max-width:700px;margin:0 auto">
+
+  <!-- Job info bar -->
+  <div class="card" style="margin-bottom:0.75rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--green-dark)" id="logger-job-name">Job Name</div>
+        <div style="font-size:0.78rem;color:var(--gray-mid)" id="logger-job-meta"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.75rem;color:var(--gray-mid)">Truck</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--blue);font-weight:700" id="logger-truck"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Loads Completed</span>
+        <span id="progress-text">0 / 8 expected today</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div id="lift-progress-info" style="font-size:0.8rem;color:var(--gray-mid);margin-top:0.25rem"></div>
+  </div>
+
+  <!-- LOAD LOGGER -->
+  <div class="load-logger">
+    <div class="load-logger-header">
+      <h3 id="current-load-title">Log Load #1</h3>
+      <p id="current-lift-info">Lift 1 · Loading info below</p>
+    </div>
+
+    <!-- What goes in this load -->
+    <div class="log-section" id="load-recipe-section">
+      <div class="log-section-title">🧪 What Goes In This Load</div>
+      <div id="load-recipe"></div>
+    </div>
+
+    <!-- TAP COMPLETE -->
+    <div class="log-section">
+      <div class="log-section-title">✅ Mark Load Complete</div>
+      <button class="tap-btn-complete" onclick="completeLoad()">
+        ✅ &nbsp; TAP WHEN LOAD IS SPRAYED
+      </button>
+    </div>
+
+    <!-- HOSE WORK -->
+    <div class="log-section" id="hose-section">
+      <div class="log-section-title">🚿 Hose Work This Load?</div>
+      <div class="hose-grid">
+        <button class="hose-btn active" data-hose="none" data-mins="0" onclick="selectHose(this)">
+          No Hose
+          <span class="hose-time">Cannon only</span>
+        </button>
+        <button class="hose-btn" data-hose="easy" data-mins="20" onclick="selectHose(this)">
+          Easy Hose
+          <span class="hose-time">~20 min · flat ground</span>
+        </button>
+        <button class="hose-btn" data-hose="moderate" data-mins="45" onclick="selectHose(this)">
+          Moderate Hose
+          <span class="hose-time">~45 min · some terrain</span>
+        </button>
+        <button class="hose-btn" data-hose="difficult" data-mins="75" onclick="selectHose(this)">
+          Difficult Hose
+          <span class="hose-time">~75 min · steep/rough</span>
+        </button>
+        <button class="hose-btn" data-hose="custom" data-mins="0" onclick="selectHose(this)" style="grid-column:1/-1">
+          Custom Time
+          <span class="hose-time">Enter minutes below</span>
+        </button>
+      </div>
+      <div id="custom-hose-wrap" style="display:none;margin-top:0.5rem">
+        <input type="number" id="custom-hose-mins" placeholder="Minutes of hose work" style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem">
+      </div>
+    </div>
+
+    <!-- WATER WAIT -->
+    <div class="log-section">
+      <div class="log-section-title">⏱️ Water / Reload Wait This Load?</div>
+      <div class="wait-grid">
+        <button class="wait-btn active none" data-wait="none" data-mins="0" onclick="selectWait(this)">No Wait ✅</button>
+        <button class="wait-btn short" data-wait="short" data-mins="10" onclick="selectWait(this)">Short Wait ⚠️<br><small>Under 10 min</small></button>
+        <button class="wait-btn long" data-wait="long" data-mins="0" onclick="selectWait(this)">Long Wait 🔴<br><small>Enter minutes</small></button>
+      </div>
+      <div id="long-wait-wrap" style="display:none;margin-top:0.5rem">
+        <input type="number" id="long-wait-mins" placeholder="How many minutes waiting?" style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem">
+        <div style="margin-top:0.4rem;font-size:0.78rem;color:var(--red)">⚠️ Waits over 10 min will be flagged as potentially billable on the load sheet.</div>
+      </div>
+    </div>
+
+    <!-- NOTES for this load -->
+    <div class="log-section">
+      <div class="log-section-title">📝 Notes for This Load (optional)</div>
+      <input type="text" id="load-note" placeholder="e.g. short area near fence, rocky slope..." style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.87rem">
+    </div>
+
+  </div><!-- end load-logger -->
+
+  <!-- COMPLETED LOADS LIST -->
+  <div class="card">
+    <div class="card-title">📋 Completed Loads</div>
+    <div id="load-log-list">
+      <div style="color:var(--gray-mid);font-size:0.85rem;text-align:center;padding:1rem">No loads logged yet — tap complete after each load.</div>
+    </div>
+  </div>
+
+  <!-- FINISH DAY -->
+  <div class="card">
+    <div class="card-title">🌙 End of Day</div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Final Notes / Issues for Office</label>
+      <input type="text" id="eod-notes" placeholder="Any problems, short areas, stuck equipment...">
+    </div>
+    <button class="btn-primary" onclick="finishDay()">📊 Generate Final Load Sheet</button>
+    <button class="btn-secondary" onclick="showScreen('screen-setup')">← Back to Setup</button>
+  </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 3: FINAL LOAD SHEET ═══════════════ -->
+<div class="screen" id="screen-results">
+  <div style="padding:1rem;max-width:700px;margin:0 auto">
+
+  <div class="action-row no-print">
+    <button class="btn-action btn-back" onclick="showScreen('screen-logger')">← Back</button>
+    <button class="btn-action btn-print" onclick="window.print()">🖨️ Print</button>
+    <button class="btn-action btn-email" onclick="emailSheet()">📧 Email Office</button>
+  </div>
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,var(--green-dark),var(--green-mid));color:white;border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem">💧 Bella Terra — Hydroseeder Load Sheet</h2>
+    <div style="font-size:0.82rem;opacity:0.85;line-height:1.6" id="sheet-meta"></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-grid" id="sheet-summary"></div>
+
+  <!-- Billing alert if applicable -->
+  <div id="billing-section"></div>
+
+  <!-- Planned loads per lift -->
+  <div id="sheet-lift-results"></div>
+
+  <!-- Daily log -->
+  <div class="card">
+    <div class="card-title">📋 Field Log — Actual Loads Today</div>
+    <div id="sheet-field-log"></div>
+  </div>
+
+  <!-- Totals -->
+  <div class="card">
+    <div class="card-title">📦 Total Materials — Entire Job</div>
+    <table class="totals-table" id="sheet-totals"></table>
+  </div>
+
+  <div class="action-row no-print">
+    <button class="btn-action btn-back" onclick="showScreen('screen-logger')">← Back</button>
+    <button class="btn-action btn-print" onclick="window.print()">🖨️ Print</button>
+    <button class="btn-action btn-email" onclick="emailSheet()">📧 Email Office</button>
+  </div>
+
+  </div>
+</div>
+
+<script>
+// ═══ STATE ═══
+var job = {
+  name:'', gc:'', seedingType:'', date:'', driver:'', cannon:'',
+  truck:'', tankGal:0, product:'', lifts:0, areaAcres:0,
+  seedRate:0, fertRate:0, fertName:'', method:'cannon',
+  liftPlans:[], expectedLoads:8
+};
+var loads = [];
+var currentHose = { type:'none', mins:0 };
+var currentWait = { type:'none', mins:0 };
+
+// Max bales per tank
+var maxBales = {
+  'EFM':      {3000:20,1500:10,1000:6,500:3},
+  '5050':     {3000:24,1500:12,1000:8,500:4},
+  'BFM':      {3000:18,1500:9, 1000:6,500:3},
+  'FlexTerra':{3000:22,1500:11,1000:7,500:4},
+  'ProGanics':{3000:20,1500:10,1000:6,500:3}
+};
+
+function getMaxBales(prod, gal) {
+  var tbl = maxBales[prod] || maxBales['EFM'];
+  return tbl[parseInt(gal)] || Math.round((parseInt(gal)/3000)*(tbl[3000]||20));
+}
+
+// ─── UI HELPERS ───
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function selectTruck(btn, num, gal) {
+  document.querySelectorAll('.truck-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  job.truck = num; job.tankGal = gal;
+  updateLiftInputs();
+}
+
+function selectProduct(btn, prod) {
+  document.querySelectorAll('.product-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  job.product = prod;
+  if (prod === 'ProGanics') {
+    var lbs = document.querySelectorAll('.toggle-btn');
+    lbs.forEach(function(b){ b.classList.remove('active'); });
+    // find the 3-lift button
+    document.querySelectorAll('.toggle-btn').forEach(function(b){ if(b.textContent.indexOf('3 Lift')>-1){ b.classList.add('active'); job.lifts=3; }});
+  }
+  updateLiftInputs();
+}
+
+function selectLifts(btn, n) {
+  document.querySelectorAll('.toggle-btn').forEach(function(b){
+    if(b.onclick && b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('selectLifts')>-1) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  job.lifts = n;
+  updateLiftInputs();
+}
+
+function selectMethod(btn, m) {
+  ['method-cannon','method-hose','method-both'].forEach(function(id){
+    document.getElementById(id).classList.remove('active');
+  });
+  btn.classList.add('active');
+  job.method = m;
+}
+
+function updateLiftInputs() {
+  var c = document.getElementById('lift-inputs');
+  c.innerHTML = '';
+  if (!job.lifts || !job.product) return;
+  var html = '';
+  if (job.product === 'ProGanics' && job.lifts === 3) {
+    html = '<div class="note-box"><strong>ProGanics 3-Lift:</strong> Lift 1 = up to 2,500 lbs/acre ProGanics + ALL seed + fertilizer · Lift 2 = remaining ProGanics · Lift 3 = mulch topper only</div>' +
+      '<div class="form-grid">' +
+      '<div class="form-group"><label>ProGanics Total Rate (lbs/acre)</label><input type="number" id="rate-pg" placeholder="e.g. 4000" min="0" step="100"></div>' +
+      '<div class="form-group"><label>Lift 3 Mulch Product</label><select id="lift3-prod"><option value="EFM">EFM</option><option value="5050">50/50</option><option value="BFM">BFM</option><option value="FlexTerra">FlexTerra</option></select></div>' +
+      '<div class="form-group"><label>Lift 3 Mulch Rate (lbs/acre)</label><input type="number" id="rate-lift3" placeholder="e.g. 3500" min="0" step="100"></div>' +
+      '</div>';
+  } else if (job.lifts === 1) {
+    html = '<div class="form-group"><label>Mulch Rate (lbs/acre)</label><input type="number" id="rate-l1" placeholder="e.g. 3500" min="0" step="100"></div>';
+  } else if (job.lifts === 2) {
+    html = '<div class="note-box"><strong>2-Lift System:</strong> Lift 1 = 1,500 lbs/acre + ALL seed + ALL fertilizer. Lift 2 = remaining mulch only.</div>' +
+      '<div class="form-group"><label>Total Mulch Rate (lbs/acre)</label><input type="number" id="rate-total" placeholder="e.g. 3500" min="0" step="100"></div>';
+  }
+  c.innerHTML = html;
+}
+
+// ─── START JOB ───
+function startJob() {
+  job.name = document.getElementById('job-name').value.trim() || 'Unnamed Job';
+  job.gc = document.getElementById('gc-name').value.trim() || '—';
+  job.seedingType = document.getElementById('seeding-type').value.trim() || '—';
+  job.date = document.getElementById('job-date').value || new Date().toISOString().split('T')[0];
+  job.driver = document.getElementById('crew-driver').value.trim() || '—';
+  job.cannon = document.getElementById('crew-cannon').value.trim() || '—';
+  job.seedRate = parseFloat(document.getElementById('seed-rate').value) || 0;
+  job.fertRate = parseFloat(document.getElementById('fert-rate').value) || 0;
+  job.fertName = document.getElementById('fert-name').value.trim() || 'Fertilizer';
+
+  var areaVal = parseFloat(document.getElementById('area-size').value) || 0;
+  var areaUnit = document.getElementById('area-unit').value;
+  job.areaAcres = areaUnit === 'sqft' ? areaVal / 43560 : areaVal;
+
+  if (!job.truck) { alert('Please select a truck.'); return; }
+  if (!job.product) { alert('Please select a mulch product.'); return; }
+  if (!job.lifts) { alert('Please select number of lifts.'); return; }
+  if (job.areaAcres <= 0) { alert('Please enter the job area.'); return; }
+
+  // Build lift plans
+  job.liftPlans = [];
+  if (job.product === 'ProGanics' && job.lifts === 3) {
+    var pgTotal = parseFloat(document.getElementById('rate-pg').value) || 4000;
+    var l3rate = parseFloat(document.getElementById('rate-lift3').value) || 3500;
+    var l3prod = document.getElementById('lift3-prod').value;
+    var pg1 = Math.min(2500, pgTotal);
+    var pg2 = Math.max(0, pgTotal - pg1);
+    job.liftPlans = [
+      {name:'Lift 1',product:'ProGanics',rate:pg1,seed:true,fert:true,color:'lift1'},
+      {name:'Lift 2',product:'ProGanics',rate:pg2,seed:false,fert:false,color:'lift2'},
+      {name:'Lift 3 — Mulch Topper',product:l3prod,rate:l3rate,seed:false,fert:false,color:'lift3'}
+    ];
+  } else if (job.lifts === 1) {
+    var r1 = parseFloat(document.getElementById('rate-l1').value) || 0;
+    job.liftPlans = [{name:'Lift 1',product:job.product,rate:r1,seed:true,fert:true,color:'lift1'}];
+  } else if (job.lifts === 2) {
+    var rTot = parseFloat(document.getElementById('rate-total').value) || 0;
+    job.liftPlans = [
+      {name:'Lift 1',product:job.product,rate:1500,seed:true,fert:true,color:'lift1'},
+      {name:'Lift 2',product:job.product,rate:Math.max(0,rTot-1500),seed:false,fert:false,color:'lift2'}
+    ];
+  }
+
+  job.expectedLoads = 8;
+  loads = [];
+  resetLoadForm();
+  updateLoggerUI();
+  showScreen('screen-logger');
+}
+
+// ─── LOGGER UI ───
+function updateLoggerUI() {
+  document.getElementById('logger-job-name').textContent = job.name;
+  document.getElementById('logger-job-meta').textContent =
+    job.seedingType + ' · GC: ' + job.gc + ' · Driver: ' + job.driver + ' · Cannon: ' + job.cannon;
+  document.getElementById('logger-truck').textContent = '#' + job.truck;
+
+  var pct = Math.min(100, Math.round((loads.length / job.expectedLoads) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = loads.length + ' / ' + job.expectedLoads + ' expected today';
+
+  // Current load number
+  var loadNum = loads.length + 1;
+  document.getElementById('current-load-title').textContent = 'Log Load #' + loadNum;
+
+  // Determine which lift this load belongs to
+  var liftInfo = getLiftForLoad(loadNum);
+  if (liftInfo) {
+    document.getElementById('current-lift-info').textContent = liftInfo.plan.name + ' · ' + liftInfo.plan.product;
+    updateLoadRecipe(liftInfo);
+  }
+
+  // Show/hide hose section based on method
+  var hoseSection = document.getElementById('hose-section');
+  hoseSection.style.display = (job.method === 'cannon') ? 'none' : 'block';
+
+  renderLoadList();
+}
+
+function getLiftForLoad(loadNum) {
+  // Figure out how many loads per lift
+  var totalByLift = [];
+  job.liftPlans.forEach(function(plan) {
+    var maxB = getMaxBales(plan.product, job.tankGal);
+    var maxMulch = maxB * 50;
+    var acresPerTank = plan.rate > 0 ? maxMulch / plan.rate : job.areaAcres;
+    var numLoads = Math.ceil(job.areaAcres / acresPerTank);
+    totalByLift.push({ plan: plan, loads: numLoads, acresPerTank: acresPerTank, maxBales: maxB });
+  });
+  var cumulative = 0;
+  for (var i = 0; i < totalByLift.length; i++) {
+    cumulative += totalByLift[i].loads;
+    if (loadNum <= cumulative) {
+      var loadWithinLift = loadNum - (cumulative - totalByLift[i].loads);
+      var isLast = loadWithinLift === totalByLift[i].loads;
+      var remainAcres = isLast ? (job.areaAcres - ((loadWithinLift-1) * totalByLift[i].acresPerTank)) : totalByLift[i].acresPerTank;
+      var balesThisLoad = isLast ? Math.ceil(remainAcres * totalByLift[i].plan.rate / 50) : totalByLift[i].maxBales;
+      return { plan: totalByLift[i].plan, loadWithinLift: loadWithinLift, acresThisLoad: Math.min(remainAcres, totalByLift[i].acresPerTank), balesThisLoad: Math.max(0,balesThisLoad), isPartial: isLast && remainAcres < totalByLift[i].acresPerTank };
+    }
+  }
+  // Past all planned loads — still log
+  return { plan: job.liftPlans[job.liftPlans.length-1], loadWithinLift:'?', acresThisLoad:0, balesThisLoad:0, isPartial:false };
+}
+
+function updateLoadRecipe(liftInfo) {
+  var plan = liftInfo.plan;
+  var acres = liftInfo.acresThisLoad;
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.4rem">';
+  html += '<div class="load-item"><div class="load-item-label">' + plan.product + '</div><div class="load-item-val">' + liftInfo.balesThisLoad + ' bales (' + (liftInfo.balesThisLoad*50) + ' lbs)</div></div>';
+  if (plan.seed && job.seedRate > 0) {
+    html += '<div class="load-item"><div class="load-item-label">Seed</div><div class="load-item-val">' + (job.seedRate * acres).toFixed(1) + ' lbs</div></div>';
+  }
+  if (plan.fert && job.fertRate > 0) {
+    var fertLbs = (job.fertRate * acres);
+    html += '<div class="load-item"><div class="load-item-label">' + job.fertName + '</div><div class="load-item-val">' + fertLbs.toFixed(0) + ' lbs (' + Math.ceil(fertLbs/50) + ' bags)</div></div>';
+  }
+  html += '</div>';
+  if (acres > 0) html += '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--green-mid);font-weight:600">📍 Covers ~' + acres.toFixed(2) + ' acres (' + Math.round(acres*43560).toLocaleString() + ' sq ft)' + (liftInfo.isPartial ? ' · Partial Load' : '') + '</div>';
+  document.getElementById('load-recipe').innerHTML = html;
+}
+
+function selectHose(btn) {
+  document.querySelectorAll('.hose-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var type = btn.getAttribute('data-hose');
+  var mins = parseInt(btn.getAttribute('data-mins')) || 0;
+  currentHose = { type: type, mins: mins };
+  document.getElementById('custom-hose-wrap').style.display = (type === 'custom') ? 'block' : 'none';
+}
+
+function selectWait(btn) {
+  document.querySelectorAll('.wait-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var type = btn.getAttribute('data-wait');
+  var mins = parseInt(btn.getAttribute('data-mins')) || 0;
+  currentWait = { type: type, mins: mins };
+  document.getElementById('long-wait-wrap').style.display = (type === 'long') ? 'block' : 'none';
+}
+
+function completeLoad() {
+  var loadNum = loads.length + 1;
+  var liftInfo = getLiftForLoad(loadNum);
+  var timestamp = new Date();
+  var timeStr = timestamp.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+
+  // Get hose mins
+  var hoseMins = currentHose.mins;
+  if (currentHose.type === 'custom') {
+    hoseMins = parseInt(document.getElementById('custom-hose-mins').value) || 0;
+  }
+
+  // Get wait mins
+  var waitMins = currentWait.mins;
+  if (currentWait.type === 'long') {
+    waitMins = parseInt(document.getElementById('long-wait-mins').value) || 15;
+  }
+
+  var note = document.getElementById('load-note').value.trim();
+
+  loads.push({
+    num: loadNum,
+    time: timeStr,
+    lift: liftInfo ? liftInfo.plan.name : '—',
+    product: liftInfo ? liftInfo.plan.product : job.product,
+    bales: liftInfo ? liftInfo.balesThisLoad : 0,
+    acres: liftInfo ? liftInfo.acresThisLoad : 0,
+    hoseType: currentHose.type,
+    hoseMins: hoseMins,
+    waitType: currentWait.type,
+    waitMins: waitMins,
+    note: note
+  });
+
+  resetLoadForm();
+  updateLoggerUI();
+}
+
+function resetLoadForm() {
+  currentHose = { type:'none', mins:0 };
+  currentWait = { type:'none', mins:0 };
+  document.querySelectorAll('.hose-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.hose-btn[data-hose="none"]').classList.add('active');
+  document.querySelectorAll('.wait-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.wait-btn[data-wait="none"]').classList.add('active');
+  document.getElementById('custom-hose-wrap').style.display = 'none';
+  document.getElementById('long-wait-wrap').style.display = 'none';
+  document.getElementById('load-note').value = '';
+  var customHose = document.getElementById('custom-hose-mins');
+  if (customHose) customHose.value = '';
+  var longWait = document.getElementById('long-wait-mins');
+  if (longWait) longWait.value = '';
+}
+
+function deleteLoad(num) {
+  if (!confirm('Delete Load #' + num + '?')) return;
+  loads = loads.filter(function(l){ return l.num !== num; });
+  // Renumber
+  loads.forEach(function(l, i){ l.num = i+1; });
+  updateLoggerUI();
+}
+
+function renderLoadList() {
+  var container = document.getElementById('load-log-list');
+  if (loads.length === 0) {
+    container.innerHTML = '<div style="color:var(--gray-mid);font-size:0.85rem;text-align:center;padding:1rem">No loads logged yet.</div>';
+    return;
+  }
+  var html = '';
+  loads.slice().reverse().forEach(function(l) {
+    var cls = l.waitType === 'long' ? 'has-long-wait' : (l.waitType === 'short' ? 'has-wait' : '');
+    var detail = l.lift + ' · ' + l.product + ' · ' + l.bales + ' bales';
+    if (l.hoseMins > 0) detail += ' · 🚿 ' + l.hoseMins + ' min hose';
+    if (l.waitMins > 0) detail += ' · ⏱️ ' + l.waitMins + ' min wait';
+    if (l.note) detail += ' · ' + l.note;
+    html += '<div class="load-entry ' + cls + '">' +
+      '<div class="load-entry-main">' +
+      '<div class="load-entry-num">Load #' + l.num + '</div>' +
+      '<div class="load-entry-detail">' + detail + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem">' +
+      '<span class="load-entry-time">' + l.time + '</span>' +
+      '<button class="delete-load" onclick="deleteLoad(' + l.num + ')">🗑</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+}
+
+// ─── FINISH DAY → GENERATE SHEET ───
+function finishDay() {
+  var eodNotes = document.getElementById('eod-notes').value.trim();
+
+  // Meta
+  var dateStr = job.date ? new Date(job.date+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : new Date().toLocaleDateString();
+  document.getElementById('sheet-meta').innerHTML =
+    '<strong>' + job.name + '</strong> · GC: ' + job.gc + ' · ' + job.seedingType + '<br>' +
+    'Date: ' + dateStr + ' · Truck #' + job.truck + ' (' + job.tankGal.toLocaleString() + ' gal) · ' + job.product + '<br>' +
+    'Driver: ' + job.driver + ' · Cannon Master: ' + job.cannon;
+
+  // Calculate totals
+  var totalHoseMins = loads.reduce(function(s,l){ return s + l.hoseMins; }, 0);
+  var totalWaitMins = loads.reduce(function(s,l){ return s + (l.waitType !== 'none' ? l.waitMins : 0); }, 0);
+  var longWaits = loads.filter(function(l){ return l.waitType === 'long'; }).length;
+  var hoseLoads = loads.filter(function(l){ return l.hoseMins > 0; }).length;
+
+  // Summary boxes
+  var sumHTML =
+    '<div class="summary-box"><div class="summary-num">' + loads.length + '</div><div class="summary-label">Loads Today</div></div>' +
+    '<div class="summary-box"><div class="summary-num">' + job.areaAcres.toFixed(2) + '</div><div class="summary-label">Total Acres</div></div>' +
+    '<div class="summary-box"><div class="summary-num">' + job.lifts + '</div><div class="summary-label">Lifts</div></div>';
+  if (totalHoseMins > 0) {
+    var hoseHrs = (totalHoseMins/60).toFixed(1);
+    sumHTML += '<div class="summary-box warn"><div class="summary-num">' + hoseHrs + 'h</div><div class="summary-label">Hose Work</div></div>';
+  }
+  if (longWaits > 0) {
+    sumHTML += '<div class="summary-box alert"><div class="summary-num">' + longWaits + '</div><div class="summary-label">Long Waits ⚠️</div></div>';
+  }
+  document.getElementById('sheet-summary').innerHTML = sumHTML;
+
+  // Billing
+  var billingHTML = '';
+  if (totalHoseMins > 0 || totalWaitMins > 0) {
+    var hoseCharge = Math.ceil(totalHoseMins / 15) * (105/4); // $105/hr in 15-min blocks
+    var waitCharge = longWaits > 0 ? Math.ceil(totalWaitMins / 15) * (105/4) : 0;
+    billingHTML = '<div class="billing-card">' +
+      '<div class="billing-title">💰 Potential Billable Events</div>';
+    if (totalHoseMins > 0) {
+      billingHTML += '<div class="billing-line"><span>Hose work (' + hoseLoads + ' loads · ' + totalHoseMins + ' min)</span><span>$' + hoseCharge.toFixed(2) + '</span></div>';
+    }
+    if (waitCharge > 0) {
+      billingHTML += '<div class="billing-line"><span>Water waits — ' + longWaits + ' long wait(s) · ' + totalWaitMins + ' min</span><span>$' + waitCharge.toFixed(2) + '</span></div>';
+    }
+    var total = hoseCharge + waitCharge;
+    billingHTML += '<div class="billing-line"><span>TOTAL POTENTIAL ADDITIONAL CHARGES</span><span>$' + total.toFixed(2) + '</span></div>' +
+      '<div style="font-size:0.75rem;color:var(--red);margin-top:0.5rem">Billed at $105/hr in 15-minute increments per contract. Review with office before invoicing.</div>' +
+      '</div>';
+  }
+  document.getElementById('billing-section').innerHTML = billingHTML;
+
+  // Planned lift results
+  var liftHTML = '';
+  var grandTotals = {};
+  var totalSeedLbs = 0, totalFertBags = 0;
+  job.liftPlans.forEach(function(plan) {
+    var maxB = getMaxBales(plan.product, job.tankGal);
+    var maxMulch = maxB * 50;
+    var acresPerTank = plan.rate > 0 ? maxMulch / plan.rate : job.areaAcres;
+    var totalBales = Math.ceil(plan.rate * job.areaAcres / 50);
+    var numLoads = Math.ceil(job.areaAcres / acresPerTank);
+    var numFull = Math.floor(job.areaAcres / acresPerTank);
+    var remAcres = job.areaAcres - (numFull * acresPerTank);
+    if (!grandTotals[plan.product]) grandTotals[plan.product] = 0;
+    grandTotals[plan.product] += totalBales;
+    if (plan.seed) totalSeedLbs += job.seedRate * job.areaAcres;
+    if (plan.fert) totalFertBags += Math.ceil(job.fertRate * job.areaAcres / 50);
+
+    var cardsHTML = '';
+    for (var i = 0; i < numLoads; i++) {
+      var isLast = i === numLoads-1 && remAcres > 0.01;
+      var la = isLast ? remAcres : acresPerTank;
+      var lb = isLast ? Math.ceil(remAcres * plan.rate / 50) : maxB;
+      cardsHTML += '<div class="load-card"><div class="load-title">Load ' + (i+1) + (isLast?'<span class="load-badge">Partial</span>':'') + '</div>' +
+        '<div class="load-items">' +
+        '<div class="load-item"><div class="load-item-label">' + plan.product + '</div><div class="load-item-val">' + lb + ' bales (' + (lb*50) + ' lbs)</div></div>';
+      if (plan.seed && job.seedRate>0) cardsHTML += '<div class="load-item"><div class="load-item-label">Seed</div><div class="load-item-val">' + (job.seedRate*la).toFixed(1) + ' lbs</div></div>';
+      if (plan.fert && job.fertRate>0) { var fl=job.fertRate*la; cardsHTML += '<div class="load-item"><div class="load-item-label">' + job.fertName + '</div><div class="load-item-val">' + fl.toFixed(0) + ' lbs (' + Math.ceil(fl/50) + ' bags)</div></div>'; }
+      cardsHTML += '</div><div class="load-coverage">📍 ~' + la.toFixed(2) + ' acres (' + Math.round(la*43560).toLocaleString() + ' sq ft)</div></div>';
+    }
+    liftHTML += '<div class="lift-section"><div class="lift-header ' + plan.color + '">' + plan.name + ' — ' + plan.product + '<div class="lift-meta">' + numLoads + ' loads · ' + totalBales + ' bales · ' + job.areaAcres.toFixed(2) + ' acres</div></div>' + cardsHTML + '</div>';
+  });
+  document.getElementById('sheet-lift-results').innerHTML = liftHTML;
+
+  // Field log table
+  var logHTML = '<table class="totals-table"><tr><th>#</th><th>Time</th><th>Lift</th><th>Bales</th><th>Hose</th><th>Wait</th><th>Notes</th></tr>';
+  loads.forEach(function(l) {
+    logHTML += '<tr><td>' + l.num + '</td><td>' + l.time + '</td><td>' + l.lift + '</td><td>' + l.bales + '</td>' +
+      '<td>' + (l.hoseMins > 0 ? l.hoseMins + ' min' : '—') + '</td>' +
+      '<td style="color:' + (l.waitType==='long'?'var(--red)':(l.waitType==='short'?'var(--gold)':'inherit')) + '">' + (l.waitMins > 0 ? l.waitMins + ' min' : '—') + '</td>' +
+      '<td>' + (l.note||'—') + '</td></tr>';
+  });
+  if (eodNotes) logHTML += '<tr><td colspan="7"><strong>End of Day Notes:</strong> ' + eodNotes + '</td></tr>';
+  logHTML += '</table>';
+  document.getElementById('sheet-field-log').innerHTML = logHTML;
+
+  // Totals table
+  var totHTML = '<tr><th>Product</th><th>Bales</th><th>Total lbs</th></tr>';
+  Object.keys(grandTotals).forEach(function(k) {
+    totHTML += '<tr><td>' + k + '</td><td>' + grandTotals[k] + '</td><td>' + (grandTotals[k]*50).toLocaleString() + ' lbs</td></tr>';
+  });
+  if (totalSeedLbs > 0) totHTML += '<tr><td>Seed</td><td>' + totalSeedLbs.toFixed(0) + ' lbs</td><td>—</td></tr>';
+  if (totalFertBags > 0) totHTML += '<tr><td>' + job.fertName + '</td><td>' + totalFertBags + ' bags</td><td>' + (totalFertBags*50).toLocaleString() + ' lbs</td></tr>';
+  totHTML += '<tr><td colspan="3">LOADS COMPLETED TODAY: ' + loads.length + ' of ' + job.expectedLoads + ' expected</td></tr>';
+  document.getElementById('sheet-totals').innerHTML = totHTML;
+
+  showScreen('screen-results');
+}
+
+// ─── EMAIL ───
+function emailSheet() {
+  var totalHoseMins = loads.reduce(function(s,l){ return s+l.hoseMins; },0);
+  var totalWaitMins = loads.reduce(function(s,l){ return s+(l.waitType!=='none'?l.waitMins:0); },0);
+  var longWaits = loads.filter(function(l){ return l.waitType==='long'; }).length;
+  var hoseCharge = Math.ceil(totalHoseMins/15)*(105/4);
+  var waitCharge = longWaits>0 ? Math.ceil(totalWaitMins/15)*(105/4) : 0;
+
+  var subj = 'Load Sheet: ' + job.name + ' — ' + job.date;
+  var body = 'BELLA TERRA HYDROSEEDER LOAD SHEET\n\n' +
+    'Job: ' + job.name + '\nGC: ' + job.gc + '\nType: ' + job.seedingType + '\nDate: ' + job.date +
+    '\nTruck: #' + job.truck + ' (' + job.tankGal + ' gal)\nProduct: ' + job.product +
+    '\nDriver: ' + job.driver + '\nCannon Master: ' + job.cannon +
+    '\nArea: ' + job.areaAcres.toFixed(2) + ' acres · Lifts: ' + job.lifts +
+    '\n\nLOADS COMPLETED: ' + loads.length + ' of ' + job.expectedLoads + ' expected\n\n';
+
+  if (loads.length > 0) {
+    body += 'FIELD LOG:\n';
+    loads.forEach(function(l) {
+      body += 'Load #' + l.num + ' @ ' + l.time + ' — ' + l.lift + ' — ' + l.bales + ' bales';
+      if (l.hoseMins>0) body += ' — Hose: ' + l.hoseMins + ' min';
+      if (l.waitMins>0) body += ' — Wait: ' + l.waitMins + ' min (' + l.waitType + ')';
+      if (l.note) body += ' — ' + l.note;
+      body += '\n';
+    });
+  }
+
+  if (totalHoseMins > 0 || waitCharge > 0) {
+    body += '\nPOTENTIAL BILLABLE EVENTS:\n';
+    if (totalHoseMins>0) body += 'Hose work: ' + totalHoseMins + ' min = $' + hoseCharge.toFixed(2) + '\n';
+    if (waitCharge>0) body += 'Water waits: ' + totalWaitMins + ' min (' + longWaits + ' long waits) = $' + waitCharge.toFixed(2) + '\n';
+    body += 'TOTAL POTENTIAL ADDITIONAL: $' + (hoseCharge+waitCharge).toFixed(2) + '\n';
+  }
+
+  var eodNotes = document.getElementById('eod-notes') ? document.getElementById('eod-notes').value : '';
+  if (eodNotes) body += '\nEND OF DAY NOTES: ' + eodNotes + '\n';
+  body += '\nGenerated by Bella Terra Hydroseeder Calculator';
+
+  window.location.href = 'mailto:Rena@1BellaTerra.com,Brydon@1BellaTerra.com?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+}
+
+// Set today's date
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('job-date').value = new Date().toISOString().split('T')[0];
+});
+</script>
+</body>
+</html>
