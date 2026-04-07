@@ -848,6 +848,7 @@ body { font-family: 'Source Sans 3', sans-serif; background: var(--gray-light); 
 
 <script>
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mbdpwlad';
+ const ORDER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec'; 
 const PORTAL_PASSWORD = 'bellaterra';
 let currentEmployee = '';
 
@@ -972,15 +973,21 @@ function submitForm(type) {
 }
 
 function sendToFormspree(data, successId) {
-  if (FORMSPREE_ENDPOINT.indexOf('YOUR_FORM_ID') > -1) {
-    document.getElementById(successId).classList.add('show'); return;
-  }
-  fetch(FORMSPREE_ENDPOINT, {
+  // Determine if this goes to Google (Order) or Formspree (Signature)
+  const destination = data.product ? ORDER_ENDPOINT : FORMSPREE_ENDPOINT;
+
+  fetch(destination, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify(data)
-  }).then(function() { document.getElementById(successId).classList.add('show'); })
-  .catch(function() { document.getElementById(successId).classList.add('show'); });
+  }).then(function() { 
+    document.getElementById(successId).classList.add('show'); 
+    if (data.product) {
+       alert("Success! Your " + data.product + " reorder has been logged and sent to the vendor.");
+       closeReorderMenu();
+    }
+  }).catch(function() {
+    alert("Error sending. Please check your connection or contact the office.");
+  });
 }
 
 function initCanvases() {
