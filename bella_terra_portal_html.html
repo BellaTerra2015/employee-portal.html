@@ -163,8 +163,6 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .reorder-job-wrap input{padding:0.6rem 0.85rem;border:2px solid var(--border);border-radius:7px;font-family:inherit;font-size:0.95rem;transition:border-color 0.2s;}
 .reorder-job-wrap input:focus{outline:none;border-color:var(--green-mid);}
 .reorder-closer{background:transparent;border:none;font-size:1.6rem;cursor:pointer;color:var(--gray-mid);line-height:1;flex-shrink:0;}
-
-/* product rows */
 .reorder-item{border:2px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.85rem;transition:border-color 0.2s,background 0.2s;}
 .reorder-item.selected{border-color:var(--green-mid);background:var(--green-pale);}
 .reorder-item-top{display:flex;align-items:center;gap:0.75rem;cursor:pointer;}
@@ -188,6 +186,27 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .btn-reorder-cancel:hover{border-color:var(--red);color:var(--red);}
 .reorder-success{display:none;background:#eaf7ea;border:1px solid var(--green-light);border-radius:8px;padding:1rem 1.25rem;color:var(--green-dark);font-weight:600;margin-top:1rem;font-size:0.92rem;line-height:1.65;}
 .reorder-success.show{display:block;}
+
+/* ── ON OUR WAY MODAL ── */
+#omw-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:1200;align-items:center;justify-content:center;}
+#omw-modal.open{display:flex;}
+.omw-box{background:white;border-radius:16px;width:92%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 56px rgba(0,0,0,0.35);padding:2rem;}
+.omw-closer{background:transparent;border:none;font-size:1.6rem;cursor:pointer;color:var(--gray-mid);line-height:1;float:right;}
+.omw-service-btn{width:100%;background:#f5f5f2;border-radius:10px;padding:1.1rem 1.25rem;cursor:pointer;text-align:left;display:flex;align-items:center;gap:1rem;border:2px solid transparent;margin-bottom:0.75rem;transition:border-color 0.2s;}
+.omw-service-btn:hover{border-color:#7ab648;}
+.omw-eta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.6rem;}
+.omw-eta-btn{padding:0.5rem 0.25rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:2px solid var(--border);background:white;color:#555;transition:all 0.15s;}
+.omw-eta-btn.selected{border-color:var(--green-dark);background:var(--green-pale);color:var(--green-dark);}
+.omw-eta-btn.selected-bark{border-color:#b85c00;background:#fff3e8;color:#b85c00;}
+.omw-field{width:100%;padding:0.6rem 0.75rem;border:2px solid var(--border);border-radius:7px;font-family:inherit;font-size:0.95rem;margin-top:0.3rem;box-sizing:border-box;}
+.omw-field:focus{outline:none;border-color:var(--green-mid);}
+.omw-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:0.2rem;}
+.omw-preview{background:#f5f5f2;border-radius:10px;padding:1rem;margin:1rem 0;font-size:0.88rem;color:#444;line-height:1.6;}
+.omw-send-btn{width:100%;padding:0.9rem;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;color:white;margin-top:0.5rem;}
+.omw-back{background:none;border:none;color:#888;cursor:pointer;font-size:0.9rem;margin-bottom:1rem;padding:0;}
+.omw-scan-area{border:2px dashed var(--border);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;margin-bottom:1rem;transition:border-color 0.2s;}
+.omw-scan-area:hover{border-color:#7ab648;}
+.omw-success{background:#eaf7ea;border:1px solid var(--green-light);border-radius:10px;padding:1.5rem;text-align:center;margin-top:1rem;}
 
 @media(max-width:600px){
   .form-row,.reorder-detail-row{grid-template-columns:1fr;}
@@ -265,26 +284,44 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
   <div id="hydro-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:999;align-items:center;justify-content:center;">
     <div style="background:white;border-radius:16px;padding:2rem;width:90%;max-width:580px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">💧 Hydroseeding</h3>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">💧 Hydroseeding &amp; Bark Blowing</h3>
         <button onclick="closeHydroMenu()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;line-height:1;">&times;</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
+
         <a href="https://bellaterra2015.github.io/employee-portal.html/hydroseeder_calculator.html" target="_blank" style="display:block;background:#f5f5f2;border-radius:10px;padding:1.25rem;text-decoration:none;color:#2a2a2a;border:2px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='transparent'">
           <div style="font-size:2rem;margin-bottom:0.5rem;">🧮</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Load Calculator</div>
           <div style="font-size:0.8rem;color:#888;">Mix rates, loads, and field logging.</div>
         </a>
+
         <a href="https://bellaterra2015.github.io/Hydroseeding-Platform-Operations-Safety-Policy/" target="_blank" style="display:block;background:#f5f5f2;border-radius:10px;padding:1.25rem;text-decoration:none;color:#2a2a2a;border:2px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='transparent'">
           <div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Platform Policy</div>
           <div style="font-size:0.8rem;color:#888;">Operations and safety policy.</div>
         </a>
+
         <!-- REORDER BUTTON -->
         <div onclick="openReorder()" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.background='#d4edcc'" onmouseout="this.style.background='#e8f5e2'">
           <div style="font-size:2rem;margin-bottom:0.5rem;">🛒</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Reorder Supplies</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Flag low stock → sends vendor email</div>
         </div>
+
+        <!-- ── NEW: ON OUR WAY — HYDROSEEDING ── -->
+        <div onclick="openOMW('Hydroseeding')" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.background='#d4edcc'" onmouseout="this.style.background='#e8f5e2'">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">💧📱</div>
+          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">On Our Way — Hydroseed</div>
+          <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Scan work order → text customer ETA</div>
+        </div>
+
+        <!-- ── NEW: ON OUR WAY — BARK BLOWING ── -->
+        <div onclick="openOMW('Bark Blowing')" style="display:block;background:#fff3e8;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #e07c30;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.background='#ffe8cc'" onmouseout="this.style.background='#fff3e8'">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">🌬️📱</div>
+          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#b85c00;margin-bottom:0.25rem;">On Our Way — Bark Blowing</div>
+          <div style="font-size:0.8rem;color:#b85c00;font-weight:600;">Scan work order → text customer ETA</div>
+        </div>
+
         <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;opacity:0.6;cursor:default;">
           <div style="font-size:2rem;margin-bottom:0.5rem;">📻</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">How to Use Comms</div>
@@ -300,7 +337,16 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Preload Checklist</div>
           <div style="font-size:0.8rem;color:#888;">🚧 Coming soon</div>
         </div>
+
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ ON OUR WAY MODAL ═══ -->
+  <div id="omw-modal">
+    <div class="omw-box">
+      <button class="omw-closer" onclick="closeOMW()">&times;</button>
+      <div id="omw-content"></div>
     </div>
   </div>
 
@@ -314,15 +360,11 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
         </div>
         <button class="reorder-closer" onclick="closeReorder()">&times;</button>
       </div>
-
       <div class="reorder-job-wrap">
         <label>Job / Project Name</label>
         <input type="text" id="reorder-job" value="Hydroseed Residential">
       </div>
-
-      <!-- Products are rendered by JS -->
       <div id="reorder-items"></div>
-
       <div class="reorder-footer">
         <button class="btn-reorder-submit" onclick="submitReorder()">📤 Send Reorder Request</button>
         <button class="btn-reorder-cancel" onclick="closeReorder()">Cancel</button>
@@ -346,7 +388,6 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
         <button class="res-tab" onclick="showSubPanel('sub-handbook',this)">📖 Employee Handbook <span class="badge" id="handbook-badge">!</span></button>
       </div>
 
-      <!-- OVERVIEW -->
       <div class="sub-panel active" id="sub-dashboard">
         <div class="welcome-card">
           <h3>Your To-Do List</h3>
@@ -374,7 +415,6 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
         </div>
       </div>
 
-      <!-- HANDBOOK -->
       <div class="sub-panel" id="sub-handbook">
         <div class="section-header"><h3>Employee Handbook</h3><div class="divider"></div></div>
         <div class="handbook-progress">
@@ -388,339 +428,35 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
           <h3>✅ Handbook Complete!</h3>
           <p>All required sections have been initialed. Your acknowledgments have been sent to payroll.</p>
         </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-1">1</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">About This Manual &amp; Company Overview</div>
-              <div class="chapter-type read-only">📘 Read — No initials required</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <p>While Bella Terra was established as, and is registered as, a limited liability corporation, we use the terms "Bella Terra, LLC," "Bella Terra," and "the Company" interchangeably throughout this manual.</p>
-              <p style="margin-top:0.75rem">Employees are encouraged to ask questions and provide feedback to their Team Leader, Foreman, Supervisor, or Management. Please bring any errors or suggestions to the attention of Heather Hooper.</p>
-              <h4>Purpose</h4>
-              <p>This manual is designed to develop clear communication of company policies and provide a positive contribution to team morale and operational success.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-2">2</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">New Employee Onboarding &amp; Required Forms</div>
-              <div class="chapter-type initial" id="type-2">✍ Initial required after reading</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>Pre-Hire Screening</h4>
-              <p>All potential employees are subject to pre-employment drug and alcohol testing.</p>
-              <h4>Required Forms Upon Hire</h4>
-              <ul>
-                <li><strong>USCIS Form I-9</strong> — Identity and employment authorization</li>
-                <li><strong>W-4</strong> — Federal tax withholding</li>
-                <li><strong>Direct Deposit Form</strong></li>
-                <li><strong>Trade Secret &amp; Non-Solicitation Agreement</strong></li>
-                <li><strong>4/10 Work Agreement</strong> (signed annually)</li>
-                <li><strong>Breaks &amp; Meal Period Acknowledgment</strong> (signed annually)</li>
-              </ul>
-            </div>
-            <div class="initial-block">
-              <p><strong>Initial to confirm:</strong> I have read and understand the New Employee Onboarding section.</p>
-              <div class="initial-row">
-                <input type="text" placeholder="Initials" id="init-2" maxlength="4">
-                <button class="btn-initial" onclick="saveInitial(2)">Confirm Initials</button>
-                <div class="initial-done" id="done-2">✅ Initialed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-3">3</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">Operations, Scheduling &amp; Payroll</div>
-              <div class="chapter-type initial" id="type-3">✍ Initial required after reading</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>4/10 Work Week</h4>
-              <p>Bella Terra operates on a 4/10 schedule — four 10-hour days per week.</p>
-              <h4>Rest and Meal Breaks</h4>
-              <ul>
-                <li>Paid 10-minute rest break for every 4 hours worked</li>
-                <li>Unpaid 30-minute meal break when working more than 5 hours</li>
-                <li>Breaks may not be skipped or waived to leave early</li>
-              </ul>
-              <h4>Payroll</h4>
-              <ul>
-                <li>Time cards must be accurately completed each day</li>
-                <li>Overtime is calculated on hours worked over 40 per week</li>
-                <li>Direct deposit is available and encouraged</li>
-              </ul>
-            </div>
-            <div class="initial-block">
-              <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's scheduling, break, and payroll policies.</p>
-              <div class="initial-row">
-                <input type="text" placeholder="Initials" id="init-3" maxlength="4">
-                <button class="btn-initial" onclick="saveInitial(3)">Confirm Initials</button>
-                <div class="initial-done" id="done-3">✅ Initialed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-4">4</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">Employee Health &amp; Welfare / Paid Sick Leave</div>
-              <div class="chapter-type read-only">📘 Read — No initials required</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>Paid Sick Leave</h4>
-              <p>Employees earn 1 hour of paid sick leave for every 40 hours worked.</p>
-              <h4>Employer-Funded Medical Care</h4>
-              <p>Bella Terra covers up to 4 visits per year at <strong>Vital Care Primary &amp; Urgent Care</strong>, 1207 SE Rasmussen Blvd, Suite 119, Battle Ground, WA · (360) 723-0528</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-5">5</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">Drug &amp; Alcohol Policy</div>
-              <div class="chapter-type initial" id="type-5">✍ Initial required after reading</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>Zero Tolerance Policy</h4>
-              <p>Bella Terra has a zero-tolerance policy for illegal substances and alcohol use during work hours.</p>
-              <h4>Marijuana — Washington State Notice</h4>
-              <p><strong>Any detectable level of marijuana impairment during work hours is prohibited.</strong> Pre-employment, reasonable suspicion, and post-accident testing are in effect.</p>
-            </div>
-            <div class="initial-block">
-              <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Drug &amp; Alcohol Policy including marijuana provisions.</p>
-              <div class="initial-row">
-                <input type="text" placeholder="Initials" id="init-5" maxlength="4">
-                <button class="btn-initial" onclick="saveInitial(5)">Confirm Initials</button>
-                <div class="initial-done" id="done-5">✅ Initialed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-6">6</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">Out-of-Town Project Housing Policy</div>
-              <div class="chapter-type initial" id="type-6">✍ Initial required after reading</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>Strictly Prohibited in Company Housing</h4>
-              <ul>
-                <li>Alcohol in any form</li>
-                <li>Illegal drugs or marijuana in any form</li>
-                <li>Vaping or tobacco products used indoors</li>
-                <li>Guests not employed by Bella Terra on the same project</li>
-              </ul>
-              <h4>Room Assignments &amp; Privacy</h4>
-              <p><strong>Any employee sharing housing with employees of a different gender will be assigned a private bedroom with a private or en-suite bathroom.</strong></p>
-            </div>
-            <div class="initial-block">
-              <p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Out-of-Town Project Housing Policy.</p>
-              <div class="initial-row">
-                <input type="text" placeholder="Initials" id="init-6" maxlength="4">
-                <button class="btn-initial" onclick="saveInitial(6)">Confirm Initials</button>
-                <div class="initial-done" id="done-6">✅ Initialed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="handbook-chapter">
-          <div class="chapter-header" onclick="toggleChapter(this)">
-            <div class="chapter-num" id="num-7">7</div>
-            <div class="chapter-title-wrap">
-              <div class="chapter-title">Trade Secret &amp; Non-Solicitation Agreement</div>
-              <div class="chapter-type initial" id="type-7">✍ Initial required after reading</div>
-            </div>
-            <span class="chapter-arrow">▼</span>
-          </div>
-          <div class="chapter-body">
-            <div class="chapter-content">
-              <h4>Protected Confidential Information</h4>
-              <ul>
-                <li>Hydroseeding application techniques, seed mixes, mulch formulas</li>
-                <li>Customer lists, contact information, pricing, and project history</li>
-                <li>Equipment settings, operational procedures, and efficiency methods</li>
-              </ul>
-              <h4>Non-Solicitation of Customers</h4>
-              <p>For <strong>18 months following separation</strong> from Bella Terra, you agree not to directly solicit any current Bella Terra customer.</p>
-            </div>
-            <div class="initial-block">
-              <p><strong>Initial to confirm:</strong> I have read and agree to Bella Terra's Trade Secret &amp; Non-Solicitation policy.</p>
-              <div class="initial-row">
-                <input type="text" placeholder="Initials" id="init-7" maxlength="4">
-                <button class="btn-initial" onclick="saveInitial(7)">Confirm Initials</button>
-                <div class="initial-done" id="done-7">✅ Initialed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="handbook-submit-wrap" style="display:none;margin-top:1.5rem;">
-          <div class="sig-card">
-            <h4>Submit Handbook Acknowledgment</h4>
-            <div class="description">All required sections initialed. Submit to send your acknowledgment to payroll.</div>
-            <div class="form-row">
-              <div class="form-group"><label>Full Name</label><input type="text" id="hb-name" placeholder="First Last"></div>
-              <div class="form-group"><label>Date</label><input type="date" id="hb-date"></div>
-            </div>
-            <button class="btn-submit" onclick="submitHandbook()">📤 Submit Acknowledgment</button>
-            <div class="success-msg" id="hb-success">✅ Acknowledgment sent to payroll</div>
-          </div>
-        </div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-1">1</div><div class="chapter-title-wrap"><div class="chapter-title">About This Manual &amp; Company Overview</div><div class="chapter-type read-only">📘 Read — No initials required</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><p>While Bella Terra was established as, and is registered as, a limited liability corporation, we use the terms "Bella Terra, LLC," "Bella Terra," and "the Company" interchangeably throughout this manual.</p><p style="margin-top:0.75rem">Employees are encouraged to ask questions and provide feedback to their Team Leader, Foreman, Supervisor, or Management. Please bring any errors or suggestions to the attention of Heather Hooper.</p><h4>Purpose</h4><p>This manual is designed to develop clear communication of company policies and provide a positive contribution to team morale and operational success.</p></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-2">2</div><div class="chapter-title-wrap"><div class="chapter-title">New Employee Onboarding &amp; Required Forms</div><div class="chapter-type initial" id="type-2">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Pre-Hire Screening</h4><p>All potential employees are subject to pre-employment drug and alcohol testing.</p><h4>Required Forms Upon Hire</h4><ul><li><strong>USCIS Form I-9</strong> — Identity and employment authorization</li><li><strong>W-4</strong> — Federal tax withholding</li><li><strong>Direct Deposit Form</strong></li><li><strong>Trade Secret &amp; Non-Solicitation Agreement</strong></li><li><strong>4/10 Work Agreement</strong> (signed annually)</li><li><strong>Breaks &amp; Meal Period Acknowledgment</strong> (signed annually)</li></ul></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand the New Employee Onboarding section.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-2" maxlength="4"><button class="btn-initial" onclick="saveInitial(2)">Confirm Initials</button><div class="initial-done" id="done-2">✅ Initialed</div></div></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-3">3</div><div class="chapter-title-wrap"><div class="chapter-title">Operations, Scheduling &amp; Payroll</div><div class="chapter-type initial" id="type-3">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>4/10 Work Week</h4><p>Bella Terra operates on a 4/10 schedule — four 10-hour days per week.</p><h4>Rest and Meal Breaks</h4><ul><li>Paid 10-minute rest break for every 4 hours worked</li><li>Unpaid 30-minute meal break when working more than 5 hours</li><li>Breaks may not be skipped or waived to leave early</li></ul><h4>Payroll</h4><ul><li>Time cards must be accurately completed each day</li><li>Overtime is calculated on hours worked over 40 per week</li><li>Direct deposit is available and encouraged</li></ul></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's scheduling, break, and payroll policies.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-3" maxlength="4"><button class="btn-initial" onclick="saveInitial(3)">Confirm Initials</button><div class="initial-done" id="done-3">✅ Initialed</div></div></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-4">4</div><div class="chapter-title-wrap"><div class="chapter-title">Employee Health &amp; Welfare / Paid Sick Leave</div><div class="chapter-type read-only">📘 Read — No initials required</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Paid Sick Leave</h4><p>Employees earn 1 hour of paid sick leave for every 40 hours worked.</p><h4>Employer-Funded Medical Care</h4><p>Bella Terra covers up to 4 visits per year at <strong>Vital Care Primary &amp; Urgent Care</strong>, 1207 SE Rasmussen Blvd, Suite 119, Battle Ground, WA · (360) 723-0528</p></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-5">5</div><div class="chapter-title-wrap"><div class="chapter-title">Drug &amp; Alcohol Policy</div><div class="chapter-type initial" id="type-5">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Zero Tolerance Policy</h4><p>Bella Terra has a zero-tolerance policy for illegal substances and alcohol use during work hours.</p><h4>Marijuana — Washington State Notice</h4><p><strong>Any detectable level of marijuana impairment during work hours is prohibited.</strong> Pre-employment, reasonable suspicion, and post-accident testing are in effect.</p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Drug &amp; Alcohol Policy including marijuana provisions.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-5" maxlength="4"><button class="btn-initial" onclick="saveInitial(5)">Confirm Initials</button><div class="initial-done" id="done-5">✅ Initialed</div></div></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-6">6</div><div class="chapter-title-wrap"><div class="chapter-title">Out-of-Town Project Housing Policy</div><div class="chapter-type initial" id="type-6">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Strictly Prohibited in Company Housing</h4><ul><li>Alcohol in any form</li><li>Illegal drugs or marijuana in any form</li><li>Vaping or tobacco products used indoors</li><li>Guests not employed by Bella Terra on the same project</li></ul><h4>Room Assignments &amp; Privacy</h4><p><strong>Any employee sharing housing with employees of a different gender will be assigned a private bedroom with a private or en-suite bathroom.</strong></p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Out-of-Town Project Housing Policy.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-6" maxlength="4"><button class="btn-initial" onclick="saveInitial(6)">Confirm Initials</button><div class="initial-done" id="done-6">✅ Initialed</div></div></div></div></div>
+        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-7">7</div><div class="chapter-title-wrap"><div class="chapter-title">Trade Secret &amp; Non-Solicitation Agreement</div><div class="chapter-type initial" id="type-7">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Protected Confidential Information</h4><ul><li>Hydroseeding application techniques, seed mixes, mulch formulas</li><li>Customer lists, contact information, pricing, and project history</li><li>Equipment settings, operational procedures, and efficiency methods</li></ul><h4>Non-Solicitation of Customers</h4><p>For <strong>18 months following separation</strong> from Bella Terra, you agree not to directly solicit any current Bella Terra customer.</p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and agree to Bella Terra's Trade Secret &amp; Non-Solicitation policy.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-7" maxlength="4"><button class="btn-initial" onclick="saveInitial(7)">Confirm Initials</button><div class="initial-done" id="done-7">✅ Initialed</div></div></div></div></div>
+        <div id="handbook-submit-wrap" style="display:none;margin-top:1.5rem;"><div class="sig-card"><h4>Submit Handbook Acknowledgment</h4><div class="description">All required sections initialed. Submit to send your acknowledgment to payroll.</div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="hb-name" placeholder="First Last"></div><div class="form-group"><label>Date</label><input type="date" id="hb-date"></div></div><button class="btn-submit" onclick="submitHandbook()">📤 Submit Acknowledgment</button><div class="success-msg" id="hb-success">✅ Acknowledgment sent to payroll</div></div></div>
       </div>
 
-      <!-- SIGNATURES -->
       <div class="sub-panel" id="sub-signatures">
         <div class="section-header"><h3>Required Signatures</h3><div class="divider"></div></div>
-        <div class="annual-info">
-          <p><strong>Annual Documents:</strong> The 4/10 Work Agreement and Breaks &amp; Meal Period Acknowledgment must be signed at the start of each calendar year. Completed signatures are emailed to <strong>payroll&#64;1BellaTerra.com</strong>.</p>
-        </div>
-        <div class="sig-card">
-          <h4>📅 4/10 Work Schedule Agreement</h4>
-          <div class="description">Must be signed at the beginning of each calendar year or upon first login on a new device.</div>
-          <div class="doc-preview">
-            <h5>Bella Terra LLC — 4/10 Work Schedule Agreement</h5>
-            <p>I understand and agree to Bella Terra's 4/10 work schedule — four (4) ten (10) hour workdays per week. I understand that:</p>
-            <ul>
-              <li>My standard workday will be 10 hours, not including unpaid meal breaks</li>
-              <li>Overtime is calculated on hours in excess of 40 per workweek</li>
-              <li>My specific days and hours will be assigned by my supervisor and may vary seasonally</li>
-              <li>This agreement is reviewed and re-executed annually</li>
-            </ul>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Full Name</label><input type="text" id="410-name" placeholder="First Last"></div>
-            <div class="form-group"><label>Position</label><input type="text" id="410-position" placeholder="e.g. Hydroseeder Operator"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Date of Hire</label><input type="date" id="410-hire"></div>
-            <div class="form-group"><label>Today's Date</label><input type="date" id="410-date"></div>
-          </div>
-          <div class="sig-pad-wrap">
-            <label>Employee Signature (draw below)</label>
-            <canvas class="sig-pad" id="canvas-410" width="500" height="120"></canvas>
-            <div class="sig-controls">
-              <button class="btn-clear" onclick="clearSig('canvas-410')">✕ Clear</button>
-              <span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span>
-            </div>
-          </div>
-          <div class="consent-check">
-            <input type="checkbox" id="consent-410">
-            <label for="consent-410">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to the 4/10 Work Schedule Agreement.</label>
-          </div>
-          <button class="btn-submit" onclick="submitForm('410')">📤 Submit Agreement</button>
-          <div class="success-msg" id="success-410">✅ 4/10 Agreement submitted to payroll</div>
-        </div>
-
-        <div class="sig-card">
-          <h4>🍽 Break &amp; Meal Period Acknowledgment</h4>
-          <div class="description">Washington State requires annual documentation that employees understand rest and meal break rights.</div>
-          <div class="doc-preview">
-            <h5>Bella Terra — Break &amp; Meal Period Acknowledgment</h5>
-            <p><strong>Rest Breaks (Paid):</strong> 10 minutes for every 4 hours worked. Cannot be waived to leave early.</p>
-            <p style="margin-top:0.5rem"><strong>Meal Breaks (Unpaid):</strong> 30 minutes when working more than 5 hours.</p>
-            <ul style="margin-top:0.5rem">
-              <li>Take your assigned breaks as scheduled</li>
-              <li>Immediately notify your supervisor if you cannot take a break</li>
-              <li>Do not skip breaks to work longer or leave early</li>
-            </ul>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Full Name</label><input type="text" id="breaks-name" placeholder="First Last"></div>
-            <div class="form-group"><label>Position</label><input type="text" id="breaks-position" placeholder="e.g. Crew Member"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Date of Hire</label><input type="date" id="breaks-hire"></div>
-            <div class="form-group"><label>Today's Date</label><input type="date" id="breaks-date"></div>
-          </div>
-          <div class="sig-pad-wrap">
-            <label>Employee Signature (draw below)</label>
-            <canvas class="sig-pad" id="canvas-breaks" width="500" height="120"></canvas>
-            <div class="sig-controls">
-              <button class="btn-clear" onclick="clearSig('canvas-breaks')">✕ Clear</button>
-              <span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span>
-            </div>
-          </div>
-          <div class="consent-check">
-            <input type="checkbox" id="consent-breaks">
-            <label for="consent-breaks">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to Bella Terra's Break &amp; Meal Period policies.</label>
-          </div>
-          <button class="btn-submit" onclick="submitForm('breaks')">📤 Submit Acknowledgment</button>
-          <div class="success-msg" id="success-breaks">✅ Acknowledgment submitted to payroll</div>
-        </div>
+        <div class="annual-info"><p><strong>Annual Documents:</strong> The 4/10 Work Agreement and Breaks &amp; Meal Period Acknowledgment must be signed at the start of each calendar year. Completed signatures are emailed to <strong>payroll&#64;1BellaTerra.com</strong>.</p></div>
+        <div class="sig-card"><h4>📅 4/10 Work Schedule Agreement</h4><div class="description">Must be signed at the beginning of each calendar year or upon first login on a new device.</div><div class="doc-preview"><h5>Bella Terra LLC — 4/10 Work Schedule Agreement</h5><p>I understand and agree to Bella Terra's 4/10 work schedule — four (4) ten (10) hour workdays per week. I understand that:</p><ul><li>My standard workday will be 10 hours, not including unpaid meal breaks</li><li>Overtime is calculated on hours in excess of 40 per workweek</li><li>My specific days and hours will be assigned by my supervisor and may vary seasonally</li><li>This agreement is reviewed and re-executed annually</li></ul></div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="410-name" placeholder="First Last"></div><div class="form-group"><label>Position</label><input type="text" id="410-position" placeholder="e.g. Hydroseeder Operator"></div></div><div class="form-row"><div class="form-group"><label>Date of Hire</label><input type="date" id="410-hire"></div><div class="form-group"><label>Today's Date</label><input type="date" id="410-date"></div></div><div class="sig-pad-wrap"><label>Employee Signature (draw below)</label><canvas class="sig-pad" id="canvas-410" width="500" height="120"></canvas><div class="sig-controls"><button class="btn-clear" onclick="clearSig('canvas-410')">✕ Clear</button><span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span></div></div><div class="consent-check"><input type="checkbox" id="consent-410"><label for="consent-410">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to the 4/10 Work Schedule Agreement.</label></div><button class="btn-submit" onclick="submitForm('410')">📤 Submit Agreement</button><div class="success-msg" id="success-410">✅ 4/10 Agreement submitted to payroll</div></div>
+        <div class="sig-card"><h4>🍽 Break &amp; Meal Period Acknowledgment</h4><div class="description">Washington State requires annual documentation that employees understand rest and meal break rights.</div><div class="doc-preview"><h5>Bella Terra — Break &amp; Meal Period Acknowledgment</h5><p><strong>Rest Breaks (Paid):</strong> 10 minutes for every 4 hours worked. Cannot be waived to leave early.</p><p style="margin-top:0.5rem"><strong>Meal Breaks (Unpaid):</strong> 30 minutes when working more than 5 hours.</p><ul style="margin-top:0.5rem"><li>Take your assigned breaks as scheduled</li><li>Immediately notify your supervisor if you cannot take a break</li><li>Do not skip breaks to work longer or leave early</li></ul></div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="breaks-name" placeholder="First Last"></div><div class="form-group"><label>Position</label><input type="text" id="breaks-position" placeholder="e.g. Crew Member"></div></div><div class="form-row"><div class="form-group"><label>Date of Hire</label><input type="date" id="breaks-hire"></div><div class="form-group"><label>Today's Date</label><input type="date" id="breaks-date"></div></div><div class="sig-pad-wrap"><label>Employee Signature (draw below)</label><canvas class="sig-pad" id="canvas-breaks" width="500" height="120"></canvas><div class="sig-controls"><button class="btn-clear" onclick="clearSig('canvas-breaks')">✕ Clear</button><span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span></div></div><div class="consent-check"><input type="checkbox" id="consent-breaks"><label for="consent-breaks">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to Bella Terra's Break &amp; Meal Period policies.</label></div><button class="btn-submit" onclick="submitForm('breaks')">📤 Submit Acknowledgment</button><div class="success-msg" id="success-breaks">✅ Acknowledgment submitted to payroll</div></div>
       </div>
 
-      <!-- CONTACTS -->
       <div class="sub-panel" id="sub-contacts">
         <div class="section-header"><h3>Contacts &amp; Resources</h3><div class="divider"></div></div>
         <div class="resource-grid">
-          <a class="resource-card" href="https://www.lni.wa.gov/WorkplaceRights" target="_blank">
-            <div class="resource-icon">⚖️</div>
-            <h4>WA Labor &amp; Industries</h4>
-            <p>Workplace rights, L&amp;I claims, safety resources.</p>
-          </a>
-          <a class="resource-card" href="https://www.vitalcarewa.com" target="_blank">
-            <div class="resource-icon">🏥</div>
-            <h4>Vital Care Urgent Care</h4>
-            <p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p>
-          </a>
-          <div class="resource-card">
-            <div class="resource-icon">📧</div>
-            <h4>HR / Office</h4>
-            <p>Liz Prather<br>office&#64;1BellaTerra.com<br><span style="font-size:0.78rem">HR · Employment Verification · W-2</span></p>
-          </div>
-          <a class="resource-card" href="tel:3606065616">
-            <div class="resource-icon">📞</div>
-            <h4>Safety — Rena Bellika</h4>
-            <p>(360) 606-5616<br>Report injuries immediately</p>
-          </a>
-          <a class="resource-card" href="tel:3605609860">
-            <div class="resource-icon">🦺</div>
-            <h4>Safety — Brydon Bellika</h4>
-            <p>(360) 560-9860<br>Report injuries immediately</p>
-          </a>
-          <div class="resource-card">
-            <div class="resource-icon">💵</div>
-            <h4>Payroll</h4>
-            <p>payroll&#64;1BellaTerra.com<br>Timecard &amp; pay questions</p>
-          </div>
+          <a class="resource-card" href="https://www.lni.wa.gov/WorkplaceRights" target="_blank"><div class="resource-icon">⚖️</div><h4>WA Labor &amp; Industries</h4><p>Workplace rights, L&amp;I claims, safety resources.</p></a>
+          <a class="resource-card" href="https://www.vitalcarewa.com" target="_blank"><div class="resource-icon">🏥</div><h4>Vital Care Urgent Care</h4><p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p></a>
+          <div class="resource-card"><div class="resource-icon">📧</div><h4>HR / Office</h4><p>Liz Prather<br>office&#64;1BellaTerra.com<br><span style="font-size:0.78rem">HR · Employment Verification · W-2</span></p></div>
+          <a class="resource-card" href="tel:3606065616"><div class="resource-icon">📞</div><h4>Safety — Rena Bellika</h4><p>(360) 606-5616<br>Report injuries immediately</p></a>
+          <a class="resource-card" href="tel:3605609860"><div class="resource-icon">🦺</div><h4>Safety — Brydon Bellika</h4><p>(360) 560-9860<br>Report injuries immediately</p></a>
+          <div class="resource-card"><div class="resource-icon">💵</div><h4>Payroll</h4><p>payroll&#64;1BellaTerra.com<br>Timecard &amp; pay questions</p></div>
         </div>
       </div>
 
-      <!-- TEAM DIRECTORY -->
       <div class="sub-panel" id="sub-directory">
         <div class="section-header"><h3>👷 Team Directory</h3><div class="divider"></div></div>
         <p style="font-size:0.85rem;color:var(--gray-mid);margin-bottom:1.5rem;">Tap a card to call. Listed alphabetically.</p>
@@ -742,7 +478,6 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
           <div class="resource-card"><div style="font-size:1.6rem;margin-bottom:0.4rem;">📊</div><h4>Kevin Willbur</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Lead Estimator · Landscaping Bids</p><a href="tel:3607986759" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;margin-bottom:0.3rem;">📱 (360) 798-6759</a></div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -754,8 +489,13 @@ var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW
 var CC_EMAILS   = ['Rena@1BellaTerra.com','Office@1BellaTerra.com'];
 var PORTAL_PW   = 'bellaterra';
 
+// ── CLICKSEND CONFIG ─────────────────────────────────────────────
+var CS_USER = 'Bids@1bellaterra.com';
+var CS_KEY  = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
+var CS_FROM = '+13602251125';
+var ANTHROPIC_KEY = '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';
+
 // ── PRODUCTS ─────────────────────────────────────────────────────
-// Fields: id, product, nameOfProduct, supplier, vendorEmail, reorderAmt, reorderUnit, triggerAmt, triggerUnit
 var PRODUCTS = [
   { id:'mulch',    product:'Mulch',             nameOfProduct:'50/50 Mulch',          supplier:'Cascade Geo', vendorEmail:'travis.riehl@cascadegeos.com', reorderAmt:5,  reorderUnit:'Pallet', triggerAmt:1,  triggerUnit:'Pallet' },
   { id:'tackifier',product:'Tackifier',          nameOfProduct:'Soil Binder',          supplier:'Simplot',     vendorEmail:'Sean.Watts@simplot.com',       reorderAmt:2,  reorderUnit:'Jug',    triggerAmt:1,  triggerUnit:'Jug'    },
@@ -767,6 +507,15 @@ var PRODUCTS = [
 var currentEmployee = '';
 var initialed = {};
 var REQUIRED_INITIALS = [2,3,5,6,7];
+
+var ETA_OPTIONS = ['15 minutes','30 minutes','45 minutes','1 hour','1.5 hours','2 hours','2.5 hours','3 hours','4 hours'];
+var omwService = '';
+var omwStep = '';
+var omwName = '';
+var omwPhone = '';
+var omwEta = '';
+var omwImageB64 = '';
+var omwImageType = '';
 
 // ── LOGIN ────────────────────────────────────────────────────────
 function doLogin(){
@@ -802,6 +551,143 @@ function showSubPanel(id,btn){
 function showHydroMenu(){document.getElementById('hydro-modal').style.display='flex';}
 function closeHydroMenu(){document.getElementById('hydro-modal').style.display='none';}
 
+// ── ON OUR WAY ───────────────────────────────────────────────────
+function openOMW(svc){
+  closeHydroMenu();
+  omwService=svc; omwStep='scan'; omwName=''; omwPhone=''; omwEta=''; omwImageB64=''; omwImageType='';
+  document.getElementById('omw-modal').classList.add('open');
+  renderOMW();
+}
+function closeOMW(){
+  document.getElementById('omw-modal').classList.remove('open');
+}
+
+function omwColors(){
+  if(omwService==='Hydroseeding') return {primary:'#2d5a27',light:'#e8f5e2',border:'#7ab648',emoji:'💧'};
+  return {primary:'#b85c00',light:'#fff3e8',border:'#e07c30',emoji:'🌬️'};
+}
+
+function renderOMW(){
+  var c=omwColors();
+  var html='';
+  if(omwStep==='scan'){
+    html='<h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:0.25rem;margin-right:2rem;">'+c.emoji+' '+omwService+'</h3>'
+      +'<p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem;">Take a photo of the work order — we\'ll pull the customer name and phone automatically.</p>'
+      +'<div class="omw-scan-area" onclick="document.getElementById(\'omw-file\').click()" style="border-color:'+c.border+'">'
+      +'<div style="font-size:2.5rem;margin-bottom:0.5rem;">📷</div>'
+      +'<div style="font-weight:600;color:'+c.primary+';">Tap to photograph work order</div>'
+      +'<div style="font-size:0.82rem;color:#888;margin-top:0.25rem;">Name &amp; phone will be read automatically</div>'
+      +'</div>'
+      +'<input type="file" id="omw-file" accept="image/*" capture="environment" style="display:none" onchange="omwHandlePhoto(this)">';
+  } else if(omwStep==='scanning'){
+    html='<h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:1rem;margin-right:2rem;">'+c.emoji+' Reading work order…</h3>'
+      +'<div style="text-align:center;padding:2rem;background:'+c.light+';border-radius:12px;">'
+      +'<div style="font-size:2rem;margin-bottom:0.75rem;">🔍</div>'
+      +'<div style="color:'+c.primary+';font-weight:600;">Extracting customer info…</div>'
+      +'</div>';
+  } else if(omwStep==='review'){
+    var isBark=omwService==='Bark Blowing';
+    var etaHtml='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.4rem;">';
+    ETA_OPTIONS.forEach(function(opt){
+      var sel=omwEta===opt;
+      var selClass=sel?(isBark?' style="border-color:#b85c00;background:#fff3e8;color:#b85c00;"':' style="border-color:#2d5a27;background:#e8f5e2;color:#2d5a27;"'):'';
+      etaHtml+='<button onclick="omwSetEta(\''+opt+'\')" style="padding:0.5rem 0.25rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:2px solid #d0dcc8;background:white;color:#555;'+( sel?(isBark?'border-color:#b85c00;background:#fff3e8;color:#b85c00;':'border-color:#2d5a27;background:#e8f5e2;color:#2d5a27;'):'' )+'">' +opt+'</button>';
+    });
+    etaHtml+='</div>';
+    var preview=omwEta?'<div class="omw-preview"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.3rem;">Message Preview</div>Your Bella Terra crew is on the way! ETA: '+omwEta+'. We look forward to seeing you. – Bella Terra LLC</div>':'';
+    html='<button class="omw-back" onclick="omwStep=\'scan\';renderOMW()">← Retake Photo</button>'
+      +'<h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:1rem;margin-right:2rem;">'+c.emoji+' Review &amp; Send</h3>'
+      +'<div style="background:white;border-radius:12px;border:2px solid '+c.border+';padding:1.25rem;margin-bottom:1rem;">'
+      +'<div style="margin-bottom:0.75rem;"><label class="omw-label" style="color:'+c.primary+';">Customer Name</label>'
+      +'<input class="omw-field" id="omw-name-input" value="'+omwName+'" oninput="omwName=this.value"></div>'
+      +'<div><label class="omw-label" style="color:'+c.primary+';">Customer Phone</label>'
+      +'<input class="omw-field" id="omw-phone-input" value="'+omwPhone+'" placeholder="10-digit number" oninput="omwPhone=this.value"></div>'
+      +'</div>'
+      +'<div style="background:white;border-radius:12px;border:2px solid '+c.border+';padding:1.25rem;margin-bottom:1rem;">'
+      +'<label class="omw-label" style="color:'+c.primary+';">Select ETA</label>'
+      +etaHtml
+      +'</div>'
+      +preview
+      +'<div id="omw-error" style="color:#c0392b;font-size:0.85rem;margin-bottom:0.5rem;display:none;"></div>'
+      +'<button class="omw-send-btn" onclick="omwSend()" style="background:'+(omwEta&&omwPhone?c.primary:'#aaa')+';">📤 Send Text</button>';
+  } else if(omwStep==='sent'){
+    html='<div class="omw-success">'
+      +'<div style="font-size:2.5rem;margin-bottom:0.5rem;">✅</div>'
+      +'<h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:0.5rem;">Text Sent!</h3>'
+      +'<p style="color:#555;margin-bottom:0.25rem;"><strong>'+omwName+'</strong></p>'
+      +'<p style="color:#555;font-size:0.9rem;margin-bottom:0.25rem;">'+omwPhone+'</p>'
+      +'<p style="color:#555;font-size:0.9rem;margin-bottom:1rem;">ETA: <strong>'+omwEta+'</strong></p>'
+      +'<button onclick="openOMW(\''+omwService+'\')" style="padding:0.75rem 1.5rem;background:'+c.primary+';color:white;border:none;border-radius:8px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;">Send Another</button>'
+      +'</div>';
+  }
+  document.getElementById('omw-content').innerHTML=html;
+}
+
+function omwHandlePhoto(input){
+  var file=input.files[0];
+  if(!file) return;
+  omwStep='scanning'; renderOMW();
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var b64=ev.target.result.split(',')[1];
+    omwImageB64=b64; omwImageType=file.type;
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:file.type,data:b64}},
+          {type:'text',text:'This is a Bella Terra work order. Extract the customer Name and Phone # from the top section. Return ONLY valid JSON: {"name":"First Last","phone":"5031234567"} — phone digits only, no formatting. Empty string if not found.'}
+        ]}]
+      })
+    })
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var raw=data.content&&data.content.find(function(b){return b.type==='text';});
+      var txt=raw?raw.text:'';
+      var parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
+      omwName=parsed.name||''; omwPhone=parsed.phone||'';
+      omwStep='review'; renderOMW();
+    })
+    .catch(function(){
+      omwName=''; omwPhone='';
+      omwStep='review'; renderOMW();
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function omwSetEta(opt){
+  omwEta=opt; renderOMW();
+}
+
+function omwSend(){
+  omwName=document.getElementById('omw-name-input')?document.getElementById('omw-name-input').value:omwName;
+  omwPhone=document.getElementById('omw-phone-input')?document.getElementById('omw-phone-input').value:omwPhone;
+  if(!omwPhone){document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Phone number is required.';return;}
+  if(!omwEta){document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Please select an ETA.';return;}
+  var digits=omwPhone.replace(/\D/g,'');
+  var to=digits.length===10?'+1'+digits:'+'+digits;
+  var auth=btoa(CS_USER+':'+CS_KEY);
+  var msg='Your Bella Terra crew is on the way! ETA: '+omwEta+'. We look forward to seeing you. \u2013 Bella Terra LLC';
+  fetch('https://rest.clicksend.com/v3/sms/send',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},
+    body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:to,body:msg}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.response_code==='SUCCESS'){omwStep='sent';renderOMW();}
+    else{document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Send failed. Check credentials.';}
+  })
+  .catch(function(){
+    document.getElementById('omw-error').style.display='block';
+    document.getElementById('omw-error').textContent='Network error. Please try again.';
+  });
+}
+
 // ── REORDER ──────────────────────────────────────────────────────
 function buildReorderItems(){
   var wrap=document.getElementById('reorder-items');
@@ -810,24 +696,10 @@ function buildReorderItems(){
     var div=document.createElement('div');
     div.className='reorder-item';
     div.id='ri-'+p.id;
-    div.innerHTML=
-      '<div class="reorder-item-top" onclick="toggleReorderItem(\''+p.id+'\')">'
-        +'<input type="checkbox" id="chk-'+p.id+'" onclick="event.stopPropagation();toggleReorderItem(\''+p.id+'\')">'
-        +'<span class="reorder-item-name">'+p.product+' <span style="font-weight:400;color:#666;font-size:0.85rem;">('+p.nameOfProduct+')</span></span>'
-        +'<span class="reorder-item-vendor">'+p.supplier+'</span>'
-      +'</div>'
-      +'<div class="reorder-item-details">'
-        +'<div class="last-order-badge">📦 Last order: '+p.reorderAmt+' '+p.reorderUnit+' &nbsp;·&nbsp; Reorder trigger: ≤'+p.triggerAmt+' '+p.triggerUnit+'</div>'
-        +'<div class="reorder-detail-row">'
-          +'<div class="form-group"><label>Qty to Order</label><input type="number" id="qty-'+p.id+'" min="1" placeholder="e.g. '+p.reorderAmt+'" value="'+p.reorderAmt+'"></div>'
-          +'<div class="form-group"><label>Unit</label><input type="text" id="unit-'+p.id+'" value="'+p.reorderUnit+'"></div>'
-        +'</div>'
-        +'<div class="reorder-notes"><label>Notes (optional)</label><textarea id="notes-'+p.id+'" placeholder="Special instructions, delivery notes…"></textarea></div>'
-      +'</div>';
+    div.innerHTML='<div class="reorder-item-top" onclick="toggleReorderItem(\''+p.id+'\')"><input type="checkbox" id="chk-'+p.id+'" onclick="event.stopPropagation();toggleReorderItem(\''+p.id+'\')"><span class="reorder-item-name">'+p.product+' <span style="font-weight:400;color:#666;font-size:0.85rem;">('+p.nameOfProduct+')</span></span><span class="reorder-item-vendor">'+p.supplier+'</span></div><div class="reorder-item-details"><div class="last-order-badge">📦 Last order: '+p.reorderAmt+' '+p.reorderUnit+' &nbsp;·&nbsp; Reorder trigger: ≤'+p.triggerAmt+' '+p.triggerUnit+'</div><div class="reorder-detail-row"><div class="form-group"><label>Qty to Order</label><input type="number" id="qty-'+p.id+'" min="1" placeholder="e.g. '+p.reorderAmt+'" value="'+p.reorderAmt+'"></div><div class="form-group"><label>Unit</label><input type="text" id="unit-'+p.id+'" value="'+p.reorderUnit+'"></div></div><div class="reorder-notes"><label>Notes (optional)</label><textarea id="notes-'+p.id+'" placeholder="Special instructions, delivery notes…"></textarea></div></div>';
     wrap.appendChild(div);
   });
 }
-
 function toggleReorderItem(id){
   var item=document.getElementById('ri-'+id);
   var chk=document.getElementById('chk-'+id);
@@ -835,23 +707,12 @@ function toggleReorderItem(id){
   item.classList.toggle('selected',sel);
   chk.checked=sel;
 }
-
-function openReorder(){
-  closeHydroMenu();
-  document.getElementById('reorder-success').classList.remove('show');
-  document.getElementById('reorder-success').textContent='';
-  document.getElementById('reorder-modal').classList.add('open');
-}
-function closeReorder(){
-  document.getElementById('reorder-modal').classList.remove('open');
-}
-
+function openReorder(){closeHydroMenu();document.getElementById('reorder-success').classList.remove('show');document.getElementById('reorder-success').textContent='';document.getElementById('reorder-modal').classList.add('open');}
+function closeReorder(){document.getElementById('reorder-modal').classList.remove('open');}
 function submitReorder(){
   var job=document.getElementById('reorder-job').value.trim()||'Hydroseed Residential';
   var selected=PRODUCTS.filter(function(p){return document.getElementById('chk-'+p.id).checked;});
   if(selected.length===0){alert('Please check at least one item to reorder.');return;}
-
-  // Group by vendor email
   var byVendor={};
   selected.forEach(function(p){
     var qty=document.getElementById('qty-'+p.id).value||p.reorderAmt;
@@ -860,68 +721,28 @@ function submitReorder(){
     if(!byVendor[p.vendorEmail]) byVendor[p.vendorEmail]={supplier:p.supplier,email:p.vendorEmail,items:[]};
     byVendor[p.vendorEmail].items.push({product:p.product,name:p.nameOfProduct,qty:qty,unit:unit,lastOrder:p.reorderAmt+' '+p.reorderUnit,notes:notes});
   });
-
   var date=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   var vendorGroups=Object.values(byVendor);
   var sent=0;
-
   function submitNext(){
     if(sent>=vendorGroups.length){
-      // All done
       var vendorNames=[...new Set(selected.map(function(p){return p.supplier;}))].join(', ');
       var msg=document.getElementById('reorder-success');
       msg.textContent='✅ Reorder sent to '+vendorNames+'. Rena & Office copied. '+selected.length+' item(s) requested for job: '+job+'.';
       msg.classList.add('show');
-      PRODUCTS.forEach(function(p){
-        document.getElementById('chk-'+p.id).checked=false;
-        document.getElementById('ri-'+p.id).classList.remove('selected');
-      });
+      PRODUCTS.forEach(function(p){document.getElementById('chk-'+p.id).checked=false;document.getElementById('ri-'+p.id).classList.remove('selected');});
       return;
     }
-
     var v=vendorGroups[sent];
-    var itemLines=v.items.map(function(it){
-      var line=it.product+' ('+it.name+') — Qty: '+it.qty+' '+it.unit+' | Last order: '+it.lastOrder;
-      if(it.notes) line+=' | Notes: '+it.notes;
-      return line;
-    }).join('\n');
-
-    var payload={
-      vendorEmail: v.email,
-      vendorName:  v.supplier,
-      ccEmails:    CC_EMAILS.join(','),
-      jobName:     job,
-      employee:    currentEmployee,
-      date:        date,
-      items:       itemLines,
-      type:        'Hydroseeding Supply Reorder'
-    };
-
-    // Use no-cors mode to bypass CORS restriction — Apps Script logs + emails server-side
-    fetch(APPS_SCRIPT,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(payload)
-    }).then(function(){
-      sent++;
-      submitNext();
-    }).catch(function(){
-      sent++;
-      submitNext(); // still advance — no-cors always returns opaque response
-    });
+    var itemLines=v.items.map(function(it){var line=it.product+' ('+it.name+') — Qty: '+it.qty+' '+it.unit+' | Last order: '+it.lastOrder;if(it.notes) line+=' | Notes: '+it.notes;return line;}).join('\n');
+    var payload={vendorEmail:v.email,vendorName:v.supplier,ccEmails:CC_EMAILS.join(','),jobName:job,employee:currentEmployee,date:date,items:itemLines,type:'Hydroseeding Supply Reorder'};
+    fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}).then(function(){sent++;submitNext();}).catch(function(){sent++;submitNext();});
   }
-
   submitNext();
 }
 
 // ── HANDBOOK ─────────────────────────────────────────────────────
-function toggleChapter(header){
-  var body=header.nextElementSibling;
-  var open=body.classList.contains('open');
-  body.classList.toggle('open',!open);
-  header.classList.toggle('open',!open);
-}
+function toggleChapter(header){var body=header.nextElementSibling;var open=body.classList.contains('open');body.classList.toggle('open',!open);header.classList.toggle('open',!open);}
 function saveInitial(num){
   var val=document.getElementById('init-'+num).value.trim();
   if(!val){alert('Please enter your initials.');return;}
@@ -950,11 +771,7 @@ function submitHandbook(){
   var name=document.getElementById('hb-name').value.trim();
   var date=document.getElementById('hb-date').value;
   if(!name||!date){alert('Please enter your name and date.');return;}
-  var payload={
-    _subject:'Bella Terra Handbook Acknowledgment — '+name,
-    employee:name,date:date,type:'Employee Handbook Acknowledgment',
-    sections_initialed:REQUIRED_INITIALS.map(function(n){var i=initialed[n]||{};return 'Ch '+n+': '+(i.initials||'—')+' at '+(i.timestamp||'');}).join(' | ')
-  };
+  var payload={_subject:'Bella Terra Handbook Acknowledgment — '+name,employee:name,date:date,type:'Employee Handbook Acknowledgment',sections_initialed:REQUIRED_INITIALS.map(function(n){var i=initialed[n]||{};return 'Ch '+n+': '+(i.initials||'—')+' at '+(i.timestamp||'');}).join(' | ')};
   sendFormspree(payload,'hb-success');
 }
 
@@ -967,25 +784,13 @@ function submitForm(type){
   if(!name||!date){alert('Please fill in all required fields.');return;}
   if(!consent){alert('Please check the consent box.');return;}
   if(!hasSignature(canvas)){alert('Please draw your signature before submitting.');return;}
-  var payload={
-    _subject:'Bella Terra '+(type==='410'?'4/10 Agreement':'Break & Meal Acknowledgment')+' — '+name,
-    employee_name:name,
-    position:document.getElementById(type+'-position').value||'',
-    date_of_hire:document.getElementById(type+'-hire').value||'',
-    signature_date:date,
-    form_type:type==='410'?'4/10 Work Schedule Agreement':'Break & Meal Period Acknowledgment',
-    signature_image:canvas.toDataURL('image/png'),
-    consent_confirmed:'Yes',
-    _replyto:'payroll@1BellaTerra.com'
-  };
+  var payload={_subject:'Bella Terra '+(type==='410'?'4/10 Agreement':'Break & Meal Acknowledgment')+' — '+name,employee_name:name,position:document.getElementById(type+'-position').value||'',date_of_hire:document.getElementById(type+'-hire').value||'',signature_date:date,form_type:type==='410'?'4/10 Work Schedule Agreement':'Break & Meal Period Acknowledgment',signature_image:canvas.toDataURL('image/png'),consent_confirmed:'Yes',_replyto:'payroll@1BellaTerra.com'};
   sendFormspree(payload,'success-'+type);
   if(type==='410') document.getElementById('status-410').textContent='✅ Signed';
   if(type==='breaks') document.getElementById('status-breaks').textContent='✅ Signed';
 }
 function sendFormspree(data,successId){
-  fetch(FORMSPREE,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
-    .then(function(){document.getElementById(successId).classList.add('show');})
-    .catch(function(){alert('Error sending. Please check your connection.');});
+  fetch(FORMSPREE,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)}).then(function(){document.getElementById(successId).classList.add('show');}).catch(function(){alert('Error sending. Please check your connection.');});
 }
 
 // ── CANVAS ───────────────────────────────────────────────────────
