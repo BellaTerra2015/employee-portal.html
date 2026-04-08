@@ -468,7 +468,48 @@ button,input,select,textarea{font-family:inherit;}
           <h3>Employee Resources</h3>
           <p>Handbook, required signatures, contacts, and HR documents.</p>
         </div>
+        <div class="tile" onclick="openServiceScheduler()">
+          <div class="tile-icon">📋</div>
+          <h3>Service Scheduler</h3>
+          <p>Send day-before confirmation texts to tomorrow's customers.</p>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULER PASSWORD MODAL -->
+  <div class="p-modal" id="scheduler-password-modal">
+    <div class="p-modal-box" style="max-width:420px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">📋 Service Scheduler</h3>
+        <button onclick="closeSchedulerPassword()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+      </div>
+      <p style="font-size:0.9rem;color:#666;margin-bottom:1.25rem;">Enter your scheduler password to access tomorrow's jobs.</p>
+      <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#2d5a27;margin-bottom:0.4rem;">Password</label>
+      <input type="password" id="scheduler-password"
+             onkeypress="if(event.key==='Enter')checkSchedulerPassword()"
+             style="width:100%;padding:0.75rem 1rem;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;margin-bottom:0.75rem;"
+             placeholder="Enter password">
+      <div id="scheduler-password-error" style="display:none;color:#c0392b;font-size:0.875rem;margin-bottom:0.75rem;">Incorrect password. Please try again.</div>
+      <button onclick="checkSchedulerPassword()"
+              style="width:100%;padding:0.85rem;background:#2d5a27;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">
+        Unlock Scheduler
+      </button>
+    </div>
+  </div>
+
+  <!-- SCHEDULER MODAL -->
+  <div class="p-modal" id="scheduler-modal">
+    <div class="p-modal-box" style="max-width:680px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">📋 Tomorrow's Confirmation Texts</h3>
+        <button onclick="closeServiceScheduler()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+      </div>
+      <div id="scheduler-loading" style="display:none;text-align:center;padding:2rem;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">⏳</div>
+        <div style="color:#666;">Loading tomorrow's jobs from Google Calendar...</div>
+      </div>
+      <div id="scheduler-content"></div>
     </div>
   </div>
 
@@ -3341,7 +3382,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // SERVICE SCHEDULER
 // ═══════════════════════════════════════════════
 const SCHEDULER_PASSWORD = 'BigGrass2026!';
-const APPS_SCRIPT_SCHEDULER_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // You'll get this after deploying the script
+const APPS_SCRIPT_SCHEDULER_URL = 'https://script.google.com/macros/s/AKfycbxvJ4vkBzbsykAUVTX4qWDZtDUXONB8vpgpJPZWsvsNQRXhJYmAvyO_pvYvBF3eV7jwMg/exec';
 
 let schedulerJobs = [];
 
