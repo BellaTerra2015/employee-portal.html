@@ -6121,6 +6121,12 @@ button,input,select,textarea{font-family:inherit;}
         <p>Select a section below to get started.</p>
       </div>
       <div class="tiles-grid">
+        <div class="tile has-badge" onclick="showResources()">
+  <span class="tile-badge" id="res-badge">!</span>
+  <div class="tile-icon">👥</div>
+  <h3>Employee Resources</h3>
+  <p>Handbook, required signatures, contacts, and HR documents.</p>
+</div>
         <!-- NURSERY tile — now opens internal nursery panel -->
         <div class="tile" onclick="showNursery()">
           <div class="tile-icon">🌱</div>
@@ -6246,7 +6252,40 @@ button,input,select,textarea{font-family:inherit;}
       <div class="reorder-success" id="reorder-success"></div>
     </div>
   </div>
+<!-- SERVICE SCHEDULER MODAL -->
+<div class="p-modal" id="scheduler-modal">
+  <div class="p-modal-box" style="max-width:900px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">📅 Service Scheduler</h3>
+      <button onclick="closeServiceScheduler()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+    </div>
+    
+    <div id="scheduler-loading" style="display:none;text-align:center;padding:2rem;">
+      <div style="font-size:2rem;margin-bottom:1rem;">⏳</div>
+      <div>Loading tomorrow's jobs from calendars...</div>
+    </div>
+    
+    <div id="scheduler-content"></div>
+  </div>
+</div>
 
+<!-- PASSWORD PROMPT MODAL -->
+<div class="p-modal" id="scheduler-password-modal">
+  <div class="omw-box" style="max-width:400px">
+    <button class="omw-closer" onclick="closeSchedulerPassword()">&times;</button>
+    <h3 style="font-family:'Playfair Display',serif;color:#2d5a27;margin-bottom:1rem;">🔒 Enter Scheduler Password</h3>
+    <div style="margin-bottom:1rem;">
+      <input type="password" id="scheduler-password" placeholder="Enter password" 
+             onkeypress="if(event.key==='Enter')checkSchedulerPassword()" 
+             style="width:100%;padding:0.75rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;">
+    </div>
+    <div id="scheduler-password-error" style="color:var(--red);font-size:0.875rem;margin-bottom:1rem;display:none;">
+      Incorrect password. Please try again.
+    </div>
+    <button class="btn-primary" onclick="checkSchedulerPassword()">Unlock Scheduler</button>
+  </div>
+</div>
+  
   <!-- EMPLOYEE RESOURCES PANEL -->
   <div id="panel-resources">
     <div class="panel-header">
@@ -8585,6 +8624,230 @@ function loadSchollsValley(){
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('login-pass').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
 });
+  // ═══════════════════════════════════════════════
+// SERVICE SCHEDULER
+// ═══════════════════════════════════════════════
+const SCHEDULER_PASSWORD = 'BigGrass2026!';
+const APPS_SCRIPT_SCHEDULER_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // You'll get this after deploying the script
+
+let schedulerJobs = [];
+
+function openServiceScheduler() {
+  document.getElementById('scheduler-password').value = '';
+  document.getElementById('scheduler-password-error').style.display = 'none';
+  document.getElementById('scheduler-password-modal').classList.add('open');
+  setTimeout(() => document.getElementById('scheduler-password').focus(), 200);
+}
+
+function closeSchedulerPassword() {
+  document.getElementById('scheduler-password-modal').classList.remove('open');
+}
+
+function checkSchedulerPassword() {
+  const password = document.getElementById('scheduler-password').value;
+  if (password === SCHEDULER_PASSWORD) {
+    closeSchedulerPassword();
+    loadSchedulerJobs();
+  } else {
+    document.getElementById('scheduler-password-error').style.display = 'block';
+  }
+}
+
+function closeServiceScheduler() {
+  document.getElementById('scheduler-modal').classList.remove('open');
+}
+
+async function loadSchedulerJobs() {
+  document.getElementById('scheduler-modal').classList.add('open');
+  document.getElementById('scheduler-loading').style.display = 'block';
+  document.getElementById('scheduler-content').innerHTML = '';
+  
+  try {
+    const response = await fetch(APPS_SCRIPT_SCHEDULER_URL + '?action=getTomorrowJobs');
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    schedulerJobs = data.jobs || [];
+    renderSchedulerJobs();
+    
+  } catch (error) {
+    document.getElementById('scheduler-content').innerHTML = `
+      <div style="background:var(--red-lt);border:2px solid var(--red);border-radius:10px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div>
+        <div style="font-weight:600;color:var(--red);margin-bottom:0.5rem;">Error Loading Jobs</div>
+        <div style="font-size:0.875rem;color:var(--text);">${error.message}</div>
+      </div>`;
+  }
+  
+  document.getElementById('scheduler-loading').style.display = 'none';
+}
+
+function renderSchedulerJobs() {
+  const content = document.getElementById('scheduler-content');
+  
+  if (!schedulerJobs.length) {
+    content.innerHTML = `
+      <div style="background:var(--green-pale);border:2px solid var(--green-light);border-radius:10px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">✅</div>
+        <div style="font-weight:600;color:var(--green-dark);">No jobs scheduled for tomorrow</div>
+      </div>`;
+    return;
+  }
+  
+  let html = `
+    <div style="background:var(--green-pale);border-radius:10px;padding:1rem;margin-bottom:1.5rem;">
+      <strong>${schedulerJobs.length} job(s)</strong> scheduled for tomorrow. Review times and click "Send All Confirmations" to text customers.
+    </div>`;
+  
+  schedulerJobs.forEach((job, index) => {
+    html += `
+      <div style="background:white;border:2px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;">
+          <div>
+            <div style="font-weight:700;font-size:1.1rem;color:var(--green-dark);">${job.customerName}</div>
+            <div style="font-size:0.875rem;color:var(--gray-mid);margin-top:0.25rem;">${job.phone}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);">Calendar</div>
+            <div style="font-weight:600;color:var(--green-mid);">${job.calendar}</div>
+          </div>
+        </div>
+        
+        <div style="background:var(--gray-light);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);margin-bottom:0.5rem;">Services</div>
+          ${job.services.map(s => `<div style="font-size:0.95rem;margin-bottom:0.25rem;">• ${s}</div>`).join('')}
+        </div>
+        
+        <div style="background:var(--gray-light);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);margin-bottom:0.5rem;">Address</div>
+          <div style="font-size:0.95rem;">${job.address}</div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+          <div>
+            <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green-dark);margin-bottom:0.4rem;">Start Time</label>
+            <input type="time" id="start-${index}" value="${job.startTime}" 
+                   onchange="updateJobTime(${index}, 'start', this.value)"
+                   style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;">
+          </div>
+          <div>
+            <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green-dark);margin-bottom:0.4rem;">End Time</label>
+            <input type="time" id="end-${index}" value="${job.endTime}" 
+                   onchange="updateJobTime(${index}, 'end', this.value)"
+                   style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;">
+          </div>
+          <div style="display:flex;align-items:flex-end;">
+            <button onclick="previewMessage(${index})" 
+                    style="width:100%;padding:0.6rem;background:var(--blue-accent);color:white;border:none;border-radius:7px;font-weight:600;cursor:pointer;">
+              👁 Preview
+            </button>
+          </div>
+        </div>
+        
+        <div id="preview-${index}" style="display:none;background:var(--green-pale);border:2px solid var(--green-light);border-radius:8px;padding:1rem;margin-top:1rem;font-family:monospace;font-size:0.85rem;white-space:pre-wrap;"></div>
+      </div>`;
+  });
+  
+  html += `
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+      <button onclick="sendAllConfirmations()" 
+              style="flex:1;padding:1rem;background:var(--green-dark);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
+        📤 Send All Confirmations (${schedulerJobs.length})
+      </button>
+      <button onclick="closeServiceScheduler()" 
+              style="padding:1rem 1.5rem;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:10px;font-size:1rem;cursor:pointer;">
+        Cancel
+      </button>
+    </div>`;
+  
+  content.innerHTML = html;
+}
+
+function updateJobTime(index, type, value) {
+  if (type === 'start') {
+    schedulerJobs[index].startTime = value;
+  } else {
+    schedulerJobs[index].endTime = value;
+  }
+}
+
+function previewMessage(index) {
+  const job = schedulerJobs[index];
+  const preview = document.getElementById(`preview-${index}`);
+  
+  const message = buildConfirmationMessage(job);
+  preview.textContent = message;
+  preview.style.display = 'block';
+}
+
+function buildConfirmationMessage(job) {
+  const start = formatTime(job.startTime);
+  const end = formatTime(job.endTime);
+  const date = job.date; // Already formatted as "April 8th"
+  
+  let serviceText;
+  if (job.services.length === 1) {
+    serviceText = `SERVICE: ${job.services[0]}`;
+  } else {
+    serviceText = `SERVICES:\n${job.services.map(s => `• ${s}`).join('\n')}`;
+  }
+  
+  return `Good news! ☀️ Bella Terra scheduled for tomorrow, ${date} between ${start} - ${end}.
+
+${serviceText}
+
+ADDRESS: ${job.address}
+
+Reply Y to confirm, D to delay or update, C to cancel.
+
+Questions? Call 360-225-1125`;
+}
+
+function formatTime(time24) {
+  const [hours, minutes] = time24.split(':');
+  const h = parseInt(hours);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${h12}:${minutes} ${ampm}`;
+}
+
+async function sendAllConfirmations() {
+  if (!confirm(`Send confirmation texts to ${schedulerJobs.length} customer(s)?`)) {
+    return;
+  }
+  
+  const button = event.target;
+  button.disabled = true;
+  button.textContent = 'Sending...';
+  
+  try {
+    const response = await fetch(APPS_SCRIPT_SCHEDULER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sendConfirmations',
+        jobs: schedulerJobs
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert(`✅ Successfully sent ${result.sent} confirmation text(s)!`);
+      closeServiceScheduler();
+    } else {
+      throw new Error(result.error || 'Unknown error');
+    }
+    
+  } catch (error) {
+    alert(`❌ Error sending texts: ${error.message}`);
+    button.disabled = false;
+    button.textContent = `📤 Send All Confirmations (${schedulerJobs.length})`;
+  }
+}
 </script>
 </body>
 </html>
