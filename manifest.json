@@ -1,0 +1,24 @@
+{
+  "name": "Bella Terra Employee Portal",
+  "short_name": "BT Portal",
+  "description": "Bella Terra employee portal for scheduling, HR, and nursery operations",
+  "start_url": "./bella_terra_portal_html.html",
+  "display": "standalone",
+  "background_color": "#2d5a27",
+  "theme_color": "#2d5a27",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
