@@ -3382,7 +3382,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // SERVICE SCHEDULER
 // ═══════════════════════════════════════════════
 const SCHEDULER_PASSWORD = 'BigGrass2026!';
-const APPS_SCRIPT_SCHEDULER_URL = 'https://script.google.com/macros/s/AKfycbxvJ4vkBzbsykAUVTX4qWDZtDUXONB8vpgpJPZWsvsNQRXhJYmAvyO_pvYvBF3eV7jwMg/exec';
+const APPS_SCRIPT_SCHEDULER_URL = 'https://script.google.com/macros/s/AKfycbzVCPFrgdetIrxKHqVi68ZVY7J3kS38HZycXLl_yq3_OTEiNlT_k5OfJPZWp-Vgt1rZ8Q/exec';
 
 let schedulerJobs = [];
 
@@ -3580,7 +3580,7 @@ async function sendAllConfirmations() {
   try {
     const response = await fetch(APPS_SCRIPT_SCHEDULER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action: 'sendConfirmations',
         jobs: schedulerJobs
