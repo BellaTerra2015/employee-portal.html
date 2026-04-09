@@ -473,6 +473,11 @@ button,input,select,textarea{font-family:inherit;}
           <h3>Service Scheduler</h3>
           <p>Send day-before confirmation texts to tomorrow's customers.</p>
         </div>
+        <div class="tile" onclick="showLogCall()">
+          <div class="tile-icon">📞</div>
+          <h3>Log a Call</h3>
+          <p>Record incoming customer calls for hydroseeding and bark blowing inquiries.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1011,6 +1016,77 @@ button,input,select,textarea{font-family:inherit;}
     </div><!-- /tab content -->
   </div><!-- /panel-olydisco -->
 
+  <!-- LOG A CALL PANEL -->
+  <div id="panel-log-call" style="display:none;min-height:100vh;background:var(--gray-light);">
+    <div style="background:var(--green-dark);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.75rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);">
+      <button onclick="showTiles()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:0.35rem 0.85rem;cursor:pointer;font-size:0.82rem;font-family:inherit;">← Portal</button>
+      <h2 style="font-family:'Playfair Display',serif;color:white;font-size:1.25rem;margin:0;">📞 Log a Call</h2>
+    </div>
+    <div style="padding:1.25rem;max-width:640px;margin:0 auto;">
+      <div class="od-card">
+        <h4>📞 Incoming Call Log</h4>
+
+        <div class="od-g2">
+          <div class="od-f">
+            <label>Caller Name</label>
+            <input type="text" id="lc-caller-name" placeholder="First Last" autocomplete="off">
+          </div>
+          <div class="od-f">
+            <label>Phone Number</label>
+            <input type="tel" id="lc-phone" placeholder="(360) 555-0000" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="od-g2">
+          <div class="od-f">
+            <label>Service Type</label>
+            <select id="lc-service-type">
+              <option value="">Select service…</option>
+              <option value="Hydroseeding">Hydroseeding</option>
+              <option value="Bark Blowing">Bark Blowing</option>
+            </select>
+          </div>
+          <div class="od-f">
+            <label>Logged By</label>
+            <select id="lc-logged-by">
+              <option value="">Select…</option>
+              <option value="Robert">Robert</option>
+              <option value="Randy">Randy</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="od-f">
+          <label>Job Address</label>
+          <input type="text" id="lc-address" placeholder="123 Main St, City, State">
+        </div>
+
+        <div class="od-f">
+          <label>Lot Size / Sq Ft or CY</label>
+          <input type="text" id="lc-lot-size" placeholder="e.g. 4500">
+          <div style="font-size:0.78rem;color:var(--gray-mid);margin-top:0.35rem;">sq ft for hydroseed &nbsp;·&nbsp; CY for bark</div>
+        </div>
+
+        <div class="od-f">
+          <label>Notes</label>
+          <textarea id="lc-notes" rows="3" placeholder="Any additional details about the call…" style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="od-f">
+          <label>Date &amp; Time</label>
+          <input type="datetime-local" id="lc-datetime">
+        </div>
+
+        <button class="od-submit" id="lc-submit-btn" onclick="submitLogCall()">📞 Log This Call</button>
+
+        <div id="lc-success" style="display:none;background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:0.85rem 1rem;color:var(--green-dark);font-size:0.9rem;font-weight:600;margin-top:0.85rem;">
+          ✅ Call logged successfully. Form cleared.
+        </div>
+        <div id="lc-error" style="display:none;background:#fdeaea;border:1px solid var(--red);border-radius:8px;padding:0.85rem 1rem;color:var(--red);font-size:0.9rem;font-weight:600;margin-top:0.85rem;line-height:1.5;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- EMPLOYEE RESOURCES PANEL -->
   <div id="panel-resources">
     <div class="panel-header">
@@ -1496,6 +1572,7 @@ function showTiles(){
   document.getElementById('panel-scheduledjobs').style.display='none';
   document.getElementById('panel-jobs').style.display='none';
   document.getElementById('panel-olydisco').style.display='none';
+  document.getElementById('panel-log-call').style.display='none';
   document.getElementById('main-tiles').style.display='block';
 }
 function showResources(){document.getElementById('main-tiles').style.display='none';document.getElementById('panel-resources').style.display='block';}
@@ -4115,6 +4192,97 @@ function kelsoTotalDone(btn,textSent){
   var ok=document.getElementById('kelso-total-ok');
   ok.textContent=textSent?'✅ Daily total submitted. Text reminder sent.':'✅ Daily total submitted. Phone number not found — remind crew lead manually.';
   ok.style.display='block';
+}
+
+// ═══════════════════════════════════════════════
+// LOG A CALL — Airtable
+// ═══════════════════════════════════════════════
+var AT_BASE  = 'appdtsnIEuASNVrn4';
+var AT_TABLE = 'tblQQcyu5tdHNhk1d';
+var AT_TOKEN = 'patTWo30QfHzcYBh2.fd64fbfa6d16009e1b49c6e7e55e2fa0a0962882b91335bde4398c8179bca89a';
+
+function showLogCall(){
+  ['main-tiles','panel-resources','panel-nursery','panel-jobs','panel-olydisco','panel-scheduledjobs']
+    .forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+  document.getElementById('panel-log-call').style.display='block';
+  lcStampDatetime();
+}
+
+function lcStampDatetime(){
+  var now=new Date();
+  var iso=now.getFullYear()+'-'
+    +String(now.getMonth()+1).padStart(2,'0')+'-'
+    +String(now.getDate()).padStart(2,'0')+'T'
+    +String(now.getHours()).padStart(2,'0')+':'
+    +String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('lc-datetime').value=iso;
+}
+
+function submitLogCall(){
+  var callerName  = document.getElementById('lc-caller-name').value.trim();
+  var phone       = document.getElementById('lc-phone').value.trim();
+  var serviceType = document.getElementById('lc-service-type').value;
+  var address     = document.getElementById('lc-address').value.trim();
+  var lotSize     = document.getElementById('lc-lot-size').value.trim();
+  var notes       = document.getElementById('lc-notes').value.trim();
+  var loggedBy    = document.getElementById('lc-logged-by').value;
+  var datetime    = document.getElementById('lc-datetime').value;
+
+  var errEl = document.getElementById('lc-error');
+  errEl.style.display='none';
+  document.getElementById('lc-success').style.display='none';
+
+  if(!callerName || !serviceType || !loggedBy){
+    errEl.textContent='⚠ Caller Name, Service Type, and Logged By are required.';
+    errEl.style.display='block';
+    return;
+  }
+
+  var btn=document.getElementById('lc-submit-btn');
+  btn.disabled=true; btn.textContent='⏳ Logging…';
+
+  var isoDatetime = datetime ? new Date(datetime).toISOString() : new Date().toISOString();
+
+  fetch('https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE, {
+    method:'POST',
+    headers:{
+      'Authorization':'Bearer '+AT_TOKEN,
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({fields:{
+      'Caller Name':  callerName,
+      'Phone Number': phone,
+      'Service Type': serviceType,
+      'Job Address':  address,
+      'Lot Size':     lotSize,
+      'Notes':        notes,
+      'Logged By':    loggedBy,
+      'Date & Time':  isoDatetime,
+      'Status':       'Open'
+    }})
+  })
+  .then(function(res){
+    if(res.ok){ lcSuccess(btn); }
+    else{ return res.json().then(function(d){ lcError(btn, d.error?d.error.message:'Server error ('+res.status+'). Please retry.'); }); }
+  })
+  .catch(function(err){ lcError(btn,'Network error — check your connection and retry. ('+(err.message||err)+')'); });
+}
+
+function lcSuccess(btn){
+  btn.disabled=false; btn.textContent='📞 Log This Call';
+  document.getElementById('lc-success').style.display='block';
+  ['lc-caller-name','lc-phone','lc-address','lc-lot-size','lc-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('lc-service-type').value='';
+  document.getElementById('lc-logged-by').value='';
+  lcStampDatetime();
+  setTimeout(function(){ document.getElementById('lc-success').style.display='none'; },6000);
+}
+
+function lcError(btn, msg){
+  btn.disabled=false; btn.textContent='📞 Log This Call';
+  var errEl=document.getElementById('lc-error');
+  errEl.textContent='❌ '+msg;
+  errEl.style.display='block';
 }
 
 // ── PWA Service Worker ──
