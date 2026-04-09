@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Vehicles — Bella Terra</title>
+<meta name="theme-color" content="#2d5a27">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── CSS VARIABLES (matches portal) ── */
+:root {
+  --green-dark:#2d5a27;--green-mid:#4a7c3f;--green-light:#7ab648;
+  --green-pale:#e8f5e2;--blue-accent:#1a6b8a;--gold:#c8961e;
+  --white:#ffffff;--gray-light:#f5f5f2;--gray-mid:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;
+  --shadow:0 2px 12px rgba(45,90,39,0.10);
+  --orange-dark:#b85c00;--orange-light:#fff3e8;--orange-border:#e07c30;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:var(--text);min-height:100vh;}
+button,input,select,textarea{font-family:inherit;}
+
+/* ── HEADER ── */
+.fleet-header{background:var(--green-dark);padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.btn-back{background:transparent;color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.3);padding:0.4rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;text-decoration:none;display:inline-block;transition:all 0.2s;}
+.btn-back:hover{background:rgba(255,255,255,0.1);color:white;}
+.fleet-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.2rem;flex:1;}
+
+/* ── TAB NAV ── */
+.fleet-tab-nav{background:white;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;padding:0 1rem;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;}
+.fleet-tab{padding:1rem 1.25rem;font-size:0.9rem;font-weight:600;color:var(--gray-mid);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;margin-bottom:-2px;}
+.fleet-tab:hover{color:var(--green-mid);}
+.fleet-tab.active{color:var(--green-dark);border-bottom-color:var(--green-dark);}
+
+/* ── PANEL ── */
+.fleet-panel{display:none;padding:1.5rem;max-width:900px;margin:0 auto;}
+.fleet-panel.active{display:block;}
+
+/* ── CARD / SECTION ── */
+.f-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem;}
+.f-card-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--green-dark);margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:2px solid var(--border);}
+.section-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);display:block;margin-bottom:0.3rem;}
+.f-input{width:100%;padding:0.6rem 0.75rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;margin-bottom:0.85rem;transition:border-color 0.2s;}
+.f-input:focus{outline:none;border-color:var(--green-mid);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{margin-bottom:0.85rem;}
+.form-group:last-child{margin-bottom:0;}
+
+/* ── SEARCHABLE DROPDOWN ── */
+.ss-wrap{position:relative;margin-bottom:0.85rem;}
+.ss-input{width:100%;padding:0.6rem 2.2rem 0.6rem 0.75rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;cursor:pointer;background:white;transition:border-color 0.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.75rem center;}
+.ss-input:focus,.ss-input.open{outline:none;border-color:var(--green-mid);}
+.ss-input::placeholder{color:#aaa;}
+.ss-dropdown{display:none;position:absolute;top:calc(100% - 2px);left:0;right:0;background:white;border:2px solid var(--green-mid);border-top:none;border-radius:0 0 7px 7px;max-height:230px;overflow-y:auto;z-index:500;box-shadow:0 6px 16px rgba(0,0,0,0.12);}
+.ss-dropdown.open{display:block;}
+.ss-option{padding:0.55rem 0.85rem;cursor:pointer;font-size:0.92rem;transition:background 0.1s;}
+.ss-option:hover,.ss-option.active{background:var(--green-pale);color:var(--green-dark);}
+.ss-option .ss-num{font-weight:700;color:var(--green-dark);margin-right:0.3rem;}
+.ss-option .ss-nick{color:var(--text);}
+.ss-no-results{padding:0.6rem 0.85rem;font-size:0.88rem;color:var(--gray-mid);font-style:italic;}
+.ss-clear{position:absolute;right:2rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-mid);cursor:pointer;font-size:1rem;line-height:1;padding:0.2rem;display:none;}
+.ss-wrap.has-value .ss-clear{display:block;}
+
+/* ── BUTTONS ── */
+.btn-primary{padding:0.8rem 1.75rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-primary:hover{background:var(--green-mid);}
+.btn-secondary{padding:0.7rem 1.25rem;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:8px;font-size:0.95rem;cursor:pointer;transition:all 0.2s;}
+.btn-secondary:hover{border-color:var(--green-light);color:var(--green-dark);}
+.btn-danger{padding:0.7rem 1.25rem;background:var(--red);color:white;border:none;border-radius:8px;font-size:0.95rem;cursor:pointer;}
+.btn-sm{padding:0.4rem 0.85rem;font-size:0.82rem;border-radius:6px;}
+.btn-row{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;}
+
+/* ── URGENCY SELECTOR ── */
+.urgency-group{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;}
+.urgency-btn{padding:0.5rem 1rem;border:2px solid var(--border);border-radius:20px;background:white;cursor:pointer;font-size:0.88rem;font-weight:600;transition:all 0.2s;}
+.urgency-btn.sel-routine{border-color:#2d5a27;background:#e8f5e2;color:#2d5a27;}
+.urgency-btn.sel-semi{border-color:#c8961e;background:#fdf8e1;color:#7a3e05;}
+.urgency-btn.sel-urgent{border-color:#e07c30;background:#fff3e8;color:#b85c00;}
+.urgency-btn.sel-down{border-color:#c0392b;background:#fdeaea;color:#c0392b;}
+
+/* ── PHOTO UPLOAD ── */
+.photo-zone{border:2px dashed var(--border);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;margin-bottom:0.85rem;}
+.photo-zone:hover{border-color:var(--green-light);background:var(--green-pale);}
+.photo-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-zone-icon{font-size:2rem;margin-bottom:0.5rem;}
+.photo-zone p{font-size:0.88rem;color:var(--gray-mid);}
+.photo-zone .min-note{font-size:0.78rem;color:var(--red);font-weight:600;margin-top:0.3rem;}
+.photo-previews{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.85rem;}
+.photo-preview{position:relative;width:80px;height:80px;}
+.photo-preview img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:2px solid var(--border);}
+.photo-remove{position:absolute;top:-6px;right:-6px;background:var(--red);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+
+/* ── PARTS TABLE ── */
+.parts-table{width:100%;border-collapse:collapse;margin-bottom:0.75rem;font-size:0.9rem;}
+.parts-table th{text-align:left;padding:0.5rem 0.6rem;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green-dark);border-bottom:2px solid var(--border);}
+.parts-table td{padding:0.4rem 0.4rem;}
+.parts-table td input{width:100%;padding:0.4rem 0.5rem;border:1px solid var(--border);border-radius:5px;font-size:0.88rem;}
+.parts-table td input:focus{outline:none;border-color:var(--green-mid);}
+.parts-row-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;padding:0.2rem 0.4rem;}
+
+/* ── LOG ENTRIES ── */
+.log-entry{background:white;border-radius:10px;border:2px solid var(--border);padding:1.1rem 1.25rem;margin-bottom:0.75rem;transition:border-color 0.2s;}
+.log-entry:hover{border-color:var(--green-light);}
+.log-entry-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;flex-wrap:wrap;}
+.log-entry-title{font-weight:700;font-size:0.97rem;color:var(--text);}
+.log-entry-meta{font-size:0.8rem;color:var(--gray-mid);margin-top:0.2rem;}
+.log-entry-badge{font-size:0.72rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:10px;white-space:nowrap;}
+.badge-routine{background:#e8f5e2;color:#2d5a27;}
+.badge-semi{background:#fdf8e1;color:#7a3e05;}
+.badge-urgent{background:#fff3e8;color:#b85c00;}
+.badge-down{background:#fdeaea;color:#c0392b;}
+.log-entry-body{margin-top:0.6rem;font-size:0.88rem;color:#555;line-height:1.5;}
+.log-entry-parts{margin-top:0.5rem;font-size:0.82rem;color:var(--gray-mid);}
+
+/* ── SUCCESS BANNER ── */
+.success-banner{background:#eaf7ea;border:2px solid var(--green-light);border-radius:10px;padding:1.25rem 1.5rem;color:var(--green-dark);font-weight:600;display:none;margin-bottom:1rem;}
+.success-banner.show{display:block;}
+
+/* ── VEHICLE CARD GRID ── */
+.vehicle-card-grid{display:flex;flex-direction:column;gap:1.5rem;}
+.vc-section-label{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--green-dark);padding-bottom:0.5rem;border-bottom:2px solid var(--border);margin-bottom:0.75rem;}
+.vc-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:0.85rem;}
+.v-card{background:white;border-radius:12px;border:2px solid var(--border);padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center;box-shadow:var(--shadow);}
+.v-card:hover{transform:translateY(-3px);border-color:var(--green-light);box-shadow:0 6px 20px rgba(45,90,39,0.15);}
+.v-card-num{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;color:var(--gray-mid);margin-bottom:0.35rem;font-family:'DM Sans',sans-serif;}
+.v-card-name{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--green-dark);margin-bottom:0.4rem;}
+.v-card-plate{font-size:0.8rem;color:var(--gray-mid);margin-bottom:0.35rem;}
+.v-card-ymm{font-size:0.8rem;color:var(--text);line-height:1.4;}
+.v-card-icon{font-size:1.8rem;margin-bottom:0.5rem;}
+.v-card-open-hint{font-size:0.72rem;color:var(--green-mid);margin-top:0.6rem;font-weight:600;}
+
+/* ── VEHICLE MODAL ── */
+.v-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1.5rem 1rem;}
+.v-modal.open{display:flex;}
+.v-modal-box{background:white;border-radius:16px;width:100%;max-width:640px;box-shadow:0 16px 56px rgba(0,0,0,0.3);overflow:hidden;margin:auto;}
+.v-modal-header{background:var(--green-dark);color:white;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+.v-modal-header h3{font-family:'Playfair Display',serif;font-size:1.2rem;}
+.v-modal-close{background:transparent;border:none;color:rgba(255,255,255,0.8);font-size:1.5rem;cursor:pointer;line-height:1;padding:0 0.25rem;}
+.v-modal-body{padding:1.5rem;}
+.v-modal-ymm{font-size:0.9rem;color:var(--gray-mid);margin-bottom:1.25rem;}
+.v-section{margin-bottom:1.5rem;}
+.v-section-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--green-dark);margin-bottom:0.6rem;display:flex;align-items:center;gap:0.4rem;}
+.v-doc-links{display:flex;flex-direction:column;gap:0.4rem;}
+.v-doc-link{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:7px;text-decoration:none;color:var(--text);font-size:0.9rem;transition:all 0.15s;}
+.v-doc-link:hover{border-color:var(--green-light);background:var(--green-pale);}
+.v-doc-link span.doc-icon{font-size:1.1rem;}
+.v-doc-link .doc-label{flex:1;}
+.v-doc-link .doc-arrow{color:var(--green-mid);font-weight:700;}
+.v-history-list{display:flex;flex-direction:column;gap:0.5rem;}
+.v-history-item{background:var(--gray-light);border-radius:7px;padding:0.65rem 0.85rem;font-size:0.85rem;}
+.v-history-date{font-weight:700;color:var(--green-dark);}
+.v-history-empty{font-size:0.88rem;color:var(--gray-mid);font-style:italic;}
+.v-tab-nav{display:flex;border-bottom:2px solid var(--border);margin-bottom:1rem;}
+.v-tab{padding:0.6rem 0.9rem;font-size:0.82rem;font-weight:600;color:var(--gray-mid);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;margin-bottom:-2px;}
+.v-tab.active{color:var(--green-dark);border-bottom-color:var(--green-dark);}
+.v-sub-panel{display:none;}.v-sub-panel.active{display:block;}
+
+/* ── ARCHIVE MODAL ── */
+.arch-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:1100;align-items:center;justify-content:center;}
+.arch-overlay.open{display:flex;}
+.arch-box{background:white;border-radius:12px;padding:1.75rem;width:90%;max-width:380px;box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+.arch-box h4{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--green-dark);margin-bottom:0.5rem;}
+.arch-box p{font-size:0.88rem;color:var(--gray-mid);margin-bottom:1rem;}
+.arch-err{color:var(--red);font-size:0.83rem;margin-top:0.4rem;display:none;}
+
+/* ── INSPECTIONS LINK CARD ── */
+.insp-hero{background:linear-gradient(135deg,#1a3a5c 0%,#2c5f8d 100%);border-radius:14px;padding:2.5rem 2rem;text-align:center;color:white;margin-bottom:1.25rem;}
+.insp-hero h3{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:0.6rem;}
+.insp-hero p{opacity:0.85;font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;}
+.btn-insp{display:inline-block;background:white;color:#1a3a5c;padding:0.85rem 2rem;border-radius:8px;font-weight:700;font-size:1rem;text-decoration:none;transition:all 0.2s;}
+.btn-insp:hover{background:#e8f0f8;transform:translateY(-2px);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr;}
+  .fleet-header h2{font-size:1rem;}
+  .v-modal{padding:0;align-items:flex-end;}
+  .v-modal-box{border-radius:16px 16px 0 0;max-width:100%;margin:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="fleet-header">
+  <a href="bella_terra_portal_html.html" class="btn-back">← Portal</a>
+  <h2>🚛 Fleet Vehicles</h2>
+</header>
+
+<!-- ── TAB NAVIGATION ── -->
+<nav class="fleet-tab-nav">
+  <button class="fleet-tab active" onclick="showFleetTab('repair',this)">🔧 Repair Request</button>
+  <button class="fleet-tab" onclick="showFleetTab('maintenance',this)">📋 Maintenance Log</button>
+  <button class="fleet-tab" onclick="showFleetTab('inspections',this)">🔍 Fleet Inspections</button>
+  <button class="fleet-tab" onclick="showFleetTab('accident',this)">🚨 Accident Reporting</button>
+  <button class="fleet-tab" onclick="showFleetTab('vehicles',this)">🚗 Vehicle Cards</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 1 — FLEET INSPECTIONS
+════════════════════════════════════════════════ -->
+<div id="tab-inspections" class="fleet-panel">
+  <div class="insp-hero">
+    <div style="font-size:3rem;margin-bottom:0.75rem;">🚛</div>
+    <h3>Fleet Inspections</h3>
+    <p>Pre-trip and post-trip inspection forms, DOT checklists, and equipment logs for all Bella Terra vehicles and trailers.</p>
+    <a href="https://bellaterra2015.github.io/fleet-inspections/" target="_blank" class="btn-insp">Open Fleet Inspections →</a>
+  </div>
+  <div class="f-card" style="text-align:center;padding:1.25rem;">
+    <p style="font-size:0.88rem;color:var(--gray-mid);">Fleet inspection forms are managed at the dedicated inspections site.<br>Use the button above to access all inspection records and forms.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 2 — ACCIDENT REPORTING
+════════════════════════════════════════════════ -->
+<div id="tab-accident" class="fleet-panel">
+  <div class="success-banner" id="accident-success">
+    ✅ Accident report submitted. A copy has been sent to your email, Rena, and Brydon.
+  </div>
+
+  <div class="f-card">
+    <div class="f-card-title">🚨 Accident Report</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Employee Name *</label>
+        <input type="text" id="acc-name" class="f-input" placeholder="Full name">
+      </div>
+      <div class="form-group">
+        <label class="section-label">Personal Email *</label>
+        <input type="email" id="acc-email" class="f-input" placeholder="your@email.com">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Unit Involved *</label>
+      <div class="ss-wrap" id="acc-unit-wrap">
+        <input type="text" class="ss-input" id="acc-unit-input" placeholder="Search by number or name…" autocomplete="off">
+        <button class="ss-clear" id="acc-unit-clear" onclick="clearSelect('acc')">✕</button>
+        <input type="hidden" id="acc-unit">
+        <div class="ss-dropdown" id="acc-unit-dropdown"></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Date & Time *</label>
+        <input type="datetime-local" id="acc-datetime" class="f-input">
+      </div>
+      <div class="form-group">
+        <label class="section-label">Location *</label>
+        <input type="text" id="acc-location" class="f-input" placeholder="Address or landmark">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Description of Incident *</label>
+      <textarea id="acc-description" class="f-input" rows="4" placeholder="Describe what happened, direction of travel, road conditions, etc."></textarea>
+    </div>
+
+    <div class="f-card-title" style="margin-top:1.25rem;font-size:1rem;">Other Party Information</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Other Party Name</label>
+        <input type="text" id="acc-other-name" class="f-input" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label class="section-label">Other Party Phone</label>
+        <input type="tel" id="acc-other-phone" class="f-input" placeholder="Phone number">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Other Party Insurance</label>
+        <input type="text" id="acc-other-ins" class="f-input" placeholder="Insurance company / policy #">
+      </div>
+      <div class="form-group">
+        <label class="section-label">Police Report #</label>
+        <input type="text" id="acc-police" class="f-input" placeholder="Report number (if applicable)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="section-label">Other Party Vehicle (Year/Make/Model/Plate)</label>
+      <input type="text" id="acc-other-vehicle" class="f-input" placeholder="e.g. 2019 Toyota Camry — ABC 1234">
+    </div>
+
+    <div class="f-card-title" style="margin-top:1.25rem;font-size:1rem;">Photos</div>
+    <div class="photo-zone" id="acc-drop-zone">
+      <input type="file" id="acc-photos" accept="image/*" multiple onchange="handlePhotos(this,'acc-previews','acc-photo-count')">
+      <div class="photo-zone-icon">📷</div>
+      <p>Tap or drag to add photos</p>
+      <p class="min-note">Minimum 3 photos required</p>
+    </div>
+    <div class="photo-previews" id="acc-previews"></div>
+    <p id="acc-photo-msg" style="font-size:0.82rem;color:var(--gray-mid);margin-bottom:0.85rem;"></p>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="submitAccidentReport()">Submit Accident Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 3 — REPAIR REQUEST
+════════════════════════════════════════════════ -->
+<div id="tab-repair" class="fleet-panel active">
+  <div class="success-banner" id="repair-success">
+    ✅ Repair request submitted. Kent, Wyatt, and Brydon have been notified via SMS.
+  </div>
+
+  <div class="f-card">
+    <div class="f-card-title">🔧 Repair Request</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Employee Name *</label>
+        <input type="text" id="rep-name" class="f-input" placeholder="Full name">
+      </div>
+      <div class="form-group">
+        <label class="section-label">Unit *</label>
+        <div class="ss-wrap" id="rep-unit-wrap">
+          <input type="text" class="ss-input" id="rep-unit-input" placeholder="Search by number or name…" autocomplete="off">
+          <button class="ss-clear" id="rep-unit-clear" onclick="clearSelect('rep')">✕</button>
+          <input type="hidden" id="rep-unit">
+          <div class="ss-dropdown" id="rep-unit-dropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Date & Time *</label>
+      <input type="datetime-local" id="rep-datetime" class="f-input">
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Problem Description *</label>
+      <textarea id="rep-description" class="f-input" rows="4" placeholder="Describe the issue in detail..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Urgency *</label>
+      <div class="urgency-group">
+        <button class="urgency-btn" data-urgency="Routine" onclick="selectUrgency(this)">🟢 Routine</button>
+        <button class="urgency-btn" data-urgency="Semi-Urgent" onclick="selectUrgency(this)">🟡 Semi-Urgent</button>
+        <button class="urgency-btn" data-urgency="Urgent" onclick="selectUrgency(this)">🟠 Urgent</button>
+        <button class="urgency-btn" data-urgency="Down-Not Running" onclick="selectUrgency(this)">🔴 Down — Not Running</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="submitRepairRequest()">Submit Request</button>
+    </div>
+  </div>
+
+  <!-- Log of submitted repair requests -->
+  <div class="f-card">
+    <div class="f-card-title">Recent Repair Requests</div>
+    <div id="repair-log-list">
+      <p class="v-history-empty">No repair requests on file yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 4 — MAINTENANCE LOG
+════════════════════════════════════════════════ -->
+<div id="tab-maintenance" class="fleet-panel">
+  <div class="f-card">
+    <div class="f-card-title">📋 New Maintenance Entry</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="section-label">Unit *</label>
+        <div class="ss-wrap" id="maint-unit-wrap">
+          <input type="text" class="ss-input" id="maint-unit-input" placeholder="Search by number or name…" autocomplete="off">
+          <button class="ss-clear" id="maint-unit-clear" onclick="clearSelect('maint')">✕</button>
+          <input type="hidden" id="maint-unit">
+          <div class="ss-dropdown" id="maint-unit-dropdown"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="section-label">Date *</label>
+        <input type="date" id="maint-date" class="f-input">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Employee Name *</label>
+      <input type="text" id="maint-name" class="f-input" placeholder="Who performed the work">
+    </div>
+
+    <div class="form-group">
+      <label class="section-label">Work Performed *</label>
+      <textarea id="maint-work" class="f-input" rows="3" placeholder="Describe all work performed..."></textarea>
+    </div>
+
+    <!-- Parts Table -->
+    <div class="form-group">
+      <label class="section-label">Parts Used</label>
+      <table class="parts-table" id="parts-table">
+        <thead>
+          <tr>
+            <th style="width:35%">Part #</th>
+            <th style="width:30%">Vendor</th>
+            <th style="width:20%">Qty</th>
+            <th style="width:15%"></th>
+          </tr>
+        </thead>
+        <tbody id="parts-tbody"></tbody>
+      </table>
+      <button class="btn-secondary btn-sm" onclick="addPartsRow()">+ Add Part</button>
+    </div>
+
+    <!-- Invoice Photos -->
+    <div class="form-group">
+      <label class="section-label">Invoice / Receipt Photos</label>
+      <div class="photo-zone">
+        <input type="file" id="maint-photos" accept="image/*" multiple onchange="handlePhotos(this,'maint-previews','maint-photo-count')">
+        <div class="photo-zone-icon">📄</div>
+        <p>Tap or drag to attach invoices</p>
+      </div>
+      <div class="photo-previews" id="maint-previews"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="submitMaintenanceEntry()">Save Entry</button>
+    </div>
+  </div>
+
+  <!-- Log Entries -->
+  <div class="f-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;">
+      <div class="f-card-title" style="margin:0;border:none;padding:0;">Maintenance History</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+        <div class="ss-wrap" id="filter-unit-wrap" style="margin:0;min-width:180px;">
+          <input type="text" class="ss-input" id="filter-unit-input" placeholder="All Units" autocomplete="off" style="font-size:0.88rem;padding:0.45rem 2rem 0.45rem 0.7rem;">
+          <button class="ss-clear" id="filter-unit-clear" onclick="clearSelect('filter')" style="right:1.8rem;">✕</button>
+          <input type="hidden" id="filter-unit">
+          <div class="ss-dropdown" id="filter-unit-dropdown"></div>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="openArchive()">🗄 View Archive</button>
+      </div>
+    </div>
+    <div id="maint-log-list">
+      <p class="v-history-empty">No maintenance entries yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 5 — VEHICLE CARDS
+════════════════════════════════════════════════ -->
+<div id="tab-vehicles" class="fleet-panel">
+  <div class="vehicle-card-grid" id="vehicle-card-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     VEHICLE DETAIL MODAL
+════════════════════════════════════════════════ -->
+<div class="v-modal" id="vehicle-modal" onclick="closeVehicleModal(event)">
+  <div class="v-modal-box">
+    <div class="v-modal-header">
+      <div>
+        <div id="vm-unit-badge" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.75;margin-bottom:0.2rem;"></div>
+        <h3 id="vm-name"></h3>
+      </div>
+      <button class="v-modal-close" onclick="document.getElementById('vehicle-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="v-modal-body">
+      <p class="v-modal-ymm" id="vm-ymm"></p>
+
+      <div class="v-tab-nav">
+        <button class="v-tab active" onclick="showVTab('docs',this)">📁 Documents</button>
+        <button class="v-tab" onclick="showVTab('maint-hist',this)">🔧 Maintenance</button>
+        <button class="v-tab" onclick="showVTab('repair-hist',this)">🛠 Repairs</button>
+      </div>
+
+      <div class="v-sub-panel active" id="vp-docs">
+        <div class="v-section">
+          <div class="v-section-title">🚔 Cop Lights</div>
+          <div class="v-doc-links">
+            <a href="https://drive.google.com/drive/folders/1_jjw13GJ8sPUD-6kTcU-BrxXn9Tl7sdS?usp=sharing" target="_blank" class="v-doc-link">
+              <span class="doc-icon">📋</span><span class="doc-label">Registration</span><span class="doc-arrow">→</span>
+            </a>
+            <a href="https://drive.google.com/drive/folders/1_jjw13GJ8sPUD-6kTcU-BrxXn9Tl7sdS?usp=sharing" target="_blank" class="v-doc-link">
+              <span class="doc-icon">🛡</span><span class="doc-label">Insurance</span><span class="doc-arrow">→</span>
+            </a>
+            <a href="https://drive.google.com/drive/folders/1_jjw13GJ8sPUD-6kTcU-BrxXn9Tl7sdS?usp=sharing" target="_blank" class="v-doc-link">
+              <span class="doc-icon">✅</span><span class="doc-label">Inspection Certificate</span><span class="doc-arrow">→</span>
+            </a>
+          </div>
+        </div>
+        <div class="v-section">
+          <div class="v-section-title">📄 Manual</div>
+          <div class="v-doc-links">
+            <a href="https://drive.google.com/drive/folders/1_jjw13GJ8sPUD-6kTcU-BrxXn9Tl7sdS?usp=sharing" target="_blank" class="v-doc-link">
+              <span class="doc-icon">📖</span><span class="doc-label">Owner's Manual</span><span class="doc-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="v-sub-panel" id="vp-maint-hist">
+        <div class="v-history-list" id="vm-maint-list">
+          <p class="v-history-empty">No maintenance records for this unit yet.</p>
+        </div>
+      </div>
+
+      <div class="v-sub-panel" id="vp-repair-hist">
+        <div class="v-history-list" id="vm-repair-list">
+          <p class="v-history-empty">No repair requests for this unit yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ARCHIVE PASSWORD MODAL
+════════════════════════════════════════════════ -->
+<div class="arch-overlay" id="archive-overlay">
+  <div class="arch-box">
+    <h4>🗄 View Archive</h4>
+    <p>Enter the archive password to view entries older than 2 years.</p>
+    <label class="section-label">Password</label>
+    <input type="password" id="archive-pw" class="f-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkArchivePw()">
+    <p class="arch-err" id="archive-err">Incorrect password. Try again.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="checkArchivePw()">Unlock</button>
+      <button class="btn-secondary" onclick="document.getElementById('archive-overlay').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════ -->
+<script>
+// ── CONFIGURATION ──────────────────────────────
+const CLICKSEND_USERNAME = 'Bids@1bellaterra.com';
+const CLICKSEND_API_KEY  = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
+const EMAIL_SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxa52KhAmPtWCgP6KGt8o74igU1XZCu_Lqk8kmqPGLvuBYrSA_8yfu_p8WqVqMm9dar/exec';
+
+const SMS_RECIPIENTS = [
+  { name: 'Kent',   number: '+13605184248' },
+  { name: 'Wyatt',  number: '+13605184399' },
+  { name: 'Brydon', number: '+13605609860' }
+];
+const ACCIDENT_EMAIL_TO = ['Rena@1bellaterra.com', 'Brydon@1bellaterra.com'];
+
+// ── FLEET VEHICLE LIST ─────────────────────────
+// Source: "Vehicle Numbers 4/9/2026" — Equipment truck trailer numbers. 3.pdf
+// category: 'truck' | 'trailer' | 'equipment'
+const FLEET_UNITS = [
+  // ── TRUCKS ──
+  { id:'101', num:'101', nickname:'Mack',              year:'1990', make:'Mack',        model:'CH613 Dump Truck',        plate:'RP14104', icon:'🚚', category:'truck'     },
+  { id:'102', num:'102', nickname:'Kenworth',          year:'1989', make:'Kenworth',    model:'W900B Hydroseeder',       plate:'RP14102', icon:'🚚', category:'truck'     },
+  { id:'103', num:'103', nickname:'Freightliner',      year:'1984', make:'Freightliner',model:'HS2 1.5 Hydroseeder',     plate:'RP14103', icon:'🚚', category:'truck'     },
+  { id:'104', num:'104', nickname:'2500HD Chevy',      year:'2008', make:'Chevy',       model:'Silverado 2500HD Pickup', plate:'C85320Z', icon:'🛻', category:'truck'     },
+  { id:'105', num:'105', nickname:'S10 Chevy',         year:'2003', make:'Chevy',       model:'S10 Pickup',              plate:'C30834X', icon:'🛻', category:'truck'     },
+  { id:'106', num:'106', nickname:'Ford F350',         year:'2000', make:'Ford',        model:'F350 Super Duty Pickup',  plate:'C14206V', icon:'🛻', category:'truck'     },
+  { id:'108', num:'108', nickname:'W4',                year:'—',    make:'—',           model:'W4',                      plate:'D40419C', icon:'🚚', category:'truck'     },
+  { id:'109', num:'109', nickname:'GMC Sierra 2500HD', year:'2006', make:'GMC',         model:'Sierra 2500HD',           plate:'C92745N', icon:'🛻', category:'truck'     },
+  { id:'111', num:'111', nickname:'CAD Truck',         year:'1989', make:'Peterbilt',   model:'357 CAD Truck',           plate:'RP16504', icon:'🚚', category:'truck'     },
+  { id:'112', num:'112', nickname:'Highlander',        year:'2022', make:'Toyota',      model:'Highlander',              plate:'CBJ8768', icon:'🚙', category:'truck'     },
+  { id:'113', num:'113', nickname:'Ramp Truck',        year:'1984', make:'Ford',        model:'LN9000 Ramp Truck',       plate:'RP1410',  icon:'🚚', category:'truck'     },
+  { id:'114', num:'114', nickname:'Western Star',      year:'2006', make:'Western Star',model:'4900SA Bark Blower',      plate:'RP16503', icon:'🚚', category:'truck'     },
+  { id:'115', num:'115', nickname:"Ford Brydon's",     year:'2019', make:'Ford',        model:'F250 Super Duty',         plate:'D44183F', icon:'🛻', category:'truck'     },
+  { id:'116', num:'116', nickname:'Clifford',          year:'2006', make:'Peterbilt',   model:'357 Easy Lawn',           plate:'RP24304', icon:'🚚', category:'truck'     },
+  { id:'117', num:'117', nickname:'Rogue',             year:'2023', make:'Nissan',      model:'Rogue',                   plate:'D97939G', icon:'🚙', category:'truck'     },
+  { id:'118', num:'118', nickname:'Peterbilt Not Ready',year:'1993',make:'Peterbilt',   model:'378',                     plate:'—',       icon:'🚚', category:'truck'     },
+  { id:'119', num:'119', nickname:'Chevy Silver',      year:'2015', make:'Chevy',       model:'Silverado 3500HD',        plate:'D95431F', icon:'🛻', category:'truck'     },
+  { id:'120', num:'120', nickname:'Greenie',           year:'1995', make:'Freightliner',model:'L-80 Bark Blower',        plate:'RP27819', icon:'🚚', category:'truck'     },
+  { id:'121', num:'121', nickname:'Chevy Black',       year:'2013', make:'Chevy',       model:'Silverado 2500HD',        plate:'D50475H', icon:'🛻', category:'truck'     },
+  { id:'122', num:'122', nickname:'Curtain Truck',     year:'2014', make:'Freightliner',model:"N2106 24' Curtain Truck", plate:'RP25873', icon:'🚚', category:'truck'     },
+  { id:'123', num:'123', nickname:'Dumpy',             year:'2002', make:'International',model:'5 Yard Dump Truck',      plate:'D55230J', icon:'🚚', category:'truck'     },
+  { id:'124', num:'124', nickname:'Day Cab Pete',      year:'2016', make:'Peterbilt',   model:'579 Day Cab Tractor',     plate:'—',       icon:'🚚', category:'truck'     },
+  // ── TRAILERS ──
+  { id:'201', num:'201', nickname:'Dump Trailer',      year:'2020', make:'PJ Trailers', model:'DB Dump Trailer 6 yds',  plate:'28242AE', icon:'🚛', category:'trailer'   },
+  { id:'202', num:'202', nickname:'Reefer Trailer',    year:'—',    make:'—',           model:'Reefer Trailer',         plate:'64164AG', icon:'🚛', category:'trailer'   },
+  { id:'203', num:'203', nickname:'Tiltdeck Trailer',  year:'1983', make:'TrailKing',   model:'Large Equip. Tiltdeck',  plate:'64075AG', icon:'🚛', category:'trailer'   },
+  { id:'204', num:'204', nickname:'Finn Hydro 0.5',   year:'—',    make:'Finn',        model:'Hydro Seeder 0.5',       plate:'42288AH', icon:'💧', category:'trailer'   },
+  { id:'205', num:'205', nickname:'Landscape Trailer', year:'2020', make:'Carry-On',    model:"7x14 7K Landscape",      plate:'01466AE', icon:'🚛', category:'trailer'   },
+  { id:'206', num:'206', nickname:'Green Trailer',     year:'—',    make:'—',           model:'Green Trailer',          plate:'5726-Z0', icon:'🚛', category:'trailer'   },
+  { id:'207', num:'207', nickname:'Black Flatdeck',    year:'2016', make:'PJ Trailers', model:'L3 Black Flatdeck',      plate:'90714AK', icon:'🚛', category:'trailer'   },
+  { id:'208', num:'208', nickname:'Lunch Trailer',     year:'2003', make:'Carson',      model:'Fun Runner',             plate:'90972AL', icon:'🚛', category:'trailer'   },
+  { id:'209', num:'209', nickname:'Airstream',         year:'—',    make:'Airstream',   model:'Trailer',                plate:'—',       icon:'🚛', category:'trailer'   },
+  // ── EQUIPMENT ──
+  { id:'301', num:'301', nickname:'Mini Excavator',    year:'—',    make:'—',           model:'Mini Excavator',         plate:'—',       icon:'🏗', category:'equipment' },
+  { id:'302', num:'302', nickname:'Water Wagon',       year:'2016', make:'—',           model:'Water Wagon',            plate:'54842AJ', icon:'🚜', category:'equipment' },
+  { id:'303', num:'303', nickname:'Skidsteer',         year:'—',    make:'—',           model:'Skid Steer',             plate:'—',       icon:'🏗', category:'equipment' },
+  { id:'304', num:'304', nickname:'Mini Truck',        year:'—',    make:'—',           model:'Mini Truck',             plate:'—',       icon:'🚛', category:'equipment' },
+  { id:'305', num:'305', nickname:'Mini Truck Dump',   year:'—',    make:'—',           model:'Mini Truck Dump',        plate:'—',       icon:'🚛', category:'equipment' },
+  { id:'306', num:'306', nickname:'Excavator Sany',    year:'—',    make:'Sany',        model:'Excavator',              plate:'—',       icon:'🏗', category:'equipment' },
+  { id:'307', num:'307', nickname:'Dingo',             year:'—',    make:'—',           model:'Dingo',                  plate:'—',       icon:'🚜', category:'equipment' },
+  { id:'308', num:'308', nickname:'CAT Wheel Loader',  year:'2013', make:'Caterpillar', model:'IT14G Wheel Loader',     plate:'—',       icon:'🏗', category:'equipment' },
+  { id:'309', num:'309', nickname:'Morooka',           year:'—',    make:'Morooka',     model:'Carrier',                plate:'—',       icon:'🚜', category:'equipment' },
+  { id:'310', num:'310', nickname:'Lil Bowie',         year:'—',    make:'Bowie',       model:'1000 Gal Tank',          plate:'—',       icon:'💧', category:'equipment' },
+  { id:'311', num:'311', nickname:'Air Compressor',    year:'2002', make:'—',           model:'Air Compressor/Trailer', plate:'5403AJ',  icon:'🔧', category:'equipment' },
+  { id:'319', num:'319', nickname:'Forklift Cat',      year:'—',    make:'Caterpillar', model:'Forklift',               plate:'—',       icon:'🏗', category:'equipment' },
+  { id:'320', num:'320', nickname:'JD 2040 Tractor',   year:'—',    make:'John Deere',  model:'2040 Tractor',           plate:'—',       icon:'🚜', category:'equipment' },
+  { id:'321', num:'321', nickname:'Grass Kicker 3000', year:'—',    make:'Easy Lawn',   model:'Hydroseed 3000',         plate:'—',       icon:'💧', category:'equipment' },
+  { id:'323', num:'323', nickname:'Moffet Forklift',   year:'2003', make:'Moffet',      model:'Forklift',               plate:'N/A',     icon:'🏗', category:'equipment' },
+  { id:'326', num:'326', nickname:'Gator',             year:'2018', make:'John Deere',  model:'TE 4x2 Gator',          plate:'—',       icon:'🚜', category:'equipment' }
+];
+
+// ── LOCALSTORAGE ───────────────────────────────
+const LS_REPAIRS = 'bt_repair_requests';
+const LS_MAINT   = 'bt_maintenance_log';
+function loadRepairs() { try { return JSON.parse(localStorage.getItem(LS_REPAIRS) || '[]'); } catch(e) { return []; } }
+function loadMaint()   { try { return JSON.parse(localStorage.getItem(LS_MAINT)   || '[]'); } catch(e) { return []; } }
+function saveRepairs(d){ localStorage.setItem(LS_REPAIRS, JSON.stringify(d)); }
+function saveMaint(d)  { localStorage.setItem(LS_MAINT,   JSON.stringify(d)); }
+
+// ── UNIT LABEL ─────────────────────────────────
+// Always "101 — Mack" format throughout the app
+function unitLabel(id) {
+  const u = FLEET_UNITS.find(x => x.id === id);
+  return u ? u.num + ' — ' + u.nickname : id;
+}
+
+// ── SEARCHABLE DROPDOWN ────────────────────────
+// prefix = 'acc' | 'rep' | 'maint' | 'filter'
+// includeAll = true adds an "All Units" option (for filter)
+function initSearchSelect(prefix, includeAll) {
+  const inputEl    = document.getElementById(prefix + '-unit-input');
+  const hiddenEl   = document.getElementById(prefix + '-unit');
+  const dropEl     = document.getElementById(prefix + '-unit-dropdown');
+  const wrapEl     = document.getElementById(prefix + '-unit-wrap');
+  if (!inputEl || !hiddenEl || !dropEl) return;
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    let units = FLEET_UNITS;
+    if (q) units = units.filter(u =>
+      u.num.includes(q) || u.nickname.toLowerCase().includes(q)
+    );
+    let html = '';
+    if (includeAll && !q) {
+      html += `<div class="ss-option" data-id="" data-label="All Units"><em style="color:var(--gray-mid)">All Units</em></div>`;
+    }
+    if (units.length === 0) {
+      html += '<div class="ss-no-results">No units found</div>';
+    } else {
+      html += units.map(u =>
+        `<div class="ss-option" data-id="${u.id}" data-label="${u.num} — ${u.nickname}">
+           <span class="ss-num">${u.num}</span><span style="color:var(--gray-mid);margin:0 0.3rem;">—</span><span class="ss-nick">${u.nickname}</span>
+         </div>`
+      ).join('');
+    }
+    dropEl.innerHTML = html;
+    // Attach click handlers
+    dropEl.querySelectorAll('.ss-option').forEach(opt => {
+      opt.addEventListener('mousedown', e => {
+        e.preventDefault();
+        selectOption(opt.dataset.id, opt.dataset.label);
+      });
+    });
+  }
+
+  function selectOption(id, label) {
+    hiddenEl.value = id;
+    inputEl.value  = label;
+    wrapEl.classList.toggle('has-value', !!id);
+    dropEl.classList.remove('open');
+    inputEl.classList.remove('open');
+    // If this is the filter dropdown, re-render log
+    if (prefix === 'filter') renderMaintenanceLog();
+  }
+
+  function openDrop() {
+    renderList(inputEl.value);
+    dropEl.classList.add('open');
+    inputEl.classList.add('open');
+  }
+
+  inputEl.addEventListener('focus', () => {
+    inputEl.select();
+    openDrop();
+  });
+
+  inputEl.addEventListener('input', () => {
+    hiddenEl.value = '';
+    wrapEl.classList.remove('has-value');
+    renderList(inputEl.value);
+    dropEl.classList.add('open');
+    inputEl.classList.add('open');
+  });
+
+  inputEl.addEventListener('blur', () => {
+    // Slight delay so mousedown on option fires first
+    setTimeout(() => {
+      dropEl.classList.remove('open');
+      inputEl.classList.remove('open');
+      // If user typed but didn't pick, clear if no valid match
+      if (!hiddenEl.value) {
+        if (!includeAll) inputEl.value = '';
+        else if (inputEl.value !== 'All Units') { inputEl.value = ''; hiddenEl.value = ''; }
+      }
+    }, 150);
+  });
+}
+
+function clearSelect(prefix) {
+  const inputEl  = document.getElementById(prefix + '-unit-input');
+  const hiddenEl = document.getElementById(prefix + '-unit');
+  const wrapEl   = document.getElementById(prefix + '-unit-wrap');
+  if (!inputEl) return;
+  inputEl.value  = '';
+  hiddenEl.value = '';
+  wrapEl.classList.remove('has-value');
+  if (prefix === 'filter') renderMaintenanceLog();
+}
+
+// ── TAB SWITCHING ──────────────────────────────
+function showFleetTab(id, btn) {
+  document.querySelectorAll('.fleet-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.fleet-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showVTab(id, btn) {
+  document.querySelectorAll('.v-sub-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.v-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('vp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── DEFAULT DATETIMES ──────────────────────────
+function setDefaultDatetimes() {
+  const now   = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  ['acc-datetime','rep-datetime'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = local;
+  });
+  const maintDate = document.getElementById('maint-date');
+  if (maintDate) maintDate.value = new Date().toISOString().split('T')[0];
+}
+
+// ── PHOTO HANDLING ─────────────────────────────
+const photoFiles = { 'acc-previews': [], 'maint-previews': [] };
+
+function handlePhotos(input, previewId) {
+  photoFiles[previewId] = photoFiles[previewId].concat(Array.from(input.files));
+  renderPhotoPreviews(previewId);
+  input.value = '';
+}
+
+function renderPhotoPreviews(previewId) {
+  const container = document.getElementById(previewId);
+  container.innerHTML = '';
+  photoFiles[previewId].forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wrap = document.createElement('div');
+      wrap.className = 'photo-preview';
+      wrap.innerHTML = `<img src="${e.target.result}" alt="Photo ${idx+1}">
+        <button class="photo-remove" onclick="removePhoto('${previewId}',${idx})">✕</button>`;
+      container.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  });
+  if (previewId === 'acc-previews') {
+    const msg   = document.getElementById('acc-photo-msg');
+    const count = photoFiles[previewId].length;
+    if (!count) { msg.textContent = ''; return; }
+    msg.textContent = count < 3
+      ? `${count} photo${count>1?'s':''} added — please add at least ${3-count} more.`
+      : `${count} photos attached ✓`;
+    msg.style.color = count < 3 ? 'var(--red)' : 'var(--green-dark)';
+  }
+}
+
+function removePhoto(previewId, idx) {
+  photoFiles[previewId].splice(idx, 1);
+  renderPhotoPreviews(previewId);
+}
+
+// ── URGENCY ────────────────────────────────────
+let selectedUrgency = '';
+const urgencyClass  = { 'Routine':'sel-routine','Semi-Urgent':'sel-semi','Urgent':'sel-urgent','Down-Not Running':'sel-down' };
+
+function selectUrgency(btn) {
+  document.querySelectorAll('.urgency-btn').forEach(b => b.className = 'urgency-btn');
+  selectedUrgency = btn.dataset.urgency;
+  btn.classList.add(urgencyClass[selectedUrgency]);
+}
+
+// ── ACCIDENT REPORT ────────────────────────────
+function submitAccidentReport() {
+  const name   = document.getElementById('acc-name').value.trim();
+  const email  = document.getElementById('acc-email').value.trim();
+  const unit   = document.getElementById('acc-unit').value;
+  const dt     = document.getElementById('acc-datetime').value;
+  const loc    = document.getElementById('acc-location').value.trim();
+  const desc   = document.getElementById('acc-description').value.trim();
+  const photos = photoFiles['acc-previews'];
+
+  if (!name || !email || !unit || !dt || !loc || !desc) { alert('Please fill in all required fields.'); return; }
+  if (photos.length < 3) { alert(`Please attach at least 3 photos. Currently ${photos.length} attached.`); return; }
+
+  const payload = {
+    type: 'accident_report', employee_name: name, employee_email: email,
+    unit: unitLabel(unit), datetime: dt, location: loc, description: desc,
+    other_name: document.getElementById('acc-other-name').value,
+    other_phone: document.getElementById('acc-other-phone').value,
+    other_insurance: document.getElementById('acc-other-ins').value,
+    police_report: document.getElementById('acc-police').value,
+    other_vehicle: document.getElementById('acc-other-vehicle').value,
+    photo_count: photos.length, email_to: [...ACCIDENT_EMAIL_TO, email],
+    submitted_at: new Date().toISOString()
+  };
+  fetch(EMAIL_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) }).catch(()=>{});
+
+  document.getElementById('accident-success').classList.add('show');
+  ['acc-name','acc-email','acc-location','acc-description','acc-other-name','acc-other-phone','acc-other-ins','acc-police','acc-other-vehicle'].forEach(id => { document.getElementById(id).value=''; });
+  clearSelect('acc');
+  setDefaultDatetimes();
+  photoFiles['acc-previews'] = [];
+  document.getElementById('acc-previews').innerHTML = '';
+  document.getElementById('acc-photo-msg').textContent = '';
+  window.scrollTo(0,0);
+}
+
+// ── REPAIR REQUEST ─────────────────────────────
+async function submitRepairRequest() {
+  const name = document.getElementById('rep-name').value.trim();
+  const unit = document.getElementById('rep-unit').value;
+  const dt   = document.getElementById('rep-datetime').value;
+  const desc = document.getElementById('rep-description').value.trim();
+
+  if (!name || !unit || !dt || !desc) { alert('Please fill in all required fields.'); return; }
+  if (!selectedUrgency) { alert('Please select an urgency level.'); return; }
+
+  const entry = { id:Date.now(), employee:name, unit, unit_label:unitLabel(unit), datetime:dt, description:desc, urgency:selectedUrgency, submitted_at:new Date().toISOString() };
+  const repairs = loadRepairs(); repairs.unshift(entry); saveRepairs(repairs);
+
+  const smsBody = `🔧 REPAIR REQUEST — ${unitLabel(unit)}\nUrgency: ${selectedUrgency}\nEmployee: ${name}\nIssue: ${desc.substring(0,120)}${desc.length>120?'...':''}\nSubmitted: ${new Date().toLocaleString()}`;
+  await sendClickSendSMS(smsBody);
+
+  document.getElementById('repair-success').classList.add('show');
+  renderRepairLog();
+  document.getElementById('rep-name').value = '';
+  clearSelect('rep');
+  document.getElementById('rep-description').value = '';
+  setDefaultDatetimes();
+  document.querySelectorAll('.urgency-btn').forEach(b => b.className='urgency-btn');
+  selectedUrgency = '';
+  window.scrollTo(0,0);
+}
+
+// ── CLICKSEND SMS ──────────────────────────────
+async function sendClickSendSMS(message) {
+  try {
+    await fetch('https://rest.clicksend.com/v3/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Basic '+btoa(CLICKSEND_USERNAME+':'+CLICKSEND_API_KEY) },
+      body: JSON.stringify({ messages: SMS_RECIPIENTS.map(r => ({ to:r.number, body:message, source:'sdk' })) })
+    });
+  } catch(e) { console.warn('ClickSend SMS error:', e); }
+}
+
+// ── RENDER REPAIR LOG ──────────────────────────
+function renderRepairLog(unitFilter) {
+  const list = document.getElementById('repair-log-list');
+  let repairs = loadRepairs();
+  if (unitFilter) repairs = repairs.filter(r => r.unit === unitFilter);
+  if (!repairs.length) { list.innerHTML='<p class="v-history-empty">No repair requests on file yet.</p>'; return; }
+  list.innerHTML = repairs.map(r => `
+    <div class="log-entry">
+      <div class="log-entry-header">
+        <div><div class="log-entry-title">${r.unit_label}</div><div class="log-entry-meta">${r.employee} · ${formatDt(r.datetime)}</div></div>
+        <span class="log-entry-badge ${urgencyBadgeClass(r.urgency)}">${r.urgency}</span>
+      </div>
+      <div class="log-entry-body">${escHtml(r.description)}</div>
+    </div>`).join('');
+}
+
+function urgencyBadgeClass(u) {
+  return {'Routine':'badge-routine','Semi-Urgent':'badge-semi','Urgent':'badge-urgent','Down-Not Running':'badge-down'}[u]||'';
+}
+
+// ── MAINTENANCE LOG ────────────────────────────
+let showArchive = false;
+
+function addPartsRow() {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td><input type="text" placeholder="Part #"></td><td><input type="text" placeholder="Vendor"></td><td><input type="number" placeholder="1" min="1"></td><td><button class="parts-row-del" onclick="this.closest('tr').remove()">✕</button></td>`;
+  document.getElementById('parts-tbody').appendChild(row);
+}
+
+function getPartsData() {
+  return Array.from(document.querySelectorAll('#parts-tbody tr')).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { part:inputs[0].value.trim(), vendor:inputs[1].value.trim(), qty:inputs[2].value.trim() };
+  }).filter(p => p.part || p.vendor || p.qty);
+}
+
+function submitMaintenanceEntry() {
+  const unit = document.getElementById('maint-unit').value;
+  const date = document.getElementById('maint-date').value;
+  const name = document.getElementById('maint-name').value.trim();
+  const work = document.getElementById('maint-work').value.trim();
+  if (!unit || !date || !name || !work) { alert('Please fill in all required fields.'); return; }
+
+  const entry = { id:Date.now(), unit, unit_label:unitLabel(unit), date, employee:name, work, parts:getPartsData(), photo_count:photoFiles['maint-previews'].length, submitted_at:new Date().toISOString() };
+  const log = loadMaint(); log.unshift(entry); saveMaint(log);
+  renderMaintenanceLog();
+
+  clearSelect('maint');
+  document.getElementById('maint-name').value = '';
+  document.getElementById('maint-work').value = '';
+  document.getElementById('parts-tbody').innerHTML = '';
+  addPartsRow();
+  photoFiles['maint-previews'] = [];
+  document.getElementById('maint-previews').innerHTML = '';
+  setDefaultDatetimes();
+  document.getElementById('maint-log-list').scrollIntoView({ behavior:'smooth' });
+}
+
+function renderMaintenanceLog() {
+  const list   = document.getElementById('maint-log-list');
+  const filter = document.getElementById('filter-unit') ? document.getElementById('filter-unit').value : '';
+  const twoYearsAgo = new Date(); twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  let entries = loadMaint();
+  if (filter) entries = entries.filter(e => e.unit === filter);
+  const recent   = entries.filter(e => new Date(e.date) >= twoYearsAgo);
+  const archived = entries.filter(e => new Date(e.date) < twoYearsAgo);
+  const visible  = showArchive ? entries : recent;
+
+  if (!entries.length) { list.innerHTML='<p class="v-history-empty">No maintenance entries yet.</p>'; return; }
+  if (!visible.length && !showArchive) { list.innerHTML='<p class="v-history-empty">No recent entries. Use "View Archive" to see older records.</p>'; return; }
+
+  list.innerHTML = visible.map(e => `
+    <div class="log-entry">
+      <div class="log-entry-header">
+        <div><div class="log-entry-title">${e.unit_label}</div><div class="log-entry-meta">${e.employee} · ${formatDate(e.date)}</div></div>
+        ${e.photo_count>0?`<span class="log-entry-badge badge-routine">📄 ${e.photo_count} invoice${e.photo_count>1?'s':''}</span>`:''}
+      </div>
+      <div class="log-entry-body">${escHtml(e.work)}</div>
+      ${e.parts&&e.parts.length?`<div class="log-entry-parts">Parts: ${e.parts.map(p=>`${p.part} (${p.vendor}, qty ${p.qty})`).join(' · ')}</div>`:''}
+    </div>`).join('');
+}
+
+// ── ARCHIVE ────────────────────────────────────
+function openArchive() {
+  document.getElementById('archive-pw').value = '';
+  document.getElementById('archive-err').style.display = 'none';
+  document.getElementById('archive-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('archive-pw').focus(),100);
+}
+
+function checkArchivePw() {
+  if (document.getElementById('archive-pw').value === '2015') {
+    showArchive = true;
+    document.getElementById('archive-overlay').classList.remove('open');
+    renderMaintenanceLog();
+  } else {
+    document.getElementById('archive-err').style.display = 'block';
+    document.getElementById('archive-pw').value = '';
+    document.getElementById('archive-pw').focus();
+  }
+}
+
+// ── VEHICLE CARDS ──────────────────────────────
+function buildVehicleCards() {
+  const groups = [
+    { key:'truck',     label:'🚚 Trucks' },
+    { key:'trailer',   label:'🚛 Trailers' },
+    { key:'equipment', label:'🏗 Equipment' }
+  ];
+  document.getElementById('vehicle-card-grid').innerHTML = groups.map(g => {
+    const units = FLEET_UNITS.filter(u => u.category === g.key);
+    if (!units.length) return '';
+    return `
+      <div>
+        <div class="vc-section-label">${g.label}</div>
+        <div class="vc-group">
+          ${units.map(u => `
+            <div class="v-card" onclick="openVehicleModal('${u.id}')">
+              <div class="v-card-icon">${u.icon}</div>
+              <div class="v-card-num">${u.num}</div>
+              <div class="v-card-name">${u.nickname}</div>
+              <div class="v-card-plate">${u.plate !== '—' ? u.plate : ''}</div>
+              <div class="v-card-ymm">${[u.year, u.make, u.model].filter(x => x && x !== '—').join(' ')}</div>
+              <div class="v-card-open-hint">Tap to view →</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openVehicleModal(unitId) {
+  const u = FLEET_UNITS.find(x => x.id === unitId);
+  if (!u) return;
+  document.getElementById('vm-unit-badge').textContent = 'Unit ' + u.num;
+  document.getElementById('vm-name').textContent = u.nickname;
+  document.getElementById('vm-ymm').textContent = `${u.year} ${u.make} ${u.model} · Plate: ${u.plate}`;
+
+  const maintItems = loadMaint().filter(e => e.unit === unitId).slice(0, 10);
+  document.getElementById('vm-maint-list').innerHTML = !maintItems.length
+    ? '<p class="v-history-empty">No maintenance records for this unit.</p>'
+    : maintItems.map(e => `<div class="v-history-item"><div class="v-history-date">${formatDate(e.date)}</div><div>${escHtml(e.work.substring(0,120))}${e.work.length>120?'...':''}</div>${e.parts&&e.parts.length?`<div style="color:var(--gray-mid);font-size:0.8rem;margin-top:0.2rem;">Parts: ${e.parts.map(p=>p.part).filter(Boolean).join(', ')}</div>`:''}</div>`).join('');
+
+  const repairItems = loadRepairs().filter(r => r.unit === unitId).slice(0, 10);
+  document.getElementById('vm-repair-list').innerHTML = !repairItems.length
+    ? '<p class="v-history-empty">No repair requests for this unit.</p>'
+    : repairItems.map(r => `<div class="v-history-item"><div class="v-history-date">${formatDt(r.datetime)} <span class="log-entry-badge ${urgencyBadgeClass(r.urgency)}" style="font-size:0.7rem;">${r.urgency}</span></div><div>${escHtml(r.description.substring(0,120))}${r.description.length>120?'...':''}</div></div>`).join('');
+
+  document.querySelectorAll('.v-sub-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.v-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('vp-docs').classList.add('active');
+  document.querySelector('.v-tab').classList.add('active');
+  document.getElementById('vehicle-modal').classList.add('open');
+}
+
+function closeVehicleModal(e) {
+  if (e.target === document.getElementById('vehicle-modal'))
+    document.getElementById('vehicle-modal').classList.remove('open');
+}
+
+// ── UTILS ──────────────────────────────────────
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${parseInt(m)}/${parseInt(day)}/${y}`;
+}
+function formatDt(dt) {
+  if (!dt) return '—';
+  try { return new Date(dt).toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); } catch(e) { return dt; }
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── INIT ───────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initSearchSelect('acc');
+  initSearchSelect('rep');
+  initSearchSelect('maint');
+  initSearchSelect('filter', true); // "All Units" option for filter
+  setDefaultDatetimes();
+  buildVehicleCards();
+  renderRepairLog();
+  renderMaintenanceLog();
+  addPartsRow();
+});
+</script>
+</body>
+</html>
