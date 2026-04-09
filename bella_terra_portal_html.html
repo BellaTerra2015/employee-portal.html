@@ -3452,17 +3452,26 @@ function renderSchedulerJobs() {
   }
   
   let html = `
-    <div style="background:var(--green-pale);border-radius:10px;padding:1rem;margin-bottom:1.5rem;">
-      <strong>${schedulerJobs.length} job(s)</strong> scheduled for tomorrow. Review times and click "Send All Confirmations" to text customers.
+    <div style="background:var(--green-pale);border-radius:10px;padding:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <span><strong>${schedulerJobs.length} job(s)</strong> scheduled for tomorrow. Uncheck any you don't want to text.</span>
+      <button onclick="toggleAllJobs()" id="select-all-btn"
+              style="padding:0.4rem 0.85rem;background:white;border:2px solid var(--green-mid);border-radius:7px;font-size:0.82rem;font-weight:600;color:var(--green-dark);cursor:pointer;white-space:nowrap;margin-left:1rem;">
+        Uncheck All
+      </button>
     </div>`;
-  
+
   schedulerJobs.forEach((job, index) => {
     html += `
-      <div style="background:white;border:2px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem;">
+      <div id="job-card-${index}" style="background:white;border:2px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem;transition:opacity 0.2s;">
         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;">
-          <div>
-            <div style="font-weight:700;font-size:1.1rem;color:var(--green-dark);">${job.customerName}</div>
-            <div style="font-size:0.875rem;color:var(--gray-mid);margin-top:0.25rem;">${job.phone}</div>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <input type="checkbox" id="job-check-${index}" checked
+                   onchange="toggleJobSelection(${index})"
+                   style="width:20px;height:20px;accent-color:var(--green-dark);cursor:pointer;flex-shrink:0;">
+            <div>
+              <div style="font-weight:700;font-size:1.1rem;color:var(--green-dark);">${job.customerName}</div>
+              <div style="font-size:0.875rem;color:var(--gray-mid);margin-top:0.25rem;">${job.phone}</div>
+            </div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);">Calendar</div>
@@ -3507,17 +3516,46 @@ function renderSchedulerJobs() {
   
   html += `
     <div style="display:flex;gap:1rem;margin-top:1.5rem;">
-      <button onclick="sendAllConfirmations()" 
+      <button onclick="sendAllConfirmations()" id="send-btn"
               style="flex:1;padding:1rem;background:var(--green-dark);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
-        📤 Send All Confirmations (${schedulerJobs.length})
+        📤 Send Confirmations (${schedulerJobs.length})
       </button>
-      <button onclick="closeServiceScheduler()" 
+      <button onclick="closeServiceScheduler()"
               style="padding:1rem 1.5rem;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:10px;font-size:1rem;cursor:pointer;">
         Cancel
       </button>
     </div>`;
   
   content.innerHTML = html;
+}
+
+function toggleJobSelection(index) {
+  const checked = document.getElementById(`job-check-${index}`).checked;
+  const card = document.getElementById(`job-card-${index}`);
+  card.style.opacity = checked ? '1' : '0.4';
+  card.style.borderColor = checked ? 'var(--border)' : '#ccc';
+  updateSendButton();
+}
+
+function toggleAllJobs() {
+  const allChecked = schedulerJobs.every((_, i) =>
+    document.getElementById(`job-check-${i}`)?.checked);
+  schedulerJobs.forEach((_, i) => {
+    const cb = document.getElementById(`job-check-${i}`);
+    if (cb) { cb.checked = !allChecked; toggleJobSelection(i); }
+  });
+  document.getElementById('select-all-btn').textContent = allChecked ? 'Check All' : 'Uncheck All';
+}
+
+function updateSendButton() {
+  const count = schedulerJobs.filter((_, i) =>
+    document.getElementById(`job-check-${i}`)?.checked).length;
+  const btn = document.getElementById('send-btn');
+  if (btn) {
+    btn.textContent = `📤 Send Confirmations (${count})`;
+    btn.disabled = count === 0;
+    btn.style.background = count === 0 ? '#aaa' : 'var(--green-dark)';
+  }
 }
 
 function updateJobTime(index, type, value) {
@@ -3569,21 +3607,29 @@ function formatTime(time24) {
 }
 
 async function sendAllConfirmations() {
-  if (!confirm(`Send confirmation texts to ${schedulerJobs.length} customer(s)?`)) {
+  const selectedJobs = schedulerJobs.filter((_, i) =>
+    document.getElementById(`job-check-${i}`)?.checked);
+
+  if (selectedJobs.length === 0) {
+    alert('No customers selected. Check at least one box to send.');
     return;
   }
-  
-  const button = event.target;
+
+  if (!confirm(`Send confirmation texts to ${selectedJobs.length} customer(s)?`)) {
+    return;
+  }
+
+  const button = document.getElementById('send-btn');
   button.disabled = true;
   button.textContent = 'Sending...';
-  
+
   try {
     const response = await fetch(APPS_SCRIPT_SCHEDULER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action: 'sendConfirmations',
-        jobs: schedulerJobs
+        jobs: selectedJobs
       })
     });
     
@@ -3599,7 +3645,7 @@ async function sendAllConfirmations() {
   } catch (error) {
     alert(`❌ Error sending texts: ${error.message}`);
     button.disabled = false;
-    button.textContent = `📤 Send All Confirmations (${schedulerJobs.length})`;
+    updateSendButton();
   }
 }
 
