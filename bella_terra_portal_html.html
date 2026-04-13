@@ -435,38 +435,38 @@ button,input,select,textarea{font-family:inherit;}
         <p>Select a section below to get started.</p>
       </div>
       <div class="tiles-grid">
-        <div class="tile has-badge" onclick="showJobs()">
-          <span class="tile-badge" id="jobs-tile-badge">1</span>
-          <div class="tile-icon">📅</div>
-          <h3>Scheduled Jobs</h3>
-          <p>Field ops, pull sheets, planting reports, inspections, and maintenance.</p>
-        </div>
-        <div class="tile" onclick="showBarkMenu()">
-          <div class="tile-icon">💨</div>
-          <h3>Bark Blowing</h3>
-          <p>Bark blowing operations, safety policies, and equipment guidelines.</p>
+        <!-- NURSERY tile — now opens internal nursery panel -->
+        <div class="tile" onclick="showNursery()">
+          <div class="tile-icon">🌱</div>
+          <h3>Nursery</h3>
+          <p>Plant inventory, potting queue, jobs, and growing resources.</p>
         </div>
         <div class="tile" onclick="showHydroMenu()">
           <div class="tile-icon">💧</div>
           <h3>Hydroseeding</h3>
           <p>Platform operations, safety policies, and equipment guidelines.</p>
         </div>
-        <a class="tile" href="fleet_vehicles.html">
+        <div class="tile" onclick="showBarkMenu()">
+          <div class="tile-icon">🌬️</div>
+          <h3>Bark Blowing</h3>
+          <p>Bark blowing operations, safety policies, and equipment guidelines.</p>
+        </div>
+        <div class="tile has-badge" onclick="showJobs()">
+          <span class="tile-badge" id="jobs-tile-badge">1</span>
+          <div class="tile-icon">📅</div>
+          <h3>Scheduled Jobs</h3>
+          <p>Field ops, pull sheets, planting reports, inspections, and maintenance.</p>
+        </div>
+        <a class="tile" href="https://bellaterra2015.github.io/fleet-inspections/" target="_blank">
           <div class="tile-icon">🚛</div>
-          <h3>Fleet Vehicles</h3>
-          <p>Inspections, accident reporting, repair requests, maintenance log, and vehicle records.</p>
+          <h3>Fleet Inspections</h3>
+          <p>Vehicle inspection forms and equipment checklists.</p>
         </a>
         <div class="tile has-badge" onclick="showResources()">
           <span class="tile-badge" id="res-badge">!</span>
           <div class="tile-icon">👥</div>
           <h3>Employee Resources</h3>
           <p>Handbook, required signatures, contacts, and HR documents.</p>
-        </div>
-        <!-- NURSERY tile — now opens internal nursery panel -->
-        <div class="tile" onclick="showNursery()">
-          <div class="tile-icon">🌱</div>
-          <h3>Nursery</h3>
-          <p>Plant inventory, potting queue, jobs, and growing resources.</p>
         </div>
         <div class="tile" onclick="openServiceScheduler()">
           <div class="tile-icon">📋</div>
@@ -1048,11 +1048,20 @@ button,input,select,textarea{font-family:inherit;}
           </div>
           <div class="od-f">
             <label>Logged By</label>
-            <select id="lc-logged-by">
+            <select id="lc-logged-by" onchange="lcToggleLoggedByOther(this)">
               <option value="">Select…</option>
+              <option value="Rena">Rena</option>
+              <option value="Liz">Liz</option>
+              <option value="Heather">Heather</option>
+              <option value="Brydon">Brydon</option>
+              <option value="Ethan">Ethan</option>
+              <option value="Kevin">Kevin</option>
+              <option value="Emily">Emily</option>
               <option value="Robert">Robert</option>
               <option value="Randy">Randy</option>
+              <option value="__other__">Other — type name…</option>
             </select>
+            <input type="text" id="lc-logged-by-other" placeholder="Type name…" style="display:none;margin-top:0.4rem;width:100%;padding:0.55rem 0.85rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.9rem;font-family:inherit;">
           </div>
         </div>
 
@@ -4208,6 +4217,12 @@ function showLogCall(){
   lcStampDatetime();
 }
 
+function lcToggleLoggedByOther(sel){
+  var other=document.getElementById('lc-logged-by-other');
+  other.style.display = sel.value==='__other__' ? 'block' : 'none';
+  if(sel.value!=='__other__') other.value='';
+}
+
 function lcStampDatetime(){
   var now=new Date();
   var iso=now.getFullYear()+'-'
@@ -4225,7 +4240,8 @@ function submitLogCall(){
   var address     = document.getElementById('lc-address').value.trim();
   var lotSize     = document.getElementById('lc-lot-size').value.trim();
   var notes       = document.getElementById('lc-notes').value.trim();
-  var loggedBy    = document.getElementById('lc-logged-by').value;
+  var loggedByRaw = document.getElementById('lc-logged-by').value;
+  var loggedBy    = loggedByRaw==='__other__' ? document.getElementById('lc-logged-by-other').value.trim() : loggedByRaw;
   var datetime    = document.getElementById('lc-datetime').value;
 
   var errEl = document.getElementById('lc-error');
@@ -4251,10 +4267,10 @@ function submitLogCall(){
     },
     body:JSON.stringify({fields:{
       'Caller Name':  callerName,
-      'Phone Number': phone,
+      'Phone': phone,
       'Service Type': serviceType,
       'Job Address':  address,
-      'Lot Size':     lotSize,
+      'Lot Size / Sq Ft or CY': lotSize,
       'Notes':        notes,
       'Logged By':    loggedBy,
       'Date & Time':  isoDatetime,
@@ -4274,6 +4290,8 @@ function lcSuccess(btn){
   ['lc-caller-name','lc-phone','lc-address','lc-lot-size','lc-notes'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('lc-service-type').value='';
   document.getElementById('lc-logged-by').value='';
+  document.getElementById('lc-logged-by-other').value='';
+  document.getElementById('lc-logged-by-other').style.display='none';
   lcStampDatetime();
   setTimeout(function(){ document.getElementById('lc-success').style.display='none'; },6000);
 }
