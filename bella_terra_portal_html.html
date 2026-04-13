@@ -1559,6 +1559,7 @@ function doLogin(){
   updateHandbookProgress();
   loadSchollsValley();
   checkClackamasReminder();
+  kelsoCheckPendingText();
 }
 function doLogout(){location.reload();}
 
@@ -4187,19 +4188,45 @@ function submitKelsoTotal(btn){
 }
 function kelsoTotalSendText(btn,lead){
   var phone=CREW_PHONES[lead]||null;
-  if(phone){
-    var auth=btoa(CS_USER+':'+CS_KEY);
-    var msg='Reminder: Don\'t forget to submit your Kelso daily fill total in the portal.';
-    fetch('https://rest.clicksend.com/v3/sms/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:phone,body:msg}]})})
-      .then(function(){kelsoTotalDone(btn,true);}).catch(function(){kelsoTotalDone(btn,true);});
+  if(!phone){kelsoTotalDone(btn,'nophone');return;}
+  var now=new Date();
+  var sendAt=new Date(now.getFullYear(),now.getMonth(),now.getDate(),16,30,0);
+  if(now>=sendAt){
+    kelsoSendTextNow(phone);
+    kelsoTotalDone(btn,'sent');
   } else {
-    kelsoTotalDone(btn,false);
+    localStorage.setItem('kelso_pending_text',JSON.stringify({phone:phone,sendAfter:sendAt.getTime()}));
+    var delay=sendAt.getTime()-now.getTime();
+    setTimeout(function(){kelsoSendTextNow(phone);localStorage.removeItem('kelso_pending_text');},delay);
+    kelsoTotalDone(btn,'scheduled');
   }
 }
-function kelsoTotalDone(btn,textSent){
+function kelsoSendTextNow(phone){
+  var auth=btoa(CS_USER+':'+CS_KEY);
+  var msg='Reminder: Don\'t forget to submit your Kelso daily fill total in the portal.';
+  fetch('https://rest.clicksend.com/v3/sms/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:phone,body:msg}]})})
+    .catch(function(){});
+}
+function kelsoCheckPendingText(){
+  var raw=localStorage.getItem('kelso_pending_text');
+  if(!raw)return;
+  try{
+    var data=JSON.parse(raw);
+    if(Date.now()>=data.sendAfter){
+      localStorage.removeItem('kelso_pending_text');
+      kelsoSendTextNow(data.phone);
+    } else {
+      var delay=data.sendAfter-Date.now();
+      setTimeout(function(){kelsoSendTextNow(data.phone);localStorage.removeItem('kelso_pending_text');},delay);
+    }
+  }catch(e){localStorage.removeItem('kelso_pending_text');}
+}
+function kelsoTotalDone(btn,status){
   btn.disabled=false;btn.textContent='📤 Submit Daily Total';
   var ok=document.getElementById('kelso-total-ok');
-  ok.textContent=textSent?'✅ Daily total submitted. Text reminder sent.':'✅ Daily total submitted. Phone number not found — remind crew lead manually.';
+  if(status==='sent') ok.textContent='✅ Daily total submitted. Text reminder sent.';
+  else if(status==='scheduled') ok.textContent='✅ Daily total submitted. Text reminder scheduled for 4:30 PM.';
+  else ok.textContent='✅ Daily total submitted. Phone number not found — remind crew lead manually.';
   ok.style.display='block';
 }
 
