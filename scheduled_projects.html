@@ -547,7 +547,7 @@ function saveHold() {
   }
   // Save to backend
   fetch(SCRIPT_URL, {
-    method: 'POST',
+    method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveHold', podioItemId:_activeHoldId, holdData:holdData, email:_currentUserEmail })
   }).catch(function(){});
@@ -560,7 +560,7 @@ function removeHold(podioItemId) {
     if (_projects[i].podioItemId === podioItemId) { _projects[i].onHold = { active:false }; break; }
   }
   fetch(SCRIPT_URL, {
-    method: 'POST',
+    method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveHold', podioItemId:podioItemId, holdData:{active:false}, email:_currentUserEmail })
   }).catch(function(){});
