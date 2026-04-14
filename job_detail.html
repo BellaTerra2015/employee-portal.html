@@ -477,7 +477,7 @@ function renderHerbLogs() {
 function buildCompletePanel() {
   return '<div class="card card-red"><h4>✅ Mark Job Complete</h4>' +
     '<div class="alert-red">⚠ <strong>Warning:</strong> This moves the project to Complete stage on the board. Make sure all reports have been submitted.</div>' +
-    '<div class="g2"><div class="f"><label>Crew Lead</label><input type="text" id="complete-lead" readonly></div>' +
+    '<div class="g2"><div class="f"><label>Crew Lead</label><input type="text" id="complete-lead" placeholder="Enter crew lead name"></div>' +
     '<div class="f"><label>Completion Date</label><input type="date" id="complete-date"></div></div>' +
     '<div class="f"><label>Final Notes</label><textarea id="complete-notes" rows="4" placeholder="Summary of work completed, outstanding items, handoff notes…"></textarea></div>' +
     '<button class="btn-submit btn-submit-red" onclick="submitComplete(this)">✅ Confirm Job Complete</button>' +
@@ -652,12 +652,19 @@ function submitReport(type, btn) {
 
 function submitComplete(btn) {
   if (!confirm('Mark this job as Complete? This will move it to the Complete column on the board.')) return;
+  var lead  = document.getElementById('complete-lead').value.trim();
+  var notes = document.getElementById('complete-notes').value.trim();
+  if (!lead) { alert('Please enter the crew lead name before marking complete.'); return; }
   btn.textContent = 'Saving…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({
-      action: 'moveProject', podioItemId: _project.podioItemId,
-      newStage: 'Complete', email: _userEmail
+      action:      'completeJob',
+      podioItemId: _project.podioItemId,
+      projectName: _project.name || '',
+      crewLead:    lead,
+      notes:       notes,
+      completedOn: new Date().toISOString()
     })
   })
   .then(function(r){ return r.json(); })
