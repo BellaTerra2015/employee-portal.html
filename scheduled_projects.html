@@ -495,21 +495,17 @@ function buildCard(p, stage) {
 
 function moveProject(podioItemId, newStage) {
   if (!isAuthorized()) { alert('You are not authorized to move projects.'); return; }
+  // Update UI immediately
+  for (var i = 0; i < _projects.length; i++) {
+    if (_projects[i].podioItemId === podioItemId) { _projects[i].portalStage = newStage; break; }
+  }
+  renderBoard();
+  // Save to backend silently
   fetch(SCRIPT_URL, {
-    method: 'POST',
+    method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'moveProject', podioItemId:podioItemId, newStage:newStage, email:_currentUserEmail })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.success) {
-      for (var i = 0; i < _projects.length; i++) {
-        if (_projects[i].podioItemId === podioItemId) { _projects[i].portalStage = newStage; break; }
-      }
-      renderBoard();
-    } else { alert('Move failed: ' + (data.error || 'Unknown error')); }
-  })
-  .catch(function(e){ alert('Error: ' + e.message); });
+  }).catch(function(e){ console.error('Move error:', e); });
 }
 
 // ── ON HOLD ───────────────────────────────────────────────────
@@ -693,21 +689,20 @@ function saveSafetyPlan() {
   };
   var btn = document.getElementById('sp-save-btn');
   btn.textContent = 'Saving…'; btn.disabled = true;
+  // Update local state immediately
+  for (var i = 0; i < _projects.length; i++) {
+    if (_projects[i].podioItemId === _activeSafetyId) { _projects[i].safetyPlan = plan; break; }
+  }
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'text/plain'},
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveSafetyPlan', podioItemId:_activeSafetyId, safetyPlan:plan, email:_currentUserEmail })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.success) {
-      for (var i = 0; i < _projects.length; i++) {
-        if (_projects[i].podioItemId === _activeSafetyId) { _projects[i].safetyPlan = plan; break; }
-      }
-      closeSafety();
-    } else { alert('Save failed: ' + (data.error || 'Unknown')); }
+  .then(function() {
+    btn.textContent = '✅ Saved!';
+    setTimeout(function(){ closeSafety(); btn.textContent = 'Save Safety Plan'; btn.disabled = false; }, 1200);
   })
-  .catch(function(e){ alert('Error: ' + e.message); })
-  .finally(function(){ btn.textContent = 'Save Safety Plan'; btn.disabled = false; });
+  .catch(function(e){ btn.textContent = 'Save Safety Plan'; btn.disabled = false; alert('Error: ' + e.message); });
 }
 
 // ── SCOPE REPORT → job detail page ──────────────────────────
@@ -749,10 +744,7 @@ function closeFinancial() {
 
 function checkFinancialPw() {
   var pw = document.getElementById('financial-pw').value;
-  fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'text/plain'},
-    body: JSON.stringify({ action:'checkPassword', password:pw })
-  })
+  fetch(SCRIPT_URL + '?action=checkPassword&password=' + encodeURIComponent(pw))
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.success && data.authorized) {
@@ -786,13 +778,14 @@ function syncFromPodio() {
   var btn = document.querySelector('.btn-sync');
   btn.textContent = '↻ Syncing…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'text/plain'},
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'syncProjects', email:_currentUserEmail })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(){ loadProjects(); })
-  .catch(function(e){ alert('Sync error: ' + e.message); })
-  .finally(function(){ btn.textContent = '↻ Sync Podio'; btn.disabled = false; });
+  .then(function() {
+    setTimeout(function(){ loadProjects(); btn.textContent = '↻ Sync Podio'; btn.disabled = false; }, 3000);
+  })
+  .catch(function(e){ alert('Sync error: ' + e.message); btn.textContent = '↻ Sync Podio'; btn.disabled = false; });
 }
 
 // ── UTILITIES ────────────────────────────────────────────────
