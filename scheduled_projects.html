@@ -175,7 +175,10 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
       <h3>🦺 Safety Plan</h3>
       <button class="modal-close" onclick="closeSafety()">&times;</button>
     </div>
-    <p id="safety-project-name" style="font-size:.85rem;color:#666;margin-bottom:1rem;font-weight:600;"></p>
+    <p id="safety-project-name" style="font-size:.85rem;color:#666;margin-bottom:.6rem;font-weight:600;"></p>
+    <button onclick="loadSafetyTemplate()" style="width:100%;padding:.55rem;margin-bottom:1rem;background:#e8f5e2;color:#2d5a27;border:2px dashed #7ab648;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;">
+      📋 Load Bella Terra Default Template
+    </button>
 
     <div class="modal-section">Emergency Services</div>
     <div class="field-group"><label>Nearest Emergency Room</label>
@@ -186,34 +189,59 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
       <input type="text" id="sp-911" placeholder="911 — or nearest dispatch number"></div>
 
     <div class="modal-section">Site Information</div>
-    <div class="field-group"><label>Site Address</label>
-      <input type="text" id="sp-address" placeholder="e.g. NW 38th St, Camas WA 98607"></div>
+    <div class="field-group"><label>Jobsite Address / Location</label>
+      <input type="text" id="sp-address" placeholder="e.g. SR 203 MP 0.77–0.80, King County, WA"></div>
+    <div class="field-group"><label>Gate Codes / Site Access</label>
+      <input type="text" id="sp-gate" placeholder="e.g. Gate A: 1234 — or 'No gate codes'"></div>
     <div class="field-row">
-      <div class="field-group"><label>Prime Contractor Foreman</label>
+      <div class="field-group"><label>Superintendent / Foreman</label>
         <input type="text" id="sp-foreman" placeholder="Name + phone"></div>
-      <div class="field-group"><label>Safety Foreman</label>
-        <input type="text" id="sp-safety-foreman" placeholder="Name + phone"></div>
+      <div class="field-group"><label>Traffic Control Supervisor</label>
+        <input type="text" id="sp-tcs" placeholder="Name + phone"></div>
     </div>
-    <div class="field-group"><label>Utilities Phone # (call before digging)</label>
-      <input type="text" id="sp-utilities" placeholder="811 — or specific utility contact"></div>
+    <div class="field-group"><label>Safety Foreman</label>
+      <input type="text" id="sp-safety-foreman" placeholder="Name + phone"></div>
+    <div class="field-group"><label>Utilities (call before digging)</label>
+      <input type="text" id="sp-utilities" placeholder="811"></div>
 
     <div class="modal-section">Bella Terra Contacts</div>
     <div class="field-row">
-      <div class="field-group"><label>Emergency Contact</label>
-        <input type="text" id="sp-emergency" placeholder="Rena — (360) xxx-xxxx"></div>
+      <div class="field-group"><label>Project Manager</label>
+        <input type="text" id="sp-emergency" placeholder="Rena — 360-606-5616"></div>
       <div class="field-group"><label>First Aid Kit Location</label>
-        <input type="text" id="sp-firstaid" placeholder="e.g. Crew truck, center console"></div>
+        <input type="text" id="sp-firstaid" placeholder="e.g. All work trucks + lunch wagon"></div>
     </div>
-    <div class="field-group"><label>Muster Point (emergency assembly)</label>
-      <input type="text" id="sp-muster" placeholder="e.g. Parking lot at NW 38th & SE 1st Ave"></div>
+    <div class="field-group"><label>Muster Point (where to meet in emergency)</label>
+      <input type="text" id="sp-muster" placeholder="e.g. Parking area at MP 0.77"></div>
 
     <div class="modal-section">PPE & Hazards</div>
     <div class="field-group"><label>Required PPE</label>
-      <input type="text" id="sp-ppe" placeholder="e.g. Hi-vis vest, steel toe, hard hat, gloves"></div>
-    <div class="field-group"><label>Site Hazards / Traffic Control</label>
-      <textarea id="sp-hazards" placeholder="Known hazards, traffic control setup, restricted zones…"></textarea></div>
+      <input type="text" id="sp-ppe" placeholder="e.g. Class 2 hi-vis vest, hard hat, gloves, steel toe"></div>
+    <div class="field-group"><label>Site Hazards</label>
+      <textarea id="sp-hazards" placeholder="e.g. Active traffic, stormwater, heavy equipment, pesticides…"></textarea></div>
+
+    <div class="modal-section">Pre-Site Safety Talk</div>
+    <div class="field-group"><label>Safety Talk / Employee Instructions</label>
+      <textarea id="sp-pretalk" style="min-height:120px;" placeholder="What every employee should know before starting work on this site…"></textarea></div>
+
     <div class="field-group"><label>Additional Notes</label>
-      <textarea id="sp-notes" placeholder="Any other site-specific safety information…"></textarea></div>
+      <textarea id="sp-notes" placeholder="Any other site-specific information…"></textarea></div>
+
+    <div class="modal-section">Chemical Safety Data Sheets (SDS)</div>
+    <div style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;line-height:2;">
+      <a href="SDS-Roundup-Custom-Aquatic.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
+        📄 Roundup Custom® for Aquatic &amp; Terrestrial Use — EPA Reg #524-343
+      </a>
+      <a href="SDS-Preference.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
+        📄 Preference® Adjuvant / Surfactant — WinField Solutions
+      </a>
+      <a href="SDS-Dynamark-UV-Blue.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
+        📄 Dynamark® UV Blue Spray Marker — WinField Solutions
+      </a>
+      <div style="margin-top:.4rem;color:#888;font-size:.78rem;">
+        ☎ Chemical emergency (24hrs): CHEMTREC 1-800-424-9300 &nbsp;|&nbsp; Bayer: 1-800-334-7577
+      </div>
+    </div>
 
     <div id="safety-auth-warn" style="display:none;background:#fff3e8;border:1px solid #e07c30;border-radius:6px;padding:.6rem .8rem;font-size:.82rem;color:#b85c00;margin-bottom:.75rem;">
       ⚠ Only Rena, Heather, Brydon, or Liz can save safety plans.
@@ -525,19 +553,22 @@ function openSafety(podioItemId) {
   _activeSafetyId = podioItemId;
   document.getElementById('safety-project-name').textContent = p.name;
   var sp = p.safetyPlan || {};
-  document.getElementById('sp-er').value             = sp.er            || '';
-  document.getElementById('sp-urgent').value         = sp.urgentCare    || '';
-  document.getElementById('sp-911').value            = sp.emergency911  || '';
-  document.getElementById('sp-address').value        = sp.siteAddress   || '';
-  document.getElementById('sp-foreman').value        = sp.foreman       || '';
-  document.getElementById('sp-safety-foreman').value = sp.safetyForeman || '';
-  document.getElementById('sp-utilities').value      = sp.utilities     || '';
-  document.getElementById('sp-emergency').value      = sp.emergency     || '';
-  document.getElementById('sp-firstaid').value       = sp.firstAid      || '';
-  document.getElementById('sp-muster').value         = sp.muster        || '';
-  document.getElementById('sp-ppe').value            = sp.ppe           || '';
-  document.getElementById('sp-hazards').value        = sp.hazards       || '';
-  document.getElementById('sp-notes').value          = sp.notes         || '';
+  document.getElementById('sp-er').value             = sp.er                      || '';
+  document.getElementById('sp-urgent').value         = sp.urgentCare              || '';
+  document.getElementById('sp-911').value            = sp.emergency911            || '';
+  document.getElementById('sp-address').value        = sp.siteAddress             || '';
+  document.getElementById('sp-gate').value           = sp.gateCodes               || '';
+  document.getElementById('sp-foreman').value        = sp.foreman                 || '';
+  document.getElementById('sp-tcs').value            = sp.trafficControlSupervisor|| '';
+  document.getElementById('sp-safety-foreman').value = sp.safetyForeman           || '';
+  document.getElementById('sp-utilities').value      = sp.utilities               || '';
+  document.getElementById('sp-emergency').value      = sp.emergency               || '';
+  document.getElementById('sp-firstaid').value       = sp.firstAid                || '';
+  document.getElementById('sp-muster').value         = sp.muster                  || '';
+  document.getElementById('sp-ppe').value            = sp.ppe                     || '';
+  document.getElementById('sp-hazards').value        = sp.hazards                 || '';
+  document.getElementById('sp-pretalk').value        = sp.preSiteTalk             || '';
+  document.getElementById('sp-notes').value          = sp.notes                   || '';
 
   var warn = document.getElementById('safety-auth-warn');
   var btn  = document.getElementById('sp-save-btn');
@@ -552,22 +583,87 @@ function closeSafety() {
   _activeSafetyId = null;
 }
 
+function loadSafetyTemplate() {
+  // Only fills blank fields — won't overwrite anything already entered
+  function fillIfEmpty(id, value) {
+    var el = document.getElementById(id);
+    if (el && !el.value.trim()) el.value = value;
+  }
+
+  // ── Bella Terra standard defaults ──
+  fillIfEmpty('sp-911',      '911');
+  fillIfEmpty('sp-utilities','811 — Call before any digging');
+  fillIfEmpty('sp-emergency','Rena Bellika — 360-606-5616');
+  fillIfEmpty('sp-firstaid', 'All work trucks. Lunch wagon at staging area when on site.');
+  fillIfEmpty('sp-ppe',
+    'STANDARD PPE (required at all times on site):\n' +
+    '  • Class 2 hi-vis vest with retroreflective tape\n' +
+    '  • Hard hat (white, yellow, or orange — high visibility)\n' +
+    '  • Steel toe boots\n' +
+    '  • Work gloves\n' +
+    '\n' +
+    'ROUNDUP CUSTOM® AQUATIC HERBICIDE (EPA #524-343):\n' +
+    '  • Chemical-resistant gloves — nitrile, butyl rubber, or barrier laminate\n' +
+    '  • Safety glasses with side-shields (minimum); goggles preferred\n' +
+    '  • Long-sleeved shirt, long pants, shoes + socks\n' +
+    '  • Chemical-resistant apron when mixing or loading\n' +
+    '  • No eating, drinking, or smoking during application\n' +
+    '  • Wash hands and face thoroughly after use\n' +
+    '  • Remove and wash PPE separately after use\n' +
+    '  • Do NOT allow spill to enter waterways — absorb with sand\n' +
+    '\n' +
+    'PREFERENCE® ADJUVANT (surfactant mixed with Roundup):\n' +
+    '  • Chemical-resistant gloves\n' +
+    '  • Safety goggles or face shield — causes serious eye irritation\n' +
+    '  • Long-sleeved shirt and long pants\n' +
+    '  • Flammable liquid — keep away from heat/sparks/flame\n' +
+    '\n' +
+    'DYNAMARK® UV BLUE (spray marker):\n' +
+    '  • Chemical-resistant gloves recommended\n' +
+    '  • Safety goggles recommended\n' +
+    '  • Long-sleeved shirt and long pants\n' +
+    '\n' +
+    'See SDS links in this safety card for full details.\n' +
+    'Chemical emergency (24hrs): CHEMTREC 1-800-424-9300'
+  );
+  fillIfEmpty('sp-pretalk',
+    'Welcome to the Bella Terra employee portal.\n\n' +
+    'BEFORE YOU START:\n' +
+    '  1. Make sure your name is logged in the portal (top of the page).\n' +
+    '  2. Review the hazards and PPE listed on this safety card.\n' +
+    '  3. Know where the first aid kit is — it\'s in every work truck.\n' +
+    '  4. Know the muster point — where to go if there is an emergency.\n\n' +
+    'IN AN EMERGENCY:\n' +
+    '  • Call 911 immediately.\n' +
+    '  • Then call your superintendent or Rena at 360-606-5616.\n' +
+    '  • Go to the muster point and wait for headcount.\n\n' +
+    'USING THE PORTAL:\n' +
+    '  • Use the tabs at the top to submit your daily work reports.\n' +
+    '  • Submit a report at the end of each work day.\n' +
+    '  • For herbicide work — always complete the Herbicide Log tab.\n\n' +
+    'Questions? Call Rena at 360-606-5616 or Heather at 360-225-1125.'
+  );
+}
+
 function saveSafetyPlan() {
   if (!isAuthorized() || !_activeSafetyId) return;
   var plan = {
-    er:            document.getElementById('sp-er').value,
-    urgentCare:    document.getElementById('sp-urgent').value,
-    emergency911:  document.getElementById('sp-911').value,
-    siteAddress:   document.getElementById('sp-address').value,
-    foreman:       document.getElementById('sp-foreman').value,
-    safetyForeman: document.getElementById('sp-safety-foreman').value,
-    utilities:     document.getElementById('sp-utilities').value,
-    emergency:     document.getElementById('sp-emergency').value,
-    firstAid:      document.getElementById('sp-firstaid').value,
-    muster:        document.getElementById('sp-muster').value,
-    ppe:           document.getElementById('sp-ppe').value,
-    hazards:       document.getElementById('sp-hazards').value,
-    notes:         document.getElementById('sp-notes').value
+    er:                       document.getElementById('sp-er').value,
+    urgentCare:               document.getElementById('sp-urgent').value,
+    emergency911:             document.getElementById('sp-911').value,
+    siteAddress:              document.getElementById('sp-address').value,
+    gateCodes:                document.getElementById('sp-gate').value,
+    foreman:                  document.getElementById('sp-foreman').value,
+    trafficControlSupervisor: document.getElementById('sp-tcs').value,
+    safetyForeman:            document.getElementById('sp-safety-foreman').value,
+    utilities:                document.getElementById('sp-utilities').value,
+    emergency:                document.getElementById('sp-emergency').value,
+    firstAid:                 document.getElementById('sp-firstaid').value,
+    muster:                   document.getElementById('sp-muster').value,
+    ppe:                      document.getElementById('sp-ppe').value,
+    hazards:                  document.getElementById('sp-hazards').value,
+    preSiteTalk:              document.getElementById('sp-pretalk').value,
+    notes:                    document.getElementById('sp-notes').value
   };
   var btn = document.getElementById('sp-save-btn');
   btn.textContent = 'Saving…'; btn.disabled = true;
