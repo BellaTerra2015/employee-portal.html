@@ -634,7 +634,7 @@ function submitReport(type, btn) {
 
   fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify(data)
   })
   .then(function(r){ return r.json(); })
@@ -657,7 +657,7 @@ function submitComplete(btn) {
   if (!lead) { alert('Please enter the crew lead name before marking complete.'); return; }
   btn.textContent = 'Saving…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({
       action:      'completeJob',
       podioItemId: _project.podioItemId,
@@ -740,7 +740,7 @@ function saveHerbLog() {
 
   // Save to backend and email Rena
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({
       action:      'submitReport',
       reportType:  'herbicide',
