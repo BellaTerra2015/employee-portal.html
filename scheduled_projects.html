@@ -497,7 +497,7 @@ function moveProject(podioItemId, newStage) {
   if (!isAuthorized()) { alert('You are not authorized to move projects.'); return; }
   fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'moveProject', podioItemId:podioItemId, newStage:newStage, email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
@@ -552,7 +552,7 @@ function saveHold() {
   // Save to backend
   fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveHold', podioItemId:_activeHoldId, holdData:holdData, email:_currentUserEmail })
   }).catch(function(){});
   closeHold();
@@ -565,7 +565,7 @@ function removeHold(podioItemId) {
   }
   fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveHold', podioItemId:podioItemId, holdData:{active:false}, email:_currentUserEmail })
   }).catch(function(){});
   renderBoard();
@@ -694,7 +694,7 @@ function saveSafetyPlan() {
   var btn = document.getElementById('sp-save-btn');
   btn.textContent = 'Saving…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'saveSafetyPlan', podioItemId:_activeSafetyId, safetyPlan:plan, email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
@@ -750,7 +750,7 @@ function closeFinancial() {
 function checkFinancialPw() {
   var pw = document.getElementById('financial-pw').value;
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'checkPassword', password:pw })
   })
   .then(function(r){ return r.json(); })
@@ -786,7 +786,7 @@ function syncFromPodio() {
   var btn = document.querySelector('.btn-sync');
   btn.textContent = '↻ Syncing…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'syncProjects', email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
