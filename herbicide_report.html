@@ -200,6 +200,12 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--tex
       <textarea id="h-remarks" rows="3" placeholder="Target pest/weed species, site conditions, any deviations from label…"></textarea></div>
   </div>
 
+  <!-- LICENSED APPLICATORS -->
+  <div class="card" id="licensee-card">
+    <h4 style="color:var(--blue-dark);margin-bottom:.65rem;">🪪 Licensed Applicators — WA State</h4>
+    <div id="licensee-list"><p style="font-size:.85rem;color:#888;">Loading license list…</p></div>
+  </div>
+
   <!-- SDS LINKS -->
   <div class="sds-box">
     <strong style="font-size:.82rem;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.05em;">Chemical Safety Data Sheets</strong>
@@ -240,6 +246,9 @@ window.onload = function() {
     document.getElementById('h-applicator').value = name;
   }
 
+  // Load licensee list
+  fetchLicensees();
+
   // Get browser location first, then fetch weather + project in parallel
   if (navigator.geolocation) {
     setStatus('location', 'loading', 'Getting GPS location…');
@@ -267,6 +276,41 @@ window.onload = function() {
     showPage();
   }
 };
+
+// ── FETCH LICENSEES ───────────────────────────────────────────
+function fetchLicensees() {
+  var currentUser = (localStorage.getItem('bt_employee_name') || '').toLowerCase();
+  fetch(SCRIPT_URL + '?action=licensees')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.licensees) return;
+      var today = new Date();
+      var rows = data.licensees.map(function(l) {
+        var fullName = (l.firstName + ' ' + l.lastName).trim();
+        var isMe = currentUser && fullName.toLowerCase().indexOf(currentUser) !== -1;
+        var exp = l.expiration ? new Date(l.expiration) : null;
+        var expired = exp && exp < today;
+        var expStr = l.expiration || '—';
+        return '<tr style="' + (isMe ? 'background:#e8f5e2;font-weight:700;' : '') + (expired ? 'color:#c0392b;' : '') + '">' +
+          '<td style="padding:.4rem .6rem;">' + (isMe ? '▶ ' : '') + fullName + '</td>' +
+          '<td style="padding:.4rem .6rem;text-align:center;">' + (l.licenseNum || '—') + '</td>' +
+          '<td style="padding:.4rem .6rem;text-align:center;">' + expStr + (expired ? ' ⚠️' : '') + '</td>' +
+          '</tr>';
+      }).join('');
+      document.getElementById('licensee-list').innerHTML =
+        '<table style="width:100%;border-collapse:collapse;font-size:.85rem;">' +
+        '<thead><tr style="background:#e8f0fb;color:var(--blue-dark);">' +
+        '<th style="padding:.4rem .6rem;text-align:left;">Name</th>' +
+        '<th style="padding:.4rem .6rem;text-align:center;">License #</th>' +
+        '<th style="padding:.4rem .6rem;text-align:center;">Expires</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>' +
+        '<p style="font-size:.75rem;color:#888;margin-top:.5rem;">Source: BT Herbicide Applicator List — updates automatically</p>';
+    })
+    .catch(function() {
+      document.getElementById('licensee-list').innerHTML =
+        '<p style="font-size:.85rem;color:#888;">Could not load license list. Check your connection.</p>';
+    });
+}
 
 // ── FETCH PROJECT ─────────────────────────────────────────────
 function fetchProject(id) {
