@@ -134,7 +134,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 <div class="page-header">
   <h1>📋 Project Board</h1>
   <div class="header-right">
-    <span class="user-badge" id="user-badge">Loading…</span>
+    <span class="user-badge" id="user-badge" onclick="promptSignIn()">Loading…</span>
     <button class="btn-sync" onclick="syncFromPodio()">↻ Sync Podio</button>
     <a class="btn-back" href="bella_terra_portal_html.html">← Portal</a>
   </div>
@@ -318,9 +318,35 @@ var _activeHoldId      = null;
 window.onload = function() {
   _currentUser      = localStorage.getItem('bt_employee_name')  || '';
   _currentUserEmail = localStorage.getItem('bt_employee_email') || '';
-  document.getElementById('user-badge').textContent = _currentUser || 'Guest';
+  updateUserBadge();
   loadProjects();
 };
+
+function updateUserBadge() {
+  var badge = document.getElementById('user-badge');
+  var auth  = isAuthorized();
+  badge.textContent = (_currentUser || 'Guest') + (auth ? ' ✓' : '');
+  badge.title = 'Click to sign in / switch user';
+  badge.style.cursor = 'pointer';
+  badge.style.background = auth ? 'rgba(122,182,72,.35)' : 'rgba(255,255,255,.15)';
+}
+
+function promptSignIn() {
+  var name  = prompt('Your name:', _currentUser || '');
+  if (name === null) return;
+  var email = prompt('Your @1bellaterra.com email:', _currentUserEmail || '');
+  if (email === null) return;
+  _currentUser      = name.trim();
+  _currentUserEmail = email.trim().toLowerCase();
+  localStorage.setItem('bt_employee_name',  _currentUser);
+  localStorage.setItem('bt_employee_email', _currentUserEmail);
+  updateUserBadge();
+  if (isAuthorized()) {
+    alert('✅ Signed in as ' + _currentUser + '. You can now save safety plans and move projects.');
+  } else {
+    alert('Saved as ' + _currentUser + '. Note: this email is not on the authorized list — safety plan editing is not available.');
+  }
+}
 
 function isAuthorized() {
   return AUTHORIZED.indexOf(_currentUserEmail.toLowerCase()) !== -1;
