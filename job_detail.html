@@ -258,9 +258,8 @@ function buildTabsAndPanels(p) {
   // Always add Site Safety
   panels.push({ scope:'Safety', cfg:{ icon:'🦺', label:'Site Safety', panel:'safety' } });
 
-  // Add Herbicide tab if Maintenance OR Herbicide scope present (and not already added via SCOPE_TABS)
-  if ((seen['maintenance'] || seen['herbicide']) && !seen['herbicide-added']) {
-    seen['herbicide-added'] = true;
+  // Always show Herbicide tab — applies to any job scope
+  if (!seen['herbicide']) {
     if (isWA) {
       panels.push({ scope:'Herbicide', cfg:{ icon:'🧪', label:'Herbicide Log', panel:'herbicide' } });
     } else {
