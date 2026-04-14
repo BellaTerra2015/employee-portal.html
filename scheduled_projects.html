@@ -426,6 +426,7 @@ function buildCard(p, stage) {
     '<div class="badges">' + primeBadge + classBadge + '</div>' +
     scopeHtml +
     '<div class="card-actions">' +
+      '<button class="btn-open" onclick="window.location.href=\'job_detail.html?id=\'+encodeURIComponent(\'' + p.podioItemId + '\')">📂 Open</button>' +
       '<button class="btn-safety" onclick="openSafety(\'' + p.podioItemId + '\')">🦺 Safety</button>' +
       reportBtn +
       holdBtn +
@@ -587,12 +588,10 @@ function saveSafetyPlan() {
   .finally(function(){ btn.textContent = 'Save Safety Plan'; btn.disabled = false; });
 }
 
-// ── SCOPE REPORT (stub — will open job detail) ────────────────
+// ── SCOPE REPORT → job detail page ──────────────────────────
 
 function openScopeReport(podioItemId, scopeName) {
-  // Will open full job detail with that scope tab active
-  // For now: navigate to job detail page (to be built)
-  alert('Opening ' + scopeName + ' report for this project.\n\nFull job detail page coming next.');
+  window.location.href = 'job_detail.html?id=' + encodeURIComponent(podioItemId);
 }
 
 // ── MAINTENANCE REPORT ────────────────────────────────────────

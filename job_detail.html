@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Detail — Bella Terra</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:#2d5a27; --green-mid:#4a7c3f; --green-light:#7ab648;
+  --blue-dark:#1a4b8c;  --blue-mid:#2e6da4;  --blue-light:#e8f0fb;
+  --gold:#c8961e; --red:#c0392b; --orange:#e07c30;
+  --gray-light:#f5f5f2; --gray-mid:#888; --text:#2a2a2a;
+  --border:#d0dcc8; --shadow:0 2px 12px rgba(0,0,0,.10);
+  --bg:#f8f9f5;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.page-header{background:var(--green-dark);padding:.85rem 1.25rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.header-top{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;}
+.btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;padding:.35rem .85rem;cursor:pointer;font-size:.82rem;font-family:inherit;}
+.job-title{font-family:'Playfair Display',serif;color:#fff;font-size:1.15rem;margin:0;}
+.job-meta{font-size:.78rem;color:rgba(255,255,255,.7);}
+
+/* ── TABS ── */
+.tabs-bar{display:flex;overflow-x:auto;background:rgba(0,0,0,.15);}
+.tab-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:.6rem 1rem;cursor:pointer;font-size:.82rem;font-family:inherit;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.08);}
+.tab-btn.active{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.1);}
+.tab-btn.tab-danger{color:#ff8a80;}
+.tab-btn.tab-danger.active{border-bottom-color:#ff8a80;}
+
+/* ── INFO BAR ── */
+.info-bar{background:#f0f4ee;border-bottom:1px solid var(--border);padding:.6rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-size:.82rem;color:var(--gray-mid);}
+.info-badges{display:flex;gap:.4rem;flex-wrap:wrap;}
+.badge{font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:10px;text-transform:uppercase;}
+.badge-prime{background:#e8f5e2;color:#2d5a27;}
+.badge-sub{background:#fff3e8;color:#b85c00;}
+.badge-gov{background:#e8f0fb;color:#1a4b8c;}
+.badge-commercial{background:#fdf8e1;color:#8b6914;}
+.badge-maintenance{background:#fff8e1;color:#c8961e;}
+.badge-hold{background:#fff3e8;border:1px solid var(--orange);color:var(--orange);}
+
+/* ── TAB CONTENT ── */
+.tab-content{padding:1.25rem;max-width:740px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow);margin-bottom:1rem;}
+.card h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--green-dark);margin-bottom:1rem;}
+.card-red{border:2px solid var(--red);}
+.card-red h4{color:var(--red);}
+
+/* ── FORM FIELDS ── */
+.f{margin-bottom:.85rem;}
+.f label{display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-dark);margin-bottom:.25rem;}
+.f label.gold{color:#8b6914;}
+.f input,.f textarea,.f select{width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;font-family:inherit;background:#fff;}
+.f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--blue-mid);}
+.f input[readonly]{background:#f5f5f2;color:var(--gray-mid);}
+.f textarea{resize:vertical;min-height:70px;}
+.f textarea.gold-bg{background:#fffdf0;border-color:#e8c860;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+
+/* ── BUTTONS ── */
+.btn-submit{width:100%;padding:.85rem;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;}
+.btn-submit:hover{background:var(--green-mid);}
+.btn-submit-red{background:var(--red);}
+.btn-submit-red:hover{background:#a0231d;}
+.btn-add-row{width:100%;padding:.7rem;background:#f0f4ee;color:var(--green-dark);border:2px dashed var(--green-mid);border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:1rem;}
+.btn-add-row:hover{background:#e0eedd;}
+.ok-msg{background:#e8f5e2;border:1px solid #b8dda8;border-radius:7px;padding:.6rem .85rem;font-size:.85rem;color:#2d5a27;margin-top:.5rem;display:none;}
+
+/* ── ROW CARDS ── */
+.row-card{background:#f8f9f5;border:1px solid var(--border);border-radius:8px;padding:.85rem;margin-bottom:.6rem;position:relative;}
+.row-card .btn-remove{position:absolute;top:.5rem;right:.5rem;background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;}
+.row-card .btn-remove:hover{color:var(--red);}
+
+/* ── SECTION TAGS ── */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.4rem;min-height:10px;}
+.sec-tag{background:var(--green-dark);color:#fff;border-radius:5px;padding:.2rem .5rem;font-size:.75rem;display:flex;align-items:center;gap:.3rem;}
+.sec-tag button{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.9rem;padding:0;line-height:1;}
+
+/* ── HERBICIDE LOGS LIST ── */
+.herb-log-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.75rem;margin-bottom:.6rem;display:flex;align-items:center;justify-content:space-between;}
+.herb-log-info{font-size:.85rem;}
+.herb-log-meta{font-size:.75rem;color:var(--gray-mid);margin-top:.2rem;}
+.btn-print{background:none;border:1px solid var(--border);border-radius:5px;padding:.25rem .65rem;font-size:.75rem;cursor:pointer;}
+.btn-print:hover{background:var(--blue-light);}
+
+/* ── ALERT BOXES ── */
+.alert-amber{background:#fff8e1;border:1px solid #f0c060;border-radius:7px;padding:.65rem .85rem;font-size:.82rem;color:#8b6914;margin-bottom:.85rem;}
+.alert-red{background:#fdeaea;border:1px solid var(--red);border-radius:7px;padding:.65rem .85rem;font-size:.875rem;color:var(--red);margin-bottom:1rem;}
+
+/* ── PLACEHOLDER ── */
+.placeholder-panel{text-align:center;padding:3rem 1rem;}
+.placeholder-panel .icon{font-size:3rem;margin-bottom:.75rem;}
+.placeholder-panel h3{font-family:'Playfair Display',serif;color:var(--gray-mid);margin-bottom:.5rem;}
+.placeholder-panel p{font-size:.85rem;color:#aaa;}
+
+/* ── LOADING ── */
+.page-loading{text-align:center;padding:4rem;color:var(--gray-mid);}
+
+/* ── SAFETY FIELDS ── */
+.section-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-mid);margin:.75rem 0 .5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border);}
+
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="page-loading" class="page-loading">Loading job…</div>
+
+<div id="page-content" style="display:none;">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-top">
+      <button class="btn-back" onclick="history.back()">‹ Board</button>
+      <div>
+        <div class="job-title" id="job-title">Loading…</div>
+        <div class="job-meta" id="job-meta"></div>
+      </div>
+    </div>
+    <div class="tabs-bar" id="tabs-bar">
+      <!-- tabs injected by JS based on scopes -->
+    </div>
+  </div>
+
+  <!-- INFO BAR -->
+  <div class="info-bar">
+    <div class="info-badges" id="info-badges"></div>
+    <span id="info-stage" style="font-size:.78rem;font-weight:600;"></span>
+  </div>
+
+  <!-- TAB CONTENT -->
+  <div class="tab-content" id="tab-content">
+    <!-- panels injected by JS -->
+  </div>
+
+</div>
+
+<!-- HERBICIDE MODAL -->
+<div id="herb-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:1.75rem;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--blue-dark);">🧪 Herbicide Application Record</h3>
+      <button onclick="closeHerbModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
+    </div>
+    <div id="herb-form-body"></div>
+  </div>
+</div>
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
+
+var _project      = null;
+var _herbLogs     = [];
+var _plantRows    = [];
+var _hydroRows    = [];
+var _shipRows     = [];
+var _currentUser  = localStorage.getItem('bt_employee_name')  || '';
+var _userEmail    = localStorage.getItem('bt_employee_email') || '';
+
+// ── SCOPE → TAB CONFIG ───────────────────────────────────────
+
+var SCOPE_TABS = {
+  'Hydroseeding':       { icon:'💧', label:'Hydroseeding',    panel:'hydro'    },
+  'Planting / Landscape':{ icon:'🌱', label:'Planting',        panel:'planting' },
+  'Blowing':            { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
+  'CAD':                { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
+  'Dump Truck':         { icon:'🚚', label:'Delivery Log',     panel:'delivery' },
+  'Maintenance':        { icon:'🌿', label:'Maintenance',      panel:'maintenance'},
+  'Irrigation':         { icon:'💦', label:'Irrigation',       panel:'placeholder-irrigation'},
+  'Fencing':            { icon:'🔧', label:'Fencing',          panel:'placeholder-fencing'},
+  'Soil Prep':          { icon:'🪱', label:'Soil Prep',        panel:'placeholder-soilprep'},
+  'Service':            { icon:'⚙️', label:'Service',          panel:'placeholder-service'},
+  'Snow Removal':       { icon:'❄️', label:'Snow Removal',     panel:'placeholder-snow'}
+};
+
+// ── INIT ─────────────────────────────────────────────────────
+
+window.onload = function() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (!id) { showError('No project ID in URL.'); return; }
+  loadProject(id);
+};
+
+function loadProject(id) {
+  fetch(SCRIPT_URL + '?action=project&id=' + id)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.project) throw new Error(data.error || 'Project not found');
+      _project = data.project;
+      buildPage();
+    })
+    .catch(function(err){ showError(err.message); });
+}
+
+function buildPage() {
+  var p = _project;
+  document.title = p.name + ' — Bella Terra';
+  document.getElementById('job-title').textContent = p.name;
+  document.getElementById('job-meta').textContent =
+    (p.contractNumber ? 'Contract: ' + p.contractNumber + '  ·  ' : '') +
+    (p.podioStage || '');
+
+  // Info bar badges
+  var badges = '';
+  if (p.primeSub) {
+    var cls = p.primeSub.toLowerCase().indexOf('sub') !== -1 ? 'badge-sub' : 'badge-prime';
+    badges += '<span class="badge ' + cls + '">' + esc(p.primeSub) + '</span>';
+  }
+  if (p.projectClass) {
+    var cc = {government:'badge-gov',commercial:'badge-commercial',residential:'badge-commercial'};
+    badges += '<span class="badge ' + (cc[p.projectClass.toLowerCase()]||'badge-gov') + '">' + esc(p.projectClass) + '</span>';
+  }
+  if (p.portalStage === 'Maintenance') {
+    badges += '<span class="badge badge-maintenance">🌿 Maintenance</span>';
+  }
+  if (p.onHold && p.onHold.active) {
+    badges += '<span class="badge badge-hold">⏸ On Hold</span>';
+  }
+  document.getElementById('info-badges').innerHTML = badges;
+  document.getElementById('info-stage').textContent = p.portalStage || '';
+
+  // Build tabs + panels
+  buildTabsAndPanels(p);
+
+  document.getElementById('page-loading').style.display = 'none';
+  document.getElementById('page-content').style.display = 'block';
+}
+
+function buildTabsAndPanels(p) {
+  var tabsBar    = document.getElementById('tabs-bar');
+  var tabContent = document.getElementById('tab-content');
+  var scopes     = p.scopeItems || [];
+  var isWA       = !p.podioStage || (p.notes || '').toLowerCase().indexOf('oregon') === -1;
+
+  // Determine which panels to show (deduplicate bark/CAD)
+  var panels = [];
+  var seen   = {};
+  scopes.forEach(function(s) {
+    var cfg = SCOPE_TABS[s.name];
+    if (cfg && !seen[cfg.panel]) {
+      seen[cfg.panel] = true;
+      panels.push({ scope: s.name, cfg: cfg });
+    }
+  });
+
+  // Always add Site Safety
+  panels.push({ scope:'Safety', cfg:{ icon:'🦺', label:'Site Safety', panel:'safety' } });
+
+  // Add Herbicide if Maintenance scope present and WA state
+  if (seen['maintenance']) {
+    if (isWA) {
+      panels.push({ scope:'Herbicide', cfg:{ icon:'🧪', label:'Herbicide Log', panel:'herbicide' } });
+    } else {
+      panels.push({ scope:'Herbicide', cfg:{ icon:'🧪', label:'Herbicide (OR)', panel:'placeholder-oregon-herb' } });
+    }
+  }
+
+  // Always add Job Complete last
+  panels.push({ scope:'Complete', cfg:{ icon:'✅', label:'Job Complete', panel:'complete', danger:true } });
+
+  // Render tabs
+  var tabsHtml = '';
+  panels.forEach(function(item, i) {
+    var dangerClass = item.cfg.danger ? ' tab-danger' : '';
+    var activeClass = i === 0 ? ' active' : '';
+    tabsHtml += '<button class="tab-btn' + dangerClass + activeClass + '" ' +
+      'onclick="showTab(\'' + item.cfg.panel + '\',this)">' +
+      item.cfg.icon + ' ' + item.cfg.label + '</button>';
+  });
+  tabsBar.innerHTML = tabsHtml;
+
+  // Render panels
+  var panelsHtml = '';
+  panels.forEach(function(item, i) {
+    var activeClass = i === 0 ? ' active' : '';
+    panelsHtml += '<div class="tab-panel' + activeClass + '" id="panel-' + item.cfg.panel + '">' +
+      buildPanelContent(item.cfg.panel, item.scope) + '</div>';
+  });
+  tabContent.innerHTML = panelsHtml;
+
+  // Init dynamic rows
+  initDate();
+}
+
+function showTab(panelId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
+  var panel = document.getElementById('panel-' + panelId);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function initDate() {
+  var today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(function(el){
+    if (!el.value) el.value = today;
+  });
+  document.querySelectorAll('input[id$="-lead"]').forEach(function(el){
+    el.value = _currentUser;
+  });
+}
+
+// ── PANEL BUILDERS ────────────────────────────────────────────
+
+function buildPanelContent(panelId, scopeName) {
+  switch(panelId) {
+    case 'hydro':        return buildHydroPanel();
+    case 'planting':     return buildPlantingPanel();
+    case 'bark':         return buildBarkPanel();
+    case 'delivery':     return buildDeliveryPanel();
+    case 'maintenance':  return buildMaintenancePanel();
+    case 'safety':       return buildSafetyPanel();
+    case 'herbicide':    return buildHerbicidePanel();
+    case 'complete':     return buildCompletePanel();
+    default:             return buildPlaceholderPanel(scopeName);
+  }
+}
+
+// ── HYDROSEEDING ──────────────────────────────────────────────
+function buildHydroPanel() {
+  return '<div class="card"><h4>💧 Hydroseeding Daily Report</h4>' +
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="hydro-date"></div>' +
+    '<div class="f"><label>Crew Lead</label><input type="text" id="hydro-lead" readonly></div></div>' +
+    '<div class="g2"><div class="f"><label>Crew Members on Site</label><input type="text" id="hydro-crew" placeholder="Comma-separated names"></div>' +
+    '<div class="f"><label>Hours on Site</label><input type="number" id="hydro-hours" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="f"><label>Total Acres — Inspector Measured</label><input type="number" id="hydro-total-acres" min="0" step="0.01" placeholder="0.00"></div></div>' +
+    '<div id="hydro-rows"></div>' +
+    '<button class="btn-add-row" onclick="addHydroRow()">＋ Add Tank Load Row</button>' +
+    '<div class="card"><div class="f"><label class="gold">⚠ Field Changes / Mix Rate Deviations</label>' +
+    '<textarea id="hydro-changes" class="gold-bg" placeholder="Mix rate changes, GC direction, field deviations…"></textarea></div>' +
+    '<div class="g2"><div class="f"><label>Inspector Name</label><input type="text" id="hydro-inspector" placeholder="Inspector present (if any)"></div>' +
+    '<div class="f"><label>Inspector Measured Acres</label><input type="number" id="hydro-inspector-acres" min="0" step="0.01" placeholder="0.00"></div></div>' +
+    '<div class="f"><label>General Notes</label><textarea id="hydro-notes" placeholder="General observations, conditions…"></textarea></div>' +
+    '<button class="btn-submit" onclick="submitReport(\'hydro\',this)">📤 Submit Hydroseeding Report</button>' +
+    '<div class="ok-msg" id="hydro-ok">✅ Report submitted successfully.</div></div>';
+}
+
+// ── PLANTING ──────────────────────────────────────────────────
+function buildPlantingPanel() {
+  return '<div class="card"><h4>🌱 Planting Daily Report</h4>' +
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="plant-date"></div>' +
+    '<div class="f"><label>Crew Lead</label><input type="text" id="plant-lead" readonly></div></div>' +
+    '<div class="g2"><div class="f"><label>Crew Members on Site</label><input type="text" id="plant-crew" placeholder="Comma-separated names"></div>' +
+    '<div class="f"><label>Hours on Site</label><input type="number" id="plant-hours" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="f"><label>Total Plants Today</label><input type="number" id="plant-total" readonly value="0" style="font-weight:700;color:var(--green-dark);background:#f5f5f2;"></div></div>' +
+    '<div id="plant-rows"></div>' +
+    '<button class="btn-add-row" onclick="addPlantRow()">＋ Add Plant Species Row</button>' +
+    '<div class="card"><div class="f"><label class="gold">⚠ Field Changes / Deviations</label>' +
+    '<textarea id="plant-changes" class="gold-bg" placeholder="Spacing changes, GC direction, plants moved between sections…"></textarea></div>' +
+    '<div class="f"><label>General Notes</label><textarea id="plant-notes" placeholder="General observations…"></textarea></div>' +
+    '<button class="btn-submit" onclick="submitReport(\'planting\',this)">📤 Submit Planting Report</button>' +
+    '<div class="ok-msg" id="plant-ok">✅ Report submitted successfully.</div></div>';
+}
+
+// ── CAD BARK ──────────────────────────────────────────────────
+function buildBarkPanel() {
+  return '<div class="card"><h4>🌬️ CAD Bark Daily Report</h4>' +
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="bark-date"></div>' +
+    '<div class="f"><label>Crew Lead</label><input type="text" id="bark-lead" readonly></div></div>' +
+    '<div class="f"><label>Crew Members on Site</label><input type="text" id="bark-crew" placeholder="Comma-separated names"></div>' +
+    '<div class="g2"><div class="f"><label>Hours on Site</label><input type="number" id="bark-hours" min="0" step="0.5" placeholder="0"></div>' +
+    '<div class="f"><label>Cubic Yards Placed</label><input type="number" id="bark-yds" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="f"><label>Plan Sections Worked</label>' +
+    '<div style="display:flex;gap:.5rem;align-items:center;">' +
+    '<input type="text" id="bark-sec-input" placeholder="e.g. B1, W3, Upland Restoration" style="flex:1;">' +
+    '<button onclick="addSecTag()" style="background:var(--green-dark);color:#fff;border:none;border-radius:7px;padding:.55rem 1rem;font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;">+ Add</button></div>' +
+    '<div class="tags-wrap" id="bark-sec-tags"></div></div>' +
+    '<div class="f"><label class="gold">⚠ Field Changes / Notes</label>' +
+    '<textarea id="bark-changes" class="gold-bg" placeholder="Spacing changes, overages moved between sections, inspector notes…"></textarea></div>' +
+    '<div class="f"><label>General Notes</label><textarea id="bark-notes" placeholder="General observations, conditions, issues…"></textarea></div>' +
+    '<button class="btn-submit" onclick="submitReport(\'bark\',this)">📤 Submit Bark Report</button>' +
+    '<div class="ok-msg" id="bark-ok">✅ Report submitted successfully.</div></div>';
+}
+
+// ── DELIVERY LOG ──────────────────────────────────────────────
+function buildDeliveryPanel() {
+  return '<div class="card"><h4>🚚 Plant Shipment / Delivery Log</h4>' +
+    '<div class="g2"><div class="f"><label>Delivery Date</label><input type="date" id="ship-date"></div>' +
+    '<div class="f"><label>Logged By</label><input type="text" id="ship-lead" readonly></div></div>' +
+    '<div class="g2"><div class="f"><label>Vendor / Nursery</label><input type="text" id="ship-vendor" placeholder="Vendor name"></div>' +
+    '<div class="f"><label>Invoice / PO #</label><input type="text" id="ship-po" placeholder="Invoice or PO number"></div></div></div>' +
+    '<div id="ship-rows"></div>' +
+    '<button class="btn-add-row" onclick="addShipRow()">＋ Add Species / Item Row</button>' +
+    '<div class="card"><div class="f"><label>Delivery Condition Notes</label>' +
+    '<textarea id="ship-notes" placeholder="Overall delivery quality, substitutions, damages noted…"></textarea></div>' +
+    '<button class="btn-submit" onclick="submitReport(\'delivery\',this)">📤 Submit Delivery Log</button>' +
+    '<div class="ok-msg" id="ship-ok">✅ Delivery log submitted.</div></div>';
+}
+
+// ── MAINTENANCE ───────────────────────────────────────────────
+function buildMaintenancePanel() {
+  return '<div class="card"><h4>🌿 Maintenance Visit Log</h4>' +
+    '<div class="alert-amber">Log each maintenance visit. For herbicide applications, use the Herbicide Log tab.</div>' +
+    '<div class="g2"><div class="f"><label>Visit Date</label><input type="date" id="maint-date"></div>' +
+    '<div class="f"><label>Crew Lead</label><input type="text" id="maint-lead" readonly></div></div>' +
+    '<div class="g2"><div class="f"><label>Crew Members</label><input type="text" id="maint-crew" placeholder="Comma-separated names"></div>' +
+    '<div class="f"><label>Hours on Site</label><input type="number" id="maint-hours" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="f"><label>Work Performed</label>' +
+    '<textarea id="maint-work" placeholder="Describe maintenance tasks completed (mowing, weeding, irrigation check, replanting…)"></textarea></div>' +
+    '<div class="f"><label>Plant Health Observations</label>' +
+    '<textarea id="maint-health" placeholder="Note any dead plants, disease, pest activity, irrigation issues…"></textarea></div>' +
+    '<div class="f"><label>Photos Taken</label><input type="text" id="maint-photos" placeholder="Describe or list photo locations / Drive link"></div>' +
+    '<div class="f"><label>Next Visit Recommended</label><input type="date" id="maint-next"></div>' +
+    '<div class="f"><label>General Notes</label><textarea id="maint-notes" placeholder="Any additional observations…"></textarea></div>' +
+    '<button class="btn-submit" onclick="submitReport(\'maintenance\',this)">📤 Submit Maintenance Log</button>' +
+    '<div class="ok-msg" id="maint-ok">✅ Maintenance log submitted.</div></div>';
+}
+
+// ── SITE SAFETY ───────────────────────────────────────────────
+function buildSafetyPanel() {
+  var sp = (_project && _project.safetyPlan) ? _project.safetyPlan : {};
+  return '<div class="card"><h4>🦺 Site Safety Plan</h4>' +
+    '<p style="font-size:.82rem;color:var(--gray-mid);margin-bottom:1rem;">View-only for field crews. Rena, Heather, Brydon, or Liz can edit from the Project Board.</p>' +
+    '<div class="section-label">Emergency Services</div>' +
+    safetyRow('Nearest Emergency Room', sp.er) +
+    safetyRow('Nearest Urgent Care', sp.urgentCare) +
+    safetyRow('Emergency Services', sp.emergency911 || '911') +
+    '<div class="section-label">Site Information</div>' +
+    safetyRow('Site Address', sp.siteAddress) +
+    safetyRow('Gate Code / Site Access', sp.gateCode) +
+    safetyRow('Prime Contractor Foreman', sp.foreman) +
+    safetyRow('Safety Foreman', sp.safetyForeman) +
+    safetyRow('Utilities (call before digging)', sp.utilities || '811') +
+    '<div class="section-label">Bella Terra Contacts</div>' +
+    safetyRow('Emergency Contact', sp.emergency) +
+    safetyRow('First Aid Kit Location', sp.firstAid) +
+    safetyRow('Muster Point', sp.muster) +
+    '<div class="section-label">PPE & Hazards</div>' +
+    safetyRow('Required PPE', sp.ppe) +
+    safetyRow('Site Hazards / Traffic Control', sp.hazards) +
+    safetyRow('Additional Notes', sp.notes) +
+    '</div>';
+}
+
+function safetyRow(label, value) {
+  if (!value) return '<div class="f"><label>' + label + '</label>' +
+    '<div style="padding:.4rem .75rem;background:#f5f5f2;border-radius:6px;font-size:.88rem;color:#aaa;font-style:italic;">Not set</div></div>';
+  return '<div class="f"><label>' + label + '</label>' +
+    '<div style="padding:.4rem .75rem;background:#f0f4ee;border-radius:6px;font-size:.88rem;">' + esc(value) + '</div></div>';
+}
+
+// ── HERBICIDE LOG ─────────────────────────────────────────────
+function buildHerbicidePanel() {
+  _herbLogs = (_project && _project.herbicideLogs) ? _project.herbicideLogs : [];
+  return '<div class="card"><h4>🧪 Herbicide Application Log — WSDOT DOT 540-509</h4>' +
+    '<div class="alert-amber">Each application requires a separate form per RCW 17.21. Records retained 7 years.</div>' +
+    '<button class="btn-submit" onclick="openHerbModal()" style="margin-bottom:1rem;">+ New Application Record</button></div>' +
+    '<div id="herb-logs-list">' + renderHerbLogs() + '</div>';
+}
+
+function renderHerbLogs() {
+  if (_herbLogs.length === 0) return '<div class="alert-amber">No herbicide applications logged yet.</div>';
+  return _herbLogs.slice().reverse().map(function(log, i) {
+    var idx = _herbLogs.length - 1 - i;
+    return '<div class="herb-log-card">' +
+      '<div><div class="herb-log-info"><strong>' + esc(log.appDate||'—') + '</strong> · ' + esc(log.materialName||'—') + ' · EPA ' + esc(log.epaReg||'—') + '</div>' +
+      '<div class="herb-log-meta">Applicator: ' + esc(log.applicator||'—') + ' · ' + esc(log.areaDesc||'—') + '</div></div>' +
+      '<button class="btn-print" onclick="printHerbForm(' + idx + ')">🖨 Print</button></div>';
+  }).join('');
+}
+
+// ── JOB COMPLETE ──────────────────────────────────────────────
+function buildCompletePanel() {
+  return '<div class="card card-red"><h4>✅ Mark Job Complete</h4>' +
+    '<div class="alert-red">⚠ <strong>Warning:</strong> This moves the project to Complete stage on the board. Make sure all reports have been submitted.</div>' +
+    '<div class="g2"><div class="f"><label>Crew Lead</label><input type="text" id="complete-lead" readonly></div>' +
+    '<div class="f"><label>Completion Date</label><input type="date" id="complete-date"></div></div>' +
+    '<div class="f"><label>Final Notes</label><textarea id="complete-notes" rows="4" placeholder="Summary of work completed, outstanding items, handoff notes…"></textarea></div>' +
+    '<button class="btn-submit btn-submit-red" onclick="submitComplete(this)">✅ Confirm Job Complete</button>' +
+    '<div class="ok-msg" id="complete-ok">✅ Job marked complete. Returning to board…</div></div>';
+}
+
+// ── PLACEHOLDER ───────────────────────────────────────────────
+function buildPlaceholderPanel(scopeName) {
+  var msgs = {
+    'placeholder-oregon-herb': { icon:'🧪', title:'Oregon Herbicide Log', msg:'Oregon-specific herbicide forms coming soon. Contact Rena for current OR reporting requirements.' },
+  };
+  var cfg = msgs[scopeName] || { icon:'🔧', title: scopeName + ' Report', msg:'Report form for this scope is being built. Check back soon.' };
+  return '<div class="placeholder-panel"><div class="icon">' + cfg.icon + '</div><h3>' + cfg.title + '</h3><p>' + cfg.msg + '</p></div>';
+}
+
+// ── DYNAMIC ROWS ─────────────────────────────────────────────
+
+function addHydroRow() {
+  var idx = _hydroRows.length;
+  _hydroRows.push({});
+  var div = document.createElement('div');
+  div.className = 'row-card';
+  div.id = 'hydro-row-' + idx;
+  div.innerHTML =
+    '<button class="btn-remove" onclick="removeRow(\'hydro\','+idx+')">×</button>' +
+    '<div class="g2"><div class="f"><label>Seed Mix / Product</label><input type="text" id="hydro-mix-'+idx+'" placeholder="Mix name or product"></div>' +
+    '<div class="f"><label>Acres This Load</label><input type="number" id="hydro-acres-'+idx+'" min="0" step="0.01" placeholder="0.00"></div></div>' +
+    '<div class="g2"><div class="f"><label>Mulch Rate (lbs/acre)</label><input type="text" id="hydro-mulch-'+idx+'" placeholder="e.g. 2000"></div>' +
+    '<div class="f"><label>Seed Rate (lbs/acre)</label><input type="text" id="hydro-seed-'+idx+'" placeholder="e.g. 40"></div></div>';
+  document.getElementById('hydro-rows').appendChild(div);
+}
+
+function addPlantRow() {
+  var idx = _plantRows.length;
+  _plantRows.push({});
+  var div = document.createElement('div');
+  div.className = 'row-card';
+  div.id = 'plant-row-' + idx;
+  div.innerHTML =
+    '<button class="btn-remove" onclick="removeRow(\'plant\','+idx+')">×</button>' +
+    '<div class="g3"><div class="f"><label>Species</label><input type="text" id="plant-sp-'+idx+'" placeholder="Common or scientific name"></div>' +
+    '<div class="f"><label>Qty Planted</label><input type="number" id="plant-qty-'+idx+'" min="0" placeholder="0" oninput="updatePlantTotal()"></div>' +
+    '<div class="f"><label>Section / Location</label><input type="text" id="plant-sec-'+idx+'" placeholder="e.g. B3, Median"></div></div>' +
+    '<div class="f"><label>Notes</label><input type="text" id="plant-note-'+idx+'" placeholder="Substitutions, damage, depth issues…"></div>';
+  document.getElementById('plant-rows').appendChild(div);
+}
+
+function addShipRow() {
+  var idx = _shipRows.length;
+  _shipRows.push({});
+  var div = document.createElement('div');
+  div.className = 'row-card';
+  div.id = 'ship-row-' + idx;
+  div.innerHTML =
+    '<button class="btn-remove" onclick="removeRow(\'ship\','+idx+')">×</button>' +
+    '<div class="g3"><div class="f"><label>Species / Item</label><input type="text" id="ship-sp-'+idx+'" placeholder="Species or item name"></div>' +
+    '<div class="f"><label>Qty Ordered</label><input type="number" id="ship-ord-'+idx+'" min="0" placeholder="0"></div>' +
+    '<div class="f"><label>Qty Received</label><input type="number" id="ship-rec-'+idx+'" min="0" placeholder="0"></div></div>' +
+    '<div class="g2"><div class="f"><label>Size / Container</label><input type="text" id="ship-size-'+idx+'" placeholder="e.g. 1-gal, 4\' B&B"></div>' +
+    '<div class="f"><label>Condition</label><input type="text" id="ship-cond-'+idx+'" placeholder="Good / Damaged / Substituted"></div></div>';
+  document.getElementById('ship-rows').appendChild(div);
+}
+
+function removeRow(type, idx) {
+  var el = document.getElementById(type + '-row-' + idx);
+  if (el) el.remove();
+  updatePlantTotal();
+}
+
+function updatePlantTotal() {
+  var total = 0;
+  document.querySelectorAll('[id^="plant-qty-"]').forEach(function(el){
+    total += parseInt(el.value) || 0;
+  });
+  var t = document.getElementById('plant-total');
+  if (t) t.value = total;
+}
+
+// ── SECTION TAGS (bark) ───────────────────────────────────────
+
+function addSecTag() {
+  var input = document.getElementById('bark-sec-input');
+  var val = (input.value || '').trim();
+  if (!val) return;
+  var wrap = document.getElementById('bark-sec-tags');
+  var tag = document.createElement('span');
+  tag.className = 'sec-tag';
+  tag.innerHTML = esc(val) + '<button onclick="this.parentElement.remove()" title="Remove">×</button>';
+  wrap.appendChild(tag);
+  input.value = '';
+}
+
+// ── SUBMIT REPORTS ────────────────────────────────────────────
+
+function submitReport(type, btn) {
+  var data = { action: 'submitReport', reportType: type, projectId: _project.podioItemId, submittedBy: _currentUser, date: new Date().toISOString() };
+
+  switch(type) {
+    case 'hydro':
+      data.date        = v('hydro-date');
+      data.crewLead    = v('hydro-lead');
+      data.crew        = v('hydro-crew');
+      data.hours       = v('hydro-hours');
+      data.totalAcres  = v('hydro-total-acres');
+      data.fieldChanges= v('hydro-changes');
+      data.inspector   = v('hydro-inspector');
+      data.inspAcres   = v('hydro-inspector-acres');
+      data.notes       = v('hydro-notes');
+      data.tankLoads   = collectRows('hydro', ['mix','acres','mulch','seed']);
+      break;
+    case 'planting':
+      data.date        = v('plant-date');
+      data.crewLead    = v('plant-lead');
+      data.crew        = v('plant-crew');
+      data.hours       = v('plant-hours');
+      data.totalPlants = v('plant-total');
+      data.fieldChanges= v('plant-changes');
+      data.notes       = v('plant-notes');
+      data.plantRows   = collectRows('plant', ['sp','qty','sec','note']);
+      break;
+    case 'bark':
+      data.date        = v('bark-date');
+      data.crewLead    = v('bark-lead');
+      data.crew        = v('bark-crew');
+      data.hours       = v('bark-hours');
+      data.cubicYards  = v('bark-yds');
+      data.sections    = Array.from(document.querySelectorAll('#bark-sec-tags .sec-tag')).map(function(t){ return t.textContent.replace('×','').trim(); });
+      data.fieldChanges= v('bark-changes');
+      data.notes       = v('bark-notes');
+      break;
+    case 'delivery':
+      data.date        = v('ship-date');
+      data.loggedBy    = v('ship-lead');
+      data.vendor      = v('ship-vendor');
+      data.po          = v('ship-po');
+      data.notes       = v('ship-notes');
+      data.items       = collectRows('ship', ['sp','ord','rec','size','cond']);
+      break;
+    case 'maintenance':
+      data.date        = v('maint-date');
+      data.crewLead    = v('maint-lead');
+      data.crew        = v('maint-crew');
+      data.hours       = v('maint-hours');
+      data.workDone    = v('maint-work');
+      data.plantHealth = v('maint-health');
+      data.photos      = v('maint-photos');
+      data.nextVisit   = v('maint-next');
+      data.notes       = v('maint-notes');
+      break;
+  }
+
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res.success) {
+      var okId = type === 'delivery' ? 'ship-ok' : type + '-ok';
+      var ok = document.getElementById(okId);
+      if (ok) { ok.style.display = 'block'; setTimeout(function(){ ok.style.display='none'; }, 4000); }
+    } else { alert('Submit failed: ' + (res.error || 'Unknown error')); }
+  })
+  .catch(function(e){ alert('Error: ' + e.message); })
+  .finally(function(){ btn.textContent = btn.textContent.replace('Submitting…',''); btn.disabled = false;
+    btn.textContent = btn.getAttribute('data-label') || btn.textContent; });
+}
+
+function submitComplete(btn) {
+  if (!confirm('Mark this job as Complete? This will move it to the Complete column on the board.')) return;
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  fetch(SCRIPT_URL, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      action: 'moveProject', podioItemId: _project.podioItemId,
+      newStage: 'Complete', email: _userEmail
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res.success) {
+      document.getElementById('complete-ok').style.display = 'block';
+      setTimeout(function(){ window.location.href = 'scheduled_projects.html'; }, 2000);
+    } else { alert('Failed: ' + (res.error || 'Unknown')); }
+  })
+  .catch(function(e){ alert('Error: ' + e.message); })
+  .finally(function(){ btn.textContent = '✅ Confirm Job Complete'; btn.disabled = false; });
+}
+
+// ── HERBICIDE MODAL ───────────────────────────────────────────
+
+function openHerbModal() {
+  var j = _project || {};
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('herb-form-body').innerHTML =
+    '<div class="g2"><div class="f"><label>Date of Application</label><input class="f" type="date" id="h-date" value="' + today + '"></div>' +
+    '<div class="f"><label>Contract Number</label><input type="text" id="h-contract" value="' + esc(j.contractNumber||'') + '"></div></div>' +
+    '<div class="g2"><div class="f"><label>County</label><input type="text" id="h-county" placeholder="e.g. Clark"></div>' +
+    '<div class="f"><label>SR / Route</label><input type="text" id="h-sr" placeholder="e.g. SR-217"></div></div>' +
+    '<div class="f"><label>Description of Area Treated</label><input type="text" id="h-area" placeholder="e.g. New Plantings — Median"></div>' +
+    '<div class="g2"><div class="f"><label>Start Time</label><input type="time" id="h-start"></div>' +
+    '<div class="f"><label>Finish Time</label><input type="time" id="h-finish"></div></div>' +
+    '<p class="section-label">Material Applied</p>' +
+    '<div class="g2"><div class="f"><label>Product Name</label><input type="text" id="h-material" placeholder="e.g. CREW"></div>' +
+    '<div class="f"><label>Manufacturer</label><input type="text" id="h-mfr" placeholder="e.g. Corteva"></div></div>' +
+    '<div class="g2"><div class="f"><label>EPA Reg. No.</label><input type="text" id="h-epa" placeholder="e.g. 62719-742"></div>' +
+    '<div class="f"><label>Lot Number</label><input type="text" id="h-lot" placeholder="Lot #"></div></div>' +
+    '<div class="g3"><div class="f"><label>Product Per Acre</label><input type="text" id="h-rate" placeholder="e.g. 150"></div>' +
+    '<div class="f"><label>Total Daily Usage</label><input type="text" id="h-total" placeholder="e.g. 50"></div>' +
+    '<div class="f"><label>Unit</label><input type="text" id="h-unit" placeholder="Oz/Gal"></div></div>' +
+    '<p class="section-label">Weather Conditions</p>' +
+    '<div class="g2"><div class="f"><label>Start Temp (°F)</label><input type="text" id="h-temp-start" placeholder="°F"></div>' +
+    '<div class="f"><label>Finish Temp (°F)</label><input type="text" id="h-temp-finish" placeholder="°F"></div></div>' +
+    '<div class="g2"><div class="f"><label>Wind Direction (From)</label><input type="text" id="h-wind-dir" placeholder="e.g. SW"></div>' +
+    '<div class="f"><label>Wind Speed (mph)</label><input type="text" id="h-wind-spd" placeholder="e.g. 5–10"></div></div>' +
+    '<p class="section-label">Personnel</p>' +
+    '<div class="g2"><div class="f"><label>Commercial Applicator</label><input type="text" id="h-applicator" value="Rena Bellika"></div>' +
+    '<div class="f"><label>Applicator Lic. No.</label><input type="text" id="h-applic-lic" value="90840"></div></div>' +
+    '<div class="g2"><div class="f"><label>Operator (if different)</label><input type="text" id="h-operator" value="Brydon Bellika"></div>' +
+    '<div class="f"><label>Operator Lic. No.</label><input type="text" id="h-op-lic" placeholder="License #"></div></div>' +
+    '<div class="f"><label>Remarks</label><textarea id="h-remarks" placeholder="Additional notes, pest targets…"></textarea></div>' +
+    '<div style="display:flex;gap:.75rem;margin-top:1rem;">' +
+    '<button class="btn-submit" onclick="saveHerbLog()" style="flex:1;">💾 Save &amp; Print Form</button>' +
+    '<button onclick="closeHerbModal()" style="flex:1;padding:.85rem;background:#f5f5f2;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:1rem;">Cancel</button></div>';
+  document.getElementById('herb-modal').style.display = 'flex';
+}
+
+function closeHerbModal() {
+  document.getElementById('herb-modal').style.display = 'none';
+}
+
+function saveHerbLog() {
+  var log = {
+    id: 'herb_' + Date.now(),
+    appDate: v('h-date'), contractNum: v('h-contract'), county: v('h-county'),
+    sr: v('h-sr'), areaDesc: v('h-area'), startTime: v('h-start'), finishTime: v('h-finish'),
+    materialName: v('h-material'), manufacturer: v('h-mfr'), epaReg: v('h-epa'), lotNum: v('h-lot'),
+    ratePerAcre: v('h-rate'), totalUsage: v('h-total'), unit: v('h-unit'),
+    tempStart: v('h-temp-start'), tempFinish: v('h-temp-finish'),
+    windDir: v('h-wind-dir'), windSpeed: v('h-wind-spd'),
+    applicator: v('h-applicator'), applicatorLic: v('h-applic-lic'),
+    operator: v('h-operator'), operatorLic: v('h-op-lic'),
+    remarks: v('h-remarks')
+  };
+
+  _herbLogs.push(log);
+  closeHerbModal();
+  printHerbForm(_herbLogs.length - 1);
+
+  // Save to backend
+  fetch(SCRIPT_URL, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'submitReport', reportType:'herbicide', projectId:_project.podioItemId, log:log })
+  }).catch(function(){});
+
+  var list = document.getElementById('herb-logs-list');
+  if (list) list.innerHTML = renderHerbLogs();
+}
+
+function printHerbForm(idx) {
+  var log = _herbLogs[idx];
+  if (!log) return;
+  var j = _project || {};
+  var appDate = log.appDate ? new Date(log.appDate + 'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'}) : '';
+  var dayOfWeek = log.appDate ? new Date(log.appDate + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}) : '';
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>DOT 540-509 — ' + esc(j.name||'') + '</title>' +
+  '<style>body{font-family:Arial,sans-serif;font-size:10px;padding:16px;max-width:750px;margin:0 auto;}' +
+  'table{width:100%;border-collapse:collapse;margin-bottom:8px;}td,th{border:1px solid #333;padding:3px 5px;vertical-align:top;}' +
+  'th{background:#eee;font-weight:700;font-size:9px;}.header{text-align:center;border-bottom:2px solid #333;margin-bottom:8px;padding-bottom:6px;}' +
+  '.hdr-title{font-size:16px;font-weight:700;}.label{font-size:8px;color:#555;display:block;}.section{font-weight:700;font-size:9px;background:#ddd;padding:2px 5px;}' +
+  '@media print{body{padding:4px;}}</style></head><body>' +
+  '<div class="header"><div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:4px;">' +
+  '<div style="font-size:10px;font-weight:700;">Washington State<br>Department of Transportation</div>' +
+  '<div><div class="hdr-title">Commercial Pesticide Application Record</div><div style="font-size:12px;font-style:italic;">Applied for WSDOT</div></div></div>' +
+  '<div style="font-size:8px;color:#555;max-width:680px;margin:0 auto;">Reference (RCW 17.21) A new form shall be filled out each day or time the pesticide tank mixture is modified. ' +
+  '<b>This Record Must be Retained for 7 Years.</b></div></div>' +
+  '<table><tr><td><div class="label">Contract Number</div><b>' + esc(log.contractNum||j.contractNumber||'—') + '</b></td>' +
+  '<td><div class="label">County</div><b>' + esc(log.county||'—') + '</b></td>' +
+  '<td><div class="label">Date</div><b>' + appDate + '</b></td>' +
+  '<td><div class="label">Day</div><b>' + dayOfWeek + '</b></td>' +
+  '<td><div class="label">Start</div>' + esc(log.startTime||'___') + '</td>' +
+  '<td><div class="label">Finish</div>' + esc(log.finishTime||'___') + '</td></tr></table>' +
+  '<table><tr><td style="width:60px"><div class="label">SR</div>' + esc(log.sr||'—') + '</td>' +
+  '<td><div class="label">Area Treated</div><b>' + esc(log.areaDesc||'—') + '</b></td></tr></table>' +
+  '<table><tr><th>Material</th><th>Manufacturer</th><th>EPA Reg.</th><th>Lot #</th><th>Rate/Acre</th><th>Total Usage</th><th>Unit</th></tr>' +
+  '<tr><td><b>' + esc(log.materialName||'—') + '</b></td><td>' + esc(log.manufacturer||'—') + '</td><td>' + esc(log.epaReg||'—') + '</td>' +
+  '<td>' + esc(log.lotNum||'—') + '</td><td>' + esc(log.ratePerAcre||'—') + '</td><td>' + esc(log.totalUsage||'—') + '</td><td>' + esc(log.unit||'—') + '</td></tr></table>' +
+  '<table><tr><th>Conditions</th><th>Temp °F</th><th>Wind Dir</th><th>Wind Speed</th></tr>' +
+  '<tr><td>Start</td><td>' + esc(log.tempStart||'—') + '</td><td>' + esc(log.windDir||'—') + '</td><td>' + esc(log.windSpeed||'—') + ' mph</td></tr>' +
+  '<tr><td>Finish</td><td>' + esc(log.tempFinish||'—') + '</td><td>' + esc(log.windDir||'—') + '</td><td>' + esc(log.windSpeed||'—') + ' mph</td></tr></table>' +
+  '<table><tr><th colspan="2">Commercial Applicator</th><th colspan="2">Operator</th></tr>' +
+  '<tr><td>' + esc(log.applicator||'—') + '</td><td>Lic: ' + esc(log.applicatorLic||'—') + '</td>' +
+  '<td>' + esc(log.operator||'—') + '</td><td>Lic: ' + esc(log.operatorLic||'—') + '</td></tr></table>' +
+  (log.remarks ? '<p style="margin-top:8px;font-size:9px;"><b>Remarks:</b> ' + esc(log.remarks) + '</p>' : '') +
+  '<script>window.print();<\/script></body></html>');
+  w.document.close();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+
+function v(id) {
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function collectRows(prefix, fields) {
+  var rows = [];
+  var i = 0;
+  while (document.getElementById(prefix + '-row-' + i)) {
+    var row = {};
+    fields.forEach(function(f){ row[f] = v(prefix + '-' + f + '-' + i); });
+    rows.push(row);
+    i++;
+  }
+  return rows;
+}
+
+function showError(msg) {
+  document.getElementById('page-loading').innerHTML =
+    '<div style="background:#fdeaea;border:1px solid #e84b3a;border-radius:8px;padding:1rem;margin:2rem;color:#c0271b;">' +
+    'Error: ' + esc(msg) + '</div>';
+}
+
+function esc(str) {
+  if (!str) return '';
+  return str.toString()
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
