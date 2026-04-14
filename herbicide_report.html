@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herbicide Report — Bella Terra</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:#2d5a27; --green-mid:#4a7c3f; --green-light:#7ab648;
+  --blue-dark:#1a4b8c;  --blue-mid:#2e6da4;  --blue-light:#e8f0fb;
+  --gold:#c8961e; --red:#c0392b; --orange:#e07c30;
+  --gray-light:#f5f5f2; --gray-mid:#888; --text:#2a2a2a;
+  --border:#d0dcc8; --shadow:0 2px 12px rgba(0,0,0,.10); --bg:#f8f9f5;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.page-header{background:var(--green-dark);padding:.85rem 1.25rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.header-top{display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem;}
+.btn-back{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;padding:.35rem .85rem;cursor:pointer;font-size:.82rem;font-family:inherit;}
+.job-title{font-family:'Playfair Display',serif;color:#fff;font-size:1.1rem;}
+.job-meta{font-size:.78rem;color:rgba(255,255,255,.7);}
+
+/* ── STATUS BAR ── */
+.status-bar{padding:.6rem 1.25rem;font-size:.82rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.status-item{display:flex;align-items:center;gap:.35rem;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#ccc;}
+.status-dot.ok{background:#7ab648;}
+.status-dot.loading{background:#e07c30;animation:pulse 1s infinite;}
+.status-dot.err{background:#c0392b;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── FORM LAYOUT ── */
+.form-wrap{max-width:680px;margin:0 auto;padding:1.25rem;}
+.section-header{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-mid);padding:.6rem 0 .4rem;border-bottom:1px solid var(--border);margin:1.25rem 0 .75rem;}
+.card{background:#fff;border-radius:10px;padding:1.25rem;box-shadow:var(--shadow);margin-bottom:1rem;}
+.f{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.7rem;}
+.f label{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-dark);}
+.f input,.f textarea,.f select{width:100%;padding:.55rem .75rem;border:2px solid var(--border);border-radius:7px;font-size:.92rem;font-family:inherit;background:#fff;}
+.f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--blue-mid);}
+.f input.auto-filled{background:#f0f7ff;border-color:#a8c8f0;}
+.f textarea{resize:vertical;min-height:60px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.75rem;}
+
+/* ── WEATHER AUTO-FILL BOX ── */
+.weather-box{background:#f0f7ff;border:1px solid #a8c8f0;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.85rem;}
+.weather-box strong{color:var(--blue-dark);}
+.weather-status{color:var(--gray-mid);font-style:italic;}
+
+/* ── CHEMICAL PRE-FILL NOTICE ── */
+.prefill-notice{background:#e8f5e2;border:1px solid #b8dda8;border-radius:8px;padding:.65rem 1rem;font-size:.82rem;color:#2d5a27;margin-bottom:.85rem;}
+
+/* ── BUTTONS ── */
+.btn-submit{width:100%;padding:.95rem;background:var(--blue-dark);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;}
+.btn-submit:hover{background:var(--blue-mid);}
+.btn-print{width:100%;padding:.85rem;background:var(--green-dark);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;}
+.btn-print:hover{background:var(--green-mid);}
+.ok-msg{display:none;background:#e8f5e2;border:1px solid #7ab648;border-radius:8px;padding:.75rem 1rem;color:#2d5a27;font-weight:700;text-align:center;margin-top:.75rem;}
+
+/* ── SDS LINKS ── */
+.sds-box{background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem 1rem;margin-top:1rem;}
+.sds-box a{display:block;color:var(--blue-dark);font-weight:600;font-size:.84rem;text-decoration:none;line-height:2;}
+.sds-box a:hover{text-decoration:underline;}
+.sds-note{font-size:.75rem;color:var(--gray-mid);margin-top:.4rem;}
+
+/* ── LOADING / ERROR ── */
+.page-loading{text-align:center;padding:4rem;color:var(--gray-mid);}
+.page-error{background:#fdeaea;border:1px solid #e84b3a;border-radius:8px;padding:1rem;margin:1rem;color:#c0271b;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="header-top">
+    <button class="btn-back" onclick="history.back()">← Back</button>
+    <span class="job-title" id="job-title">🧪 Herbicide Application Record</span>
+  </div>
+  <div class="job-meta" id="job-meta">WSDOT DOT Form 540-509 · Commercial Pesticide Application Record</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="status-bar" style="background:#fff;border-bottom:1px solid var(--border);">
+  <div class="status-item"><div class="status-dot loading" id="dot-project"></div><span id="status-project">Loading project…</span></div>
+  <div class="status-item"><div class="status-dot loading" id="dot-weather"></div><span id="status-weather">Fetching weather…</span></div>
+  <div class="status-item"><div class="status-dot loading" id="dot-location"></div><span id="status-location">Getting location…</span></div>
+</div>
+
+<div id="page-loading" class="page-loading">Loading project data and weather…</div>
+<div id="page-error"   class="page-error"   style="display:none;"></div>
+
+<!-- MAIN FORM -->
+<div id="page-content" style="display:none;">
+<div class="form-wrap">
+
+  <!-- WEATHER BOX -->
+  <div class="weather-box" id="weather-box">
+    <strong>🌤 Weather Auto-Fill</strong> — <span class="weather-status" id="weather-status">Fetching current conditions…</span>
+  </div>
+
+  <!-- CHEMICAL PRE-FILL NOTICE -->
+  <div class="prefill-notice">
+    ✅ <strong>Chemical fields pre-filled</strong> from SDS: Roundup Custom® Aquatic &amp; Terrestrial (EPA #524-343), Bayer CropScience LP. Edit if using a different product.
+  </div>
+
+  <div class="card">
+    <div class="section-header">Application Information</div>
+    <div class="g2">
+      <div class="f"><label>Application Date</label>
+        <input type="date" id="h-date"></div>
+      <div class="f"><label>Contract Number</label>
+        <input type="text" id="h-contract" placeholder="e.g. XE3697"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>SR / Route Number</label>
+        <input type="text" id="h-sr" placeholder="e.g. SR 203"></div>
+      <div class="f"><label>County</label>
+        <input type="text" id="h-county" placeholder="e.g. King"></div>
+    </div>
+    <div class="f"><label>Description of Area Treated</label>
+      <textarea id="h-area" placeholder="e.g. MP 0.77 to 0.80 — roadside slope, stormwater retrofit area" rows="2"></textarea></div>
+    <div class="g2">
+      <div class="f"><label>Start Time</label>
+        <input type="time" id="h-start"></div>
+      <div class="f"><label>Finish Time</label>
+        <input type="time" id="h-finish"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">Chemical / Product Information</div>
+    <div class="g2">
+      <div class="f"><label>Material Name</label>
+        <input type="text" id="h-material" value="Roundup Custom® for Aquatic &amp; Terrestrial Use" class="auto-filled"></div>
+      <div class="f"><label>Manufacturer</label>
+        <input type="text" id="h-mfr" value="Bayer CropScience LP" class="auto-filled"></div>
+    </div>
+    <div class="g3">
+      <div class="f"><label>EPA Reg #</label>
+        <input type="text" id="h-epa" value="524-343" class="auto-filled"></div>
+      <div class="f"><label>Lot / Batch #</label>
+        <input type="text" id="h-lot" placeholder="From container"></div>
+      <div class="f"><label>Unit</label>
+        <select id="h-unit"><option>oz</option><option>fl oz</option><option selected>gal</option><option>lbs</option><option>quart</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Rate per Acre</label>
+        <input type="text" id="h-rate" placeholder="e.g. 2 oz/gal"></div>
+      <div class="f"><label>Total Quantity Used</label>
+        <input type="text" id="h-total" placeholder="e.g. 3.5"></div>
+    </div>
+    <div class="section-header" style="margin-top:.75rem;">Adjuvant / Additive (if used)</div>
+    <div class="g2">
+      <div class="f"><label>Adjuvant Name</label>
+        <input type="text" id="h-adj-name" placeholder="e.g. Preference® Adjuvant"></div>
+      <div class="f"><label>Adjuvant EPA # / Amount</label>
+        <input type="text" id="h-adj-epa" placeholder="Exempt — per label rate"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">Environmental Conditions</div>
+    <div class="g4">
+      <div class="f"><label>Temp at Start (°F)</label>
+        <input type="text" id="h-temp-start" placeholder="°F" class="auto-filled"></div>
+      <div class="f"><label>Temp at Finish (°F)</label>
+        <input type="text" id="h-temp-finish" placeholder="°F"></div>
+      <div class="f"><label>Wind Direction</label>
+        <input type="text" id="h-wind-dir" placeholder="e.g. SW" class="auto-filled"></div>
+      <div class="f"><label>Wind Speed (mph)</label>
+        <input type="text" id="h-wind-spd" placeholder="mph" class="auto-filled"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Weather Conditions</label>
+        <input type="text" id="h-conditions" placeholder="e.g. Sunny, Overcast" class="auto-filled"></div>
+      <div class="f"><label>Precipitation</label>
+        <select id="h-precip"><option value="None">None</option><option value="Light Drizzle">Light Drizzle</option><option value="Light Rain">Light Rain</option><option value="Heavy Rain">Heavy Rain</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">Applicator Information</div>
+    <div class="g2">
+      <div class="f"><label>Certified Applicator Name</label>
+        <input type="text" id="h-applicator" placeholder="Full name" class="auto-filled"></div>
+      <div class="f"><label>Applicator License #</label>
+        <input type="text" id="h-applic-lic" placeholder="WA License #"></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Operator Name (if different)</label>
+        <input type="text" id="h-operator" placeholder="Full name or 'Same'"></div>
+      <div class="f"><label>Operator License #</label>
+        <input type="text" id="h-op-lic" placeholder="License # or 'Same'"></div>
+    </div>
+    <div class="f"><label>Remarks / Target Pest / Additional Notes</label>
+      <textarea id="h-remarks" rows="3" placeholder="Target pest/weed species, site conditions, any deviations from label…"></textarea></div>
+  </div>
+
+  <!-- SDS LINKS -->
+  <div class="sds-box">
+    <strong style="font-size:.82rem;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.05em;">Chemical Safety Data Sheets</strong>
+    <a href="SDS-Roundup-Custom-Aquatic.pdf" target="_blank">📄 Roundup Custom® Aquatic &amp; Terrestrial — EPA #524-343</a>
+    <a href="SDS-Preference.pdf" target="_blank">📄 Preference® Adjuvant — WinField Solutions</a>
+    <a href="SDS-Dynamark-UV-Blue.pdf" target="_blank">📄 Dynamark® UV Blue Spray Marker — WinField Solutions</a>
+    <div class="sds-note">Chemical emergency (24 hrs): CHEMTREC 1-800-424-9300 &nbsp;|&nbsp; Bayer: 1-800-334-7577</div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="card">
+    <button class="btn-submit" onclick="submitHerbicide(this)">📤 Submit Report &amp; Email Rena</button>
+    <button class="btn-print"  onclick="printHerbForm()" style="margin-top:.65rem;">🖨 Print DOT 540-509 Form</button>
+    <div class="ok-msg" id="submit-ok">✅ Report submitted! Email sent to Rena. Print window should open automatically.</div>
+  </div>
+
+</div><!-- /form-wrap -->
+</div><!-- /page-content -->
+
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
+
+var _project = null;
+var _weather  = null;
+var _projectId = null;
+
+// ── INIT ─────────────────────────────────────────────────────
+window.onload = function() {
+  var params = new URLSearchParams(window.location.search);
+  _projectId = params.get('id');
+
+  // Set today's date
+  document.getElementById('h-date').value = new Date().toISOString().split('T')[0];
+
+  // Pre-fill applicator from localStorage
+  var name = localStorage.getItem('bt_employee_name') || '';
+  if (name) {
+    document.getElementById('h-applicator').value = name;
+  }
+
+  // Get browser location first, then fetch weather + project in parallel
+  if (navigator.geolocation) {
+    setStatus('location', 'loading', 'Getting GPS location…');
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        setStatus('location', 'ok', 'Location: ' + pos.coords.latitude.toFixed(3) + ', ' + pos.coords.longitude.toFixed(3));
+        fetchWeather(pos.coords.latitude, pos.coords.longitude);
+      },
+      function() {
+        // Fallback to King County default for SR203
+        setStatus('location', 'ok', 'Location: King County default');
+        fetchWeather(47.65, -121.97);
+      },
+      { timeout: 8000 }
+    );
+  } else {
+    setStatus('location', 'err', 'GPS not available');
+    fetchWeather(47.65, -121.97);
+  }
+
+  if (_projectId) {
+    fetchProject(_projectId);
+  } else {
+    setStatus('project', 'ok', 'No project ID — manual entry');
+    showPage();
+  }
+};
+
+// ── FETCH PROJECT ─────────────────────────────────────────────
+function fetchProject(id) {
+  fetch(SCRIPT_URL + '?action=project&id=' + encodeURIComponent(id))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.project) throw new Error(data.error || 'Not found');
+      _project = data.project;
+      fillProjectFields(_project);
+      setStatus('project', 'ok', 'Project: ' + _project.name);
+      showPage();
+    })
+    .catch(function(e) {
+      setStatus('project', 'err', 'Project load failed — enter manually');
+      showPage();
+    });
+}
+
+function fillProjectFields(p) {
+  // Title
+  document.getElementById('job-title').textContent = '🧪 ' + (p.name || 'Herbicide Report');
+  document.getElementById('job-meta').textContent   = 'DOT 540-509 · ' + (p.contractNumber ? 'Contract ' + p.contractNumber : '') + ' · ' + (p.projectClass || '');
+
+  // Contract number
+  if (p.contractNumber) setAuto('h-contract', p.contractNumber);
+
+  // SR route — detect from project name (e.g. "SR 203", "SR203")
+  var srMatch = (p.name || '').match(/SR\s*(\d+)/i);
+  if (srMatch) setAuto('h-sr', 'SR ' + srMatch[1]);
+
+  // County — detect from notes or project name
+  var countyMatch = (p.notes || p.name || '').match(/(\w+)\s+county/i);
+  if (countyMatch) setAuto('h-county', countyMatch[1] + ' County');
+  else if ((p.name || '').toLowerCase().indexOf('king') !== -1) setAuto('h-county', 'King');
+
+  // Area from milepost info in project name
+  var mpMatch = (p.name || '').match(/MP\s*([\d.]+\s*(?:to|–|-)\s*[\d.]+)/i);
+  if (mpMatch) {
+    var existing = document.getElementById('h-area').value;
+    if (!existing) document.getElementById('h-area').value = 'MP ' + mpMatch[1];
+  }
+}
+
+// ── FETCH WEATHER ─────────────────────────────────────────────
+function fetchWeather(lat, lon) {
+  setStatus('weather', 'loading', 'Fetching weather…');
+  fetch(SCRIPT_URL + '?action=weather&lat=' + lat + '&lon=' + lon)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.weather) throw new Error('No weather data');
+      _weather = data.weather;
+      fillWeatherFields(_weather);
+      setStatus('weather', 'ok', 'Weather loaded: ' + _weather.temperature + '°F, ' + _weather.conditions);
+    })
+    .catch(function(e) {
+      setStatus('weather', 'err', 'Weather unavailable — enter manually');
+      document.getElementById('weather-box').innerHTML =
+        '<strong>🌤 Weather</strong> — <span style="color:#c0392b;">Could not fetch weather. Please fill in manually.</span>';
+    });
+}
+
+function fillWeatherFields(w) {
+  setAuto('h-temp-start', w.temperature + '°F');
+  setAuto('h-wind-dir',   w.windDirection);
+  setAuto('h-wind-spd',   w.windSpeed + ' mph');
+  setAuto('h-conditions', w.conditions);
+
+  var wBox = document.getElementById('weather-box');
+  wBox.innerHTML = '<strong>🌤 Weather Auto-Filled</strong> — ' +
+    w.temperature + '°F · ' + w.conditions + ' · Wind ' + w.windDirection + ' at ' + w.windSpeed + ' mph' +
+    ' <span style="font-size:.78rem;color:var(--gray-mid);margin-left:.5rem;">Fields highlighted in blue were auto-filled. Edit if conditions change during application.</span>';
+
+  document.getElementById('weather-status').textContent = '';
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+function submitHerbicide(btn) {
+  var log = buildLog();
+  if (!log.appDate) { alert('Please enter the application date.'); return; }
+  if (!log.materialName) { alert('Please confirm the chemical name.'); return; }
+  if (!log.applicator) { alert('Please enter the applicator name.'); return; }
+
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      action:      'submitReport',
+      reportType:  'herbicide',
+      projectId:   _projectId || '',
+      projectName: _project ? _project.name : '',
+      submittedBy: localStorage.getItem('bt_employee_name') || '',
+      log:         log
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      document.getElementById('submit-ok').style.display = 'block';
+      setTimeout(function(){ printHerbForm(); }, 800);
+    } else {
+      alert('Submit failed: ' + (data.error || 'Unknown error'));
+    }
+  })
+  .catch(function(e){ alert('Error: ' + e.message); })
+  .finally(function(){ btn.textContent = '📤 Submit Report & Email Rena'; btn.disabled = false; });
+}
+
+function buildLog() {
+  return {
+    id:           'herb_' + Date.now(),
+    appDate:      v('h-date'),
+    contractNum:  v('h-contract'),
+    county:       v('h-county'),
+    sr:           v('h-sr'),
+    areaDesc:     v('h-area'),
+    startTime:    v('h-start'),
+    finishTime:   v('h-finish'),
+    materialName: v('h-material'),
+    manufacturer: v('h-mfr'),
+    epaReg:       v('h-epa'),
+    lotNum:       v('h-lot'),
+    ratePerAcre:  v('h-rate'),
+    totalUsage:   v('h-total'),
+    unit:         v('h-unit'),
+    adjuvantName: v('h-adj-name'),
+    adjuvantEpa:  v('h-adj-epa'),
+    tempStart:    v('h-temp-start'),
+    tempFinish:   v('h-temp-finish'),
+    windDir:      v('h-wind-dir'),
+    windSpeed:    v('h-wind-spd'),
+    conditions:   v('h-conditions'),
+    precipitation:v('h-precip'),
+    applicator:   v('h-applicator'),
+    applicatorLic:v('h-applic-lic'),
+    operator:     v('h-operator'),
+    operatorLic:  v('h-op-lic'),
+    remarks:      v('h-remarks')
+  };
+}
+
+// ── PRINT DOT 540-509 ─────────────────────────────────────────
+function printHerbForm() {
+  var log = buildLog();
+  var j   = _project || {};
+  var appDate  = log.appDate ? new Date(log.appDate + 'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'}) : '';
+  var dayOfWeek= log.appDate ? new Date(log.appDate + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}) : '';
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>DOT 540-509 — ' + esc(j.name||'Herbicide Record') + '</title>' +
+  '<style>body{font-family:Arial,sans-serif;font-size:10px;padding:16px;max-width:750px;margin:0 auto;}' +
+  'h2{font-size:13px;text-align:center;margin-bottom:4px;}' +
+  'h3{font-size:11px;text-align:center;font-weight:normal;margin-bottom:8px;border-bottom:2px solid #000;padding-bottom:4px;}' +
+  'table{width:100%;border-collapse:collapse;margin-bottom:8px;}' +
+  'td,th{border:1px solid #333;padding:3px 5px;vertical-align:top;}' +
+  '.lbl{font-weight:bold;background:#f0f0f0;width:32%;}' +
+  '.sig{height:30px;}' +
+  '@media print{body{padding:4px;}}</style></head><body>' +
+  '<h2>COMMERCIAL PESTICIDE APPLICATION RECORD</h2>' +
+  '<h3>Washington State DOT Form 540-509 · RCW 17.21 · Bella Terra LLC · WA# BELLATL846MM</h3>' +
+  '<table><tr><td class="lbl">Date of Application</td><td colspan="3">' + appDate + ' (' + dayOfWeek + ')</td></tr>' +
+  '<tr><td class="lbl">Project / Job Name</td><td colspan="3">' + esc(j.name||'') + '</td></tr>' +
+  '<tr><td class="lbl">Contract Number</td><td>' + esc(log.contractNum||'') + '</td>' +
+  '<td class="lbl">SR / Route</td><td>' + esc(log.sr||'') + '</td></tr>' +
+  '<tr><td class="lbl">County</td><td>' + esc(log.county||'') + '</td>' +
+  '<td class="lbl">Description of Area Treated</td><td>' + esc(log.areaDesc||'') + '</td></tr>' +
+  '<tr><td class="lbl">Start Time</td><td>' + esc(log.startTime||'') + '</td>' +
+  '<td class="lbl">Finish Time</td><td>' + esc(log.finishTime||'') + '</td></tr>' +
+  '</table>' +
+  '<table><tr><th colspan="4" style="background:#ddd;text-align:left;">CHEMICAL INFORMATION</th></tr>' +
+  '<tr><td class="lbl">Material / Product Name</td><td colspan="3">' + esc(log.materialName||'') + '</td></tr>' +
+  '<tr><td class="lbl">Manufacturer</td><td colspan="3">' + esc(log.manufacturer||'') + '</td></tr>' +
+  '<tr><td class="lbl">EPA Registration #</td><td>' + esc(log.epaReg||'') + '</td>' +
+  '<td class="lbl">Lot / Batch #</td><td>' + esc(log.lotNum||'') + '</td></tr>' +
+  '<tr><td class="lbl">Rate per Acre</td><td>' + esc(log.ratePerAcre||'') + '</td>' +
+  '<td class="lbl">Total Quantity Used</td><td>' + esc(log.totalUsage||'') + ' ' + esc(log.unit||'') + '</td></tr>' +
+  (log.adjuvantName ? '<tr><td class="lbl">Adjuvant</td><td>' + esc(log.adjuvantName) + '</td><td class="lbl">Adjuvant EPA #</td><td>' + esc(log.adjuvantEpa||'Exempt') + '</td></tr>' : '') +
+  '</table>' +
+  '<table><tr><th colspan="4" style="background:#ddd;text-align:left;">ENVIRONMENTAL CONDITIONS</th></tr>' +
+  '<tr><td class="lbl">Temp at Start</td><td>' + esc(log.tempStart||'') + '</td>' +
+  '<td class="lbl">Temp at Finish</td><td>' + esc(log.tempFinish||'') + '</td></tr>' +
+  '<tr><td class="lbl">Wind Direction</td><td>' + esc(log.windDir||'') + '</td>' +
+  '<td class="lbl">Wind Speed</td><td>' + esc(log.windSpeed||'') + '</td></tr>' +
+  '<tr><td class="lbl">Weather Conditions</td><td>' + esc(log.conditions||'') + '</td>' +
+  '<td class="lbl">Precipitation</td><td>' + esc(log.precipitation||'None') + '</td></tr>' +
+  '</table>' +
+  '<table><tr><th colspan="4" style="background:#ddd;text-align:left;">APPLICATOR INFORMATION</th></tr>' +
+  '<tr><td class="lbl">Certified Applicator</td><td>' + esc(log.applicator||'') + '</td>' +
+  '<td class="lbl">Applicator License #</td><td>' + esc(log.applicatorLic||'') + '</td></tr>' +
+  '<tr><td class="lbl">Operator</td><td>' + esc(log.operator||'') + '</td>' +
+  '<td class="lbl">Operator License #</td><td>' + esc(log.operatorLic||'') + '</td></tr>' +
+  '<tr><td class="lbl">Remarks</td><td colspan="3">' + esc(log.remarks||'') + '</td></tr>' +
+  '</table>' +
+  '<table><tr><th colspan="2" style="background:#ddd;text-align:left;">CERTIFICATION</th></tr>' +
+  '<tr><td style="width:50%;"><div class="lbl">Applicator Signature</div><div class="sig"></div></td>' +
+  '<td style="width:50%;"><div class="lbl">Date</div><div class="sig"></div></td></tr>' +
+  '</table>' +
+  '<p style="font-size:9px;color:#666;margin-top:8px;">Records retained 7 years per RCW 17.21. Bella Terra LLC · 1342 Dike Road, Woodland WA 98674 · 360-225-1125 · www.1BellaTerra.com</p>' +
+  '<script>window.onload=function(){window.print();}<\/script>' +
+  '</body></html>');
+  w.document.close();
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function v(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function setAuto(id, val) {
+  var el = document.getElementById(id);
+  if (el && val !== undefined && val !== null) { el.value = val; el.classList.add('auto-filled'); }
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function setStatus(key, state, msg) {
+  var dot  = document.getElementById('dot-' + key);
+  var text = document.getElementById('status-' + key);
+  if (dot)  { dot.className  = 'status-dot ' + state; }
+  if (text) { text.textContent = msg; }
+}
+function showPage() {
+  // Show page once project fetch completes (weather can still be loading)
+  document.getElementById('page-loading').style.display = 'none';
+  document.getElementById('page-content').style.display = 'block';
+}
+</script>
+</body>
+</html>

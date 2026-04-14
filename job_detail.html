@@ -175,6 +175,8 @@ var SCOPE_TABS = {
   'CAD':                { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
   'Dump Truck':         { icon:'🚚', label:'Delivery Log',     panel:'delivery' },
   'Maintenance':        { icon:'🌿', label:'Maintenance',      panel:'maintenance'},
+  'Herbicide':          { icon:'🧪', label:'Herbicide Log',    panel:'herbicide'},
+  'Herbicide Application':{ icon:'🧪', label:'Herbicide Log',  panel:'herbicide'},
   'Irrigation':         { icon:'💦', label:'Irrigation',       panel:'placeholder-irrigation'},
   'Fencing':            { icon:'🔧', label:'Fencing',          panel:'placeholder-fencing'},
   'Soil Prep':          { icon:'🪱', label:'Soil Prep',        panel:'placeholder-soilprep'},
@@ -256,8 +258,9 @@ function buildTabsAndPanels(p) {
   // Always add Site Safety
   panels.push({ scope:'Safety', cfg:{ icon:'🦺', label:'Site Safety', panel:'safety' } });
 
-  // Add Herbicide if Maintenance scope present and WA state
-  if (seen['maintenance']) {
+  // Add Herbicide tab if Maintenance OR Herbicide scope present (and not already added via SCOPE_TABS)
+  if ((seen['maintenance'] || seen['herbicide']) && !seen['herbicide-added']) {
+    seen['herbicide-added'] = true;
     if (isWA) {
       panels.push({ scope:'Herbicide', cfg:{ icon:'🧪', label:'Herbicide Log', panel:'herbicide' } });
     } else {
@@ -451,11 +454,13 @@ function safetyRow(label, value) {
 
 // ── HERBICIDE LOG ─────────────────────────────────────────────
 function buildHerbicidePanel() {
-  _herbLogs = (_project && _project.herbicideLogs) ? _project.herbicideLogs : [];
-  return '<div class="card"><h4>🧪 Herbicide Application Log — WSDOT DOT 540-509</h4>' +
+  var id = _project ? _project.podioItemId : '';
+  return '<div class="card">' +
+    '<h4>🧪 Herbicide Application — WSDOT DOT 540-509</h4>' +
     '<div class="alert-amber">Each application requires a separate form per RCW 17.21. Records retained 7 years.</div>' +
-    '<button class="btn-submit" onclick="openHerbModal()" style="margin-bottom:1rem;">+ New Application Record</button></div>' +
-    '<div id="herb-logs-list">' + renderHerbLogs() + '</div>';
+    '<p style="font-size:.88rem;margin:.75rem 0;">The Herbicide Report auto-fills weather, project info, chemical details, and your name. You only fill in quantities, times, and lot number.</p>' +
+    '<a href="herbicide_report.html?id=' + encodeURIComponent(id) + '" style="display:block;text-align:center;background:#2d5a27;color:#fff;padding:.95rem;border-radius:8px;font-weight:700;font-size:1rem;text-decoration:none;margin-top:.5rem;">📋 Open Herbicide Report Form</a>' +
+    '</div>';
 }
 
 function renderHerbLogs() {
@@ -727,10 +732,17 @@ function saveHerbLog() {
   closeHerbModal();
   printHerbForm(_herbLogs.length - 1);
 
-  // Save to backend
+  // Save to backend and email Rena
   fetch(SCRIPT_URL, {
     method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action:'submitReport', reportType:'herbicide', projectId:_project.podioItemId, log:log })
+    body: JSON.stringify({
+      action:      'submitReport',
+      reportType:  'herbicide',
+      projectId:   _project.podioItemId,
+      projectName: _project.name || '',
+      submittedBy: _currentUser || '',
+      log:         log
+    })
   }).catch(function(){});
 
   var list = document.getElementById('herb-logs-list');
