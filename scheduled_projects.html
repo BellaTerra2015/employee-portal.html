@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scheduled Projects — Bella Terra</title>
+<title>Project Board — Bella Terra</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --green-dark:#2d5a27; --green-mid:#4a7c3f; --green-light:#7ab648;
   --blue-dark:#1a4b8c;  --blue-mid:#2e6da4;  --blue-light:#e8f0fb;
-  --gold:#c8961e; --red:#c0392b; --white:#fff;
+  --gold:#c8961e; --red:#c0392b; --orange:#e07c30; --white:#fff;
   --gray-light:#f5f5f2; --gray-mid:#888; --text:#2a2a2a;
   --border:#d0dcc8; --shadow:0 2px 12px rgba(0,0,0,.10);
 }
@@ -19,32 +19,38 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 /* ── HEADER ── */
 .page-header{background:var(--green-dark);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
 .page-header h1{font-family:'Playfair Display',serif;color:#fff;font-size:1.3rem;}
-.header-right{display:flex;align-items:center;gap:1rem;}
+.header-right{display:flex;align-items:center;gap:.75rem;}
 .user-badge{background:rgba(255,255,255,.15);color:#fff;padding:.3rem .75rem;border-radius:20px;font-size:.85rem;}
 .btn-back{background:transparent;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.3);padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-size:.85rem;text-decoration:none;}
 .btn-sync{background:var(--green-mid);color:#fff;border:none;padding:.4rem .9rem;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;}
 
 /* ── BOARD ── */
 .board-wrap{padding:1.5rem;overflow-x:auto;}
-.board{display:grid;grid-template-columns:repeat(4,minmax(280px,1fr));gap:1rem;min-width:900px;}
+.board{display:grid;grid-template-columns:repeat(5,minmax(260px,1fr));gap:1rem;min-width:1100px;}
 
 /* ── COLUMNS ── */
 .column{background:#e9eef7;border-radius:12px;padding:0;}
 .col-header{padding:.9rem 1rem;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;}
-.col-header h2{font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.col-header h2{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
 .col-count{background:rgba(255,255,255,.35);border-radius:10px;padding:.1rem .5rem;font-size:.8rem;font-weight:700;}
 .col-body{padding:.75rem;min-height:200px;display:flex;flex-direction:column;gap:.65rem;}
 
-.col-scheduled  .col-header{background:#4a7c3f;color:#fff;}
-.col-underway   .col-header{background:#1a4b8c;color:#fff;}
-.col-maintaining .col-header{background:#c8961e;color:#fff;}
-.col-past       .col-header{background:#555;color:#fff;}
+.col-Awarded    .col-header{background:#6d4c9e;color:#fff;}
+.col-Scheduled  .col-header{background:#2d5a27;color:#fff;}
+.col-Underway   .col-header{background:#1a4b8c;color:#fff;}
+.col-Maintenance .col-header{background:#c8961e;color:#fff;}
+.col-Complete   .col-header{background:#555;color:#fff;}
 
 /* ── PROJECT CARDS ── */
 .card{background:#fff;border-radius:10px;padding:1rem;box-shadow:var(--shadow);position:relative;transition:transform .15s;}
 .card:hover{transform:translateY(-2px);}
-.card-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--text);margin-bottom:.5rem;line-height:1.3;}
+.card-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--text);margin-bottom:.35rem;line-height:1.3;}
 .card-contract{font-size:.75rem;color:var(--gray-mid);margin-bottom:.5rem;}
+
+/* ON HOLD banner */
+.on-hold-banner{background:#fff3e8;border:1px solid var(--orange);border-radius:6px;padding:.35rem .6rem;font-size:.75rem;font-weight:700;color:var(--orange);margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.on-hold-note{font-size:.72rem;font-weight:400;color:#b85c00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+.seasonal-tag{background:#e8f0fb;border:1px solid #c5d5f0;border-radius:4px;padding:.1rem .4rem;font-size:.68rem;color:var(--blue-dark);font-weight:700;}
 
 /* badges */
 .badges{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem;}
@@ -58,23 +64,26 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 /* scope items */
 .scope-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-mid);margin-bottom:.3rem;}
 .scope-items{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.7rem;}
-.scope-btn{font-size:.72rem;padding:.2rem .5rem;border-radius:6px;border:none;cursor:default;font-weight:600;}
+.scope-btn{font-size:.72rem;padding:.2rem .5rem;border-radius:6px;border:none;font-weight:600;cursor:pointer;}
 .scope-active{background:#e8f5e2;color:#2d5a27;border:1px solid #b8dda8;}
-.scope-inactive{background:#f5f5f2;color:#aaa;border:1px solid #e0e0e0;}
+.scope-active:hover{background:#d0efcc;}
 
 /* card actions */
 .card-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;}
 .btn-safety{background:#f0f4ff;color:#1a4b8c;border:1px solid #c5d5f0;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
 .btn-safety:hover{background:#dce8ff;}
-.btn-report{background:#c8961e;color:#fff;border:none;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.btn-report{background:var(--gold);color:#fff;border:none;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
 .btn-report:hover{background:#a87818;}
 .btn-financial{background:#f5f5f2;color:#555;border:1px solid #ddd;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;}
+.btn-hold{background:#fff3e8;color:var(--orange);border:1px solid #f0c08a;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.btn-hold.active{background:var(--orange);color:#fff;}
+.btn-open{background:var(--green-dark);color:#fff;border:none;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.btn-open:hover{background:var(--green-mid);}
 
 /* move buttons */
 .move-row{display:flex;justify-content:space-between;margin-top:.65rem;border-top:1px solid #f0f0f0;padding-top:.5rem;}
 .btn-move{background:transparent;border:1px solid #ccc;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.78rem;color:#555;transition:all .15s;}
 .btn-move:hover{background:#e8f0fb;border-color:#1a4b8c;color:#1a4b8c;}
-.btn-move:disabled{opacity:.3;cursor:default;}
 .btn-move.hidden{visibility:hidden;}
 
 /* empty state */
@@ -93,20 +102,28 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .modal-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;}
 .field-group{margin-bottom:.85rem;}
 .field-group label{display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-dark);margin-bottom:.25rem;}
-.field-group input,.field-group textarea{width:100%;padding:.55rem .75rem;border:2px solid var(--border);border-radius:7px;font-size:.9rem;font-family:inherit;}
-.field-group input:focus,.field-group textarea:focus{outline:none;border-color:var(--blue-mid);}
+.field-group input,.field-group textarea,.field-group select{width:100%;padding:.55rem .75rem;border:2px solid var(--border);border-radius:7px;font-size:.9rem;font-family:inherit;}
+.field-group input:focus,.field-group textarea:focus,.field-group select:focus{outline:none;border-color:var(--blue-mid);}
 .field-group textarea{resize:vertical;min-height:60px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
 .btn-save{width:100%;padding:.85rem;background:var(--blue-dark);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;}
 .btn-save:hover{background:var(--blue-mid);}
+.btn-save-orange{background:var(--orange);}
+.btn-save-orange:hover{background:#c0621e;}
 .modal-note{font-size:.78rem;color:var(--gray-mid);margin-top:.5rem;text-align:center;}
+.modal-section{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-mid);margin:.75rem 0 .5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border);}
 
-/* ── PASSWORD MODAL ── */
+/* ── PASSWORD / FINANCIAL MODAL ── */
 .pw-modal-box{max-width:380px;}
 .financial-data{background:var(--gray-light);border-radius:8px;padding:1rem;margin-top:.75rem;}
 .financial-row{display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border);font-size:.9rem;}
 .financial-row:last-child{border:none;}
 .financial-label{color:var(--gray-mid);}
 .financial-value{font-weight:700;}
+
+/* ── SCOPE PREVIEW (in job detail mockup) ── */
+.scope-tabs-preview{background:#f8f9ff;border:2px dashed #c5d5f0;border-radius:10px;padding:1rem;margin-top:.75rem;text-align:center;color:var(--blue-mid);font-size:.85rem;}
+.scope-tabs-preview strong{display:block;margin-bottom:.35rem;color:var(--blue-dark);}
 
 @media(max-width:700px){.board{grid-template-columns:1fr;}.board-wrap{padding:.75rem;}}
 </style>
@@ -115,7 +132,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 
 <!-- HEADER -->
 <div class="page-header">
-  <h1>📋 Scheduled Projects</h1>
+  <h1>📋 Project Board</h1>
   <div class="header-right">
     <span class="user-badge" id="user-badge">Loading…</span>
     <button class="btn-sync" onclick="syncFromPodio()">↻ Sync Podio</button>
@@ -126,23 +143,27 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 <!-- BOARD -->
 <div class="board-wrap">
   <div id="board-loading" class="board-loading">Loading projects…</div>
-  <div id="board-error"  class="board-error"   style="display:none;"></div>
+  <div id="board-error"  class="board-error" style="display:none;"></div>
   <div id="board" class="board" style="display:none;">
-    <div class="column col-scheduled">
-      <div class="col-header"><h2>Scheduled</h2><span class="col-count" id="count-Scheduled">0</span></div>
+    <div class="column col-Awarded">
+      <div class="col-header"><h2>🏆 Awarded</h2><span class="col-count" id="count-Awarded">0</span></div>
+      <div class="col-body" id="col-Awarded"></div>
+    </div>
+    <div class="column col-Scheduled">
+      <div class="col-header"><h2>📅 Scheduled</h2><span class="col-count" id="count-Scheduled">0</span></div>
       <div class="col-body" id="col-Scheduled"></div>
     </div>
-    <div class="column col-underway">
-      <div class="col-header"><h2>Underway</h2><span class="col-count" id="count-Underway">0</span></div>
+    <div class="column col-Underway">
+      <div class="col-header"><h2>🔨 Underway</h2><span class="col-count" id="count-Underway">0</span></div>
       <div class="col-body" id="col-Underway"></div>
     </div>
-    <div class="column col-maintaining">
-      <div class="col-header"><h2>Maintaining</h2><span class="col-count" id="count-Maintaining">0</span></div>
-      <div class="col-body" id="col-Maintaining"></div>
+    <div class="column col-Maintenance">
+      <div class="col-header"><h2>🌿 Maintenance</h2><span class="col-count" id="count-Maintenance">0</span></div>
+      <div class="col-body" id="col-Maintenance"></div>
     </div>
-    <div class="column col-past">
-      <div class="col-header"><h2>Past Projects</h2><span class="col-count" id="count-Past Projects">0</span></div>
-      <div class="col-body" id="col-Past Projects"></div>
+    <div class="column col-Complete">
+      <div class="col-header"><h2>✅ Complete</h2><span class="col-count" id="count-Complete">0</span></div>
+      <div class="col-body" id="col-Complete"></div>
     </div>
   </div>
 </div>
@@ -151,35 +172,82 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 <div class="modal" id="safety-modal">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>📋 Safety Plan</h3>
+      <h3>🦺 Safety Plan</h3>
       <button class="modal-close" onclick="closeSafety()">&times;</button>
     </div>
-    <p id="safety-project-name" style="font-size:.85rem;color:#666;margin-bottom:1rem;"></p>
+    <p id="safety-project-name" style="font-size:.85rem;color:#666;margin-bottom:1rem;font-weight:600;"></p>
+
+    <div class="modal-section">Emergency Services</div>
     <div class="field-group"><label>Nearest Emergency Room</label>
       <input type="text" id="sp-er" placeholder="e.g. PeaceHealth SW, 400 NE Mother Joseph Pl, Vancouver"></div>
     <div class="field-group"><label>Nearest Urgent Care</label>
       <input type="text" id="sp-urgent" placeholder="e.g. Legacy GoHealth, 3220 SE 164th Ave, Vancouver"></div>
+    <div class="field-group"><label>Emergency Services Phone</label>
+      <input type="text" id="sp-911" placeholder="911 — or nearest dispatch number"></div>
+
+    <div class="modal-section">Site Information</div>
     <div class="field-group"><label>Site Address</label>
       <input type="text" id="sp-address" placeholder="e.g. NW 38th St, Camas WA 98607"></div>
-    <div class="field-group"><label>Prime Contractor Foreman</label>
-      <input type="text" id="sp-foreman" placeholder="Name + phone number"></div>
-    <div class="field-group"><label>Safety Foreman</label>
-      <input type="text" id="sp-safety-foreman" placeholder="Name + phone number"></div>
+    <div class="field-row">
+      <div class="field-group"><label>Prime Contractor Foreman</label>
+        <input type="text" id="sp-foreman" placeholder="Name + phone"></div>
+      <div class="field-group"><label>Safety Foreman</label>
+        <input type="text" id="sp-safety-foreman" placeholder="Name + phone"></div>
+    </div>
     <div class="field-group"><label>Utilities Phone # (call before digging)</label>
       <input type="text" id="sp-utilities" placeholder="811 — or specific utility contact"></div>
-    <div class="field-group"><label>Emergency Contact (Bella Terra)</label>
-      <input type="text" id="sp-emergency" placeholder="Rena — (360) xxx-xxxx"></div>
-    <div class="field-group"><label>First Aid Kit Location</label>
-      <input type="text" id="sp-firstaid" placeholder="e.g. In crew truck, center console"></div>
-    <div class="field-group"><label>Muster Point (in case of emergency)</label>
+
+    <div class="modal-section">Bella Terra Contacts</div>
+    <div class="field-row">
+      <div class="field-group"><label>Emergency Contact</label>
+        <input type="text" id="sp-emergency" placeholder="Rena — (360) xxx-xxxx"></div>
+      <div class="field-group"><label>First Aid Kit Location</label>
+        <input type="text" id="sp-firstaid" placeholder="e.g. Crew truck, center console"></div>
+    </div>
+    <div class="field-group"><label>Muster Point (emergency assembly)</label>
       <input type="text" id="sp-muster" placeholder="e.g. Parking lot at NW 38th & SE 1st Ave"></div>
+
+    <div class="modal-section">PPE & Hazards</div>
+    <div class="field-group"><label>Required PPE</label>
+      <input type="text" id="sp-ppe" placeholder="e.g. Hi-vis vest, steel toe, hard hat, gloves"></div>
+    <div class="field-group"><label>Site Hazards / Traffic Control</label>
+      <textarea id="sp-hazards" placeholder="Known hazards, traffic control setup, restricted zones…"></textarea></div>
     <div class="field-group"><label>Additional Notes</label>
-      <textarea id="sp-notes" placeholder="Any site-specific hazards, traffic control, PPE requirements…"></textarea></div>
+      <textarea id="sp-notes" placeholder="Any other site-specific safety information…"></textarea></div>
+
     <div id="safety-auth-warn" style="display:none;background:#fff3e8;border:1px solid #e07c30;border-radius:6px;padding:.6rem .8rem;font-size:.82rem;color:#b85c00;margin-bottom:.75rem;">
       ⚠ Only Rena, Heather, Brydon, or Liz can save safety plans.
     </div>
     <button class="btn-save" id="sp-save-btn" onclick="saveSafetyPlan()">Save Safety Plan</button>
     <p class="modal-note">Visible to all employees on the portal.</p>
+  </div>
+</div>
+
+<!-- ON HOLD MODAL -->
+<div class="modal" id="hold-modal">
+  <div class="modal-box pw-modal-box" style="max-width:440px;">
+    <div class="modal-header">
+      <h3>⏸ Put On Hold</h3>
+      <button class="modal-close" onclick="closeHold()">&times;</button>
+    </div>
+    <p id="hold-project-name" style="font-size:.85rem;color:#666;margin-bottom:1rem;font-weight:600;"></p>
+    <div class="field-group"><label>Reason for Hold</label>
+      <textarea id="hold-note" placeholder="e.g. Waiting on change order approval, weather delay, owner request…" style="min-height:80px;"></textarea></div>
+    <div class="field-group">
+      <label style="display:flex;align-items:center;gap:.5rem;text-transform:none;font-size:.88rem;cursor:pointer;">
+        <input type="checkbox" id="hold-seasonal" onchange="toggleSeasonalDate()" style="width:auto;"> Seasonal pause (winter / scheduled restart)
+      </label>
+    </div>
+    <div id="hold-seasonal-dates" style="display:none;">
+      <div class="field-row">
+        <div class="field-group"><label>Pause Date</label>
+          <input type="date" id="hold-pause-date"></div>
+        <div class="field-group"><label>Restart Date</label>
+          <input type="date" id="hold-restart-date"></div>
+      </div>
+    </div>
+    <button class="btn-save btn-save-orange" onclick="saveHold()">⏸ Confirm Hold</button>
+    <p class="modal-note">Project stays in its current stage with an ON HOLD banner.</p>
   </div>
 </div>
 
@@ -199,7 +267,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
       <button class="btn-save" onclick="checkFinancialPw()">View Financial Data</button>
     </div>
     <div id="financial-data-view" style="display:none;">
-      <p id="financial-project-name" style="font-size:.85rem;color:#666;margin-bottom:.75rem;"></p>
+      <p id="financial-project-name" style="font-size:.85rem;color:#666;margin-bottom:.75rem;font-weight:600;"></p>
       <div class="financial-data" id="financial-rows"></div>
     </div>
   </div>
@@ -207,19 +275,19 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
-var STAGES     = ['Scheduled','Underway','Maintaining','Past Projects'];
+var STAGES     = ['Awarded','Scheduled','Underway','Maintenance','Complete'];
 var AUTHORIZED = ['rena@1bellaterra.com','admin@1bellaterra.com','office@1bellaterra.com','brydon@1bellaterra.com'];
 
-var _projects         = [];
-var _currentUser      = '';
-var _currentUserEmail = '';
-var _activeSafetyId   = null;
+var _projects          = [];
+var _currentUser       = '';
+var _currentUserEmail  = '';
+var _activeSafetyId    = null;
 var _activeFinancialId = null;
+var _activeHoldId      = null;
 
 // ── INIT ─────────────────────────────────────────────────────
 
 window.onload = function() {
-  // Get logged-in user from portal localStorage
   _currentUser      = localStorage.getItem('bt_employee_name')  || '';
   _currentUserEmail = localStorage.getItem('bt_employee_email') || '';
   document.getElementById('user-badge').textContent = _currentUser || 'Guest';
@@ -263,10 +331,9 @@ function renderBoard() {
   STAGES.forEach(function(s){ counts[s] = 0; });
 
   _projects.forEach(function(p) {
-    var stage = p.portalStage || 'Scheduled';
-    if (STAGES.indexOf(stage) === -1) stage = 'Scheduled';
+    var stage = p.portalStage || 'Awarded';
+    if (STAGES.indexOf(stage) === -1) stage = 'Awarded';
     counts[stage]++;
-
     var col = document.getElementById('col-' + stage);
     if (col) col.appendChild(buildCard(p, stage));
   });
@@ -274,8 +341,7 @@ function renderBoard() {
   STAGES.forEach(function(s) {
     document.getElementById('count-' + s).textContent = counts[s];
     if (counts[s] === 0) {
-      document.getElementById('col-' + s).innerHTML =
-        '<div class="col-empty">No projects</div>';
+      document.getElementById('col-' + s).innerHTML = '<div class="col-empty">No projects</div>';
     }
   });
 
@@ -290,39 +356,47 @@ function buildCard(p, stage) {
 
   var stageIdx = STAGES.indexOf(stage);
   var canMove  = isAuthorized();
+  var holdData = p.onHold || null;
 
-  // Scope items HTML
-  var scopeHtml = '';
-  if (p.scopeItems && p.scopeItems.length > 0) {
-    scopeHtml = '<div class="scope-label">Scope</div><div class="scope-items">';
-    p.scopeItems.forEach(function(s) {
-      scopeHtml += '<span class="scope-btn scope-active">' + esc(s.name) + '</span>';
-    });
-    scopeHtml += '</div>';
+  // ── On Hold banner ──
+  var holdBanner = '';
+  if (holdData && holdData.active) {
+    var holdNote = holdData.note ? '<span class="on-hold-note">' + esc(holdData.note) + '</span>' : '';
+    var seasonal = holdData.seasonal
+      ? '<span class="seasonal-tag">❄ Seasonal — restarts ' + esc(holdData.restartDate || '?') + '</span>'
+      : '';
+    holdBanner = '<div class="on-hold-banner">⏸ ON HOLD ' + seasonal + holdNote + '</div>';
   }
 
-  // Prime/Sub badge
+  // ── Prime/Sub badge ──
   var primeBadge = '';
   if (p.primeSub) {
     var cls = p.primeSub.toLowerCase().indexOf('sub') !== -1 ? 'badge-sub' : 'badge-prime';
     primeBadge = '<span class="badge ' + cls + '">' + esc(p.primeSub) + '</span>';
   }
 
-  // Project class badge
+  // ── Project class badge ──
   var classBadge = '';
   if (p.projectClass) {
-    var cc = {'government':'badge-gov','commercial':'badge-commercial','residential':'badge-residential'};
-    var cKey = p.projectClass.toLowerCase();
-    var cCls = cc[cKey] || 'badge-gov';
-    classBadge = '<span class="badge ' + cCls + '">' + esc(p.projectClass) + '</span>';
+    var cc = {government:'badge-gov', commercial:'badge-commercial', residential:'badge-residential'};
+    classBadge = '<span class="badge ' + (cc[p.projectClass.toLowerCase()] || 'badge-gov') + '">' + esc(p.projectClass) + '</span>';
   }
 
-  // Move buttons
-  var leftLabel  = stageIdx > 0 ? '← ' + STAGES[stageIdx-1] : '';
-  var rightLabel = stageIdx < STAGES.length-1 ? STAGES[stageIdx+1] + ' →' : '';
+  // ── Scope items ──
+  var scopeHtml = '';
+  if (p.scopeItems && p.scopeItems.length > 0) {
+    scopeHtml = '<div class="scope-label">Scope</div><div class="scope-items">';
+    p.scopeItems.forEach(function(s) {
+      scopeHtml += '<span class="scope-btn scope-active" title="Click to open report" onclick="openScopeReport(\'' + esc(p.podioItemId) + '\',\'' + esc(s.name) + '\')">' + esc(s.name) + '</span>';
+    });
+    scopeHtml += '</div>';
+  }
 
+  // ── Move buttons ──
   var moveHtml = '';
   if (canMove) {
+    var leftLabel  = stageIdx > 0 ? '← ' + STAGES[stageIdx-1] : '';
+    var rightLabel = stageIdx < STAGES.length-1 ? STAGES[stageIdx+1] + ' →' : '';
     moveHtml = '<div class="move-row">' +
       '<button class="btn-move' + (stageIdx === 0 ? ' hidden' : '') + '" ' +
         'onclick="moveProject(\'' + p.podioItemId + '\',\'' + (STAGES[stageIdx-1]||'') + '\')">' +
@@ -333,19 +407,28 @@ function buildCard(p, stage) {
     '</div>';
   }
 
-  // Maintenance report button (only in Maintaining stage)
-  var reportBtn = stage === 'Maintaining'
-    ? '<button class="btn-report" onclick="openCamasReport(\'' + p.podioItemId + '\')">📊 Monthly Report</button>'
+  // ── Action buttons ──
+  var reportBtn = stage === 'Maintenance'
+    ? '<button class="btn-report" onclick="openMaintenanceReport(\'' + p.podioItemId + '\')">📊 Maint. Report</button>'
+    : '';
+
+  var holdActive = holdData && holdData.active;
+  var holdBtn = canMove
+    ? '<button class="btn-hold' + (holdActive ? ' active' : '') + '" onclick="' +
+        (holdActive ? 'removeHold(\'' + p.podioItemId + '\')' : 'openHold(\'' + p.podioItemId + '\')') +
+        '">' + (holdActive ? '▶ Resume' : '⏸ Hold') + '</button>'
     : '';
 
   card.innerHTML =
+    holdBanner +
     '<div class="card-name">' + esc(p.name) + '</div>' +
     (p.contractNumber ? '<div class="card-contract">Contract: ' + esc(p.contractNumber) + '</div>' : '') +
     '<div class="badges">' + primeBadge + classBadge + '</div>' +
     scopeHtml +
     '<div class="card-actions">' +
-      '<button class="btn-safety" onclick="openSafety(\'' + p.podioItemId + '\')">📋 Safety Plan</button>' +
+      '<button class="btn-safety" onclick="openSafety(\'' + p.podioItemId + '\')">🦺 Safety</button>' +
       reportBtn +
+      holdBtn +
       '<button class="btn-financial" onclick="openFinancial(\'' + p.podioItemId + '\')">💰</button>' +
     '</div>' +
     moveHtml;
@@ -357,33 +440,80 @@ function buildCard(p, stage) {
 
 function moveProject(podioItemId, newStage) {
   if (!isAuthorized()) { alert('You are not authorized to move projects.'); return; }
-
   fetch(SCRIPT_URL, {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      action: 'moveProject',
-      podioItemId: podioItemId,
-      newStage: newStage,
-      email: _currentUserEmail
-    })
+    body: JSON.stringify({ action:'moveProject', podioItemId:podioItemId, newStage:newStage, email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.success) {
-      // Update locally and re-render
       for (var i = 0; i < _projects.length; i++) {
-        if (_projects[i].podioItemId === podioItemId) {
-          _projects[i].portalStage = newStage;
-          break;
-        }
+        if (_projects[i].podioItemId === podioItemId) { _projects[i].portalStage = newStage; break; }
       }
       renderBoard();
-    } else {
-      alert('Move failed: ' + (data.error || 'Unknown error'));
-    }
+    } else { alert('Move failed: ' + (data.error || 'Unknown error')); }
   })
   .catch(function(e){ alert('Error: ' + e.message); });
+}
+
+// ── ON HOLD ───────────────────────────────────────────────────
+
+function openHold(podioItemId) {
+  var p = _projects.find(function(x){ return x.podioItemId === podioItemId; });
+  if (!p) return;
+  _activeHoldId = podioItemId;
+  document.getElementById('hold-project-name').textContent = p.name;
+  document.getElementById('hold-note').value = '';
+  document.getElementById('hold-seasonal').checked = false;
+  document.getElementById('hold-seasonal-dates').style.display = 'none';
+  document.getElementById('hold-pause-date').value = '';
+  document.getElementById('hold-restart-date').value = '';
+  document.getElementById('hold-modal').classList.add('open');
+}
+
+function closeHold() {
+  document.getElementById('hold-modal').classList.remove('open');
+  _activeHoldId = null;
+}
+
+function toggleSeasonalDate() {
+  var show = document.getElementById('hold-seasonal').checked;
+  document.getElementById('hold-seasonal-dates').style.display = show ? 'block' : 'none';
+}
+
+function saveHold() {
+  if (!_activeHoldId) return;
+  var holdData = {
+    active:      true,
+    note:        document.getElementById('hold-note').value,
+    seasonal:    document.getElementById('hold-seasonal').checked,
+    pauseDate:   document.getElementById('hold-pause-date').value,
+    restartDate: document.getElementById('hold-restart-date').value
+  };
+  for (var i = 0; i < _projects.length; i++) {
+    if (_projects[i].podioItemId === _activeHoldId) { _projects[i].onHold = holdData; break; }
+  }
+  // Save to backend
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'saveHold', podioItemId:_activeHoldId, holdData:holdData, email:_currentUserEmail })
+  }).catch(function(){});
+  closeHold();
+  renderBoard();
+}
+
+function removeHold(podioItemId) {
+  for (var i = 0; i < _projects.length; i++) {
+    if (_projects[i].podioItemId === podioItemId) { _projects[i].onHold = { active:false }; break; }
+  }
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'saveHold', podioItemId:podioItemId, holdData:{active:false}, email:_currentUserEmail })
+  }).catch(function(){});
+  renderBoard();
 }
 
 // ── SAFETY PLAN ───────────────────────────────────────────────
@@ -392,29 +522,26 @@ function openSafety(podioItemId) {
   var p = _projects.find(function(x){ return x.podioItemId === podioItemId; });
   if (!p) return;
   _activeSafetyId = podioItemId;
-
   document.getElementById('safety-project-name').textContent = p.name;
   var sp = p.safetyPlan || {};
-  document.getElementById('sp-er').value              = sp.er           || '';
-  document.getElementById('sp-urgent').value          = sp.urgentCare   || '';
-  document.getElementById('sp-address').value         = sp.siteAddress  || '';
-  document.getElementById('sp-foreman').value         = sp.foreman      || '';
-  document.getElementById('sp-safety-foreman').value  = sp.safetyForeman|| '';
-  document.getElementById('sp-utilities').value       = sp.utilities    || '';
-  document.getElementById('sp-emergency').value       = sp.emergency    || '';
-  document.getElementById('sp-firstaid').value        = sp.firstAid     || '';
-  document.getElementById('sp-muster').value          = sp.muster       || '';
-  document.getElementById('sp-notes').value           = sp.notes        || '';
+  document.getElementById('sp-er').value             = sp.er            || '';
+  document.getElementById('sp-urgent').value         = sp.urgentCare    || '';
+  document.getElementById('sp-911').value            = sp.emergency911  || '';
+  document.getElementById('sp-address').value        = sp.siteAddress   || '';
+  document.getElementById('sp-foreman').value        = sp.foreman       || '';
+  document.getElementById('sp-safety-foreman').value = sp.safetyForeman || '';
+  document.getElementById('sp-utilities').value      = sp.utilities     || '';
+  document.getElementById('sp-emergency').value      = sp.emergency     || '';
+  document.getElementById('sp-firstaid').value       = sp.firstAid      || '';
+  document.getElementById('sp-muster').value         = sp.muster        || '';
+  document.getElementById('sp-ppe').value            = sp.ppe           || '';
+  document.getElementById('sp-hazards').value        = sp.hazards       || '';
+  document.getElementById('sp-notes').value          = sp.notes         || '';
 
   var warn = document.getElementById('safety-auth-warn');
   var btn  = document.getElementById('sp-save-btn');
-  if (isAuthorized()) {
-    warn.style.display = 'none';
-    btn.style.display = 'block';
-  } else {
-    warn.style.display = 'block';
-    btn.style.display = 'none';
-  }
+  if (isAuthorized()) { warn.style.display='none'; btn.style.display='block'; }
+  else                { warn.style.display='block'; btn.style.display='none'; }
 
   document.getElementById('safety-modal').classList.add('open');
 }
@@ -426,10 +553,10 @@ function closeSafety() {
 
 function saveSafetyPlan() {
   if (!isAuthorized() || !_activeSafetyId) return;
-
   var plan = {
     er:            document.getElementById('sp-er').value,
     urgentCare:    document.getElementById('sp-urgent').value,
+    emergency911:  document.getElementById('sp-911').value,
     siteAddress:   document.getElementById('sp-address').value,
     foreman:       document.getElementById('sp-foreman').value,
     safetyForeman: document.getElementById('sp-safety-foreman').value,
@@ -437,42 +564,50 @@ function saveSafetyPlan() {
     emergency:     document.getElementById('sp-emergency').value,
     firstAid:      document.getElementById('sp-firstaid').value,
     muster:        document.getElementById('sp-muster').value,
+    ppe:           document.getElementById('sp-ppe').value,
+    hazards:       document.getElementById('sp-hazards').value,
     notes:         document.getElementById('sp-notes').value
   };
-
   var btn = document.getElementById('sp-save-btn');
-  btn.textContent = 'Saving…';
-  btn.disabled = true;
-
+  btn.textContent = 'Saving…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      action: 'saveSafetyPlan',
-      podioItemId: _activeSafetyId,
-      safetyPlan: plan,
-      email: _currentUserEmail
-    })
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'saveSafetyPlan', podioItemId:_activeSafetyId, safetyPlan:plan, email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.success) {
-      // Update local copy
       for (var i = 0; i < _projects.length; i++) {
-        if (_projects[i].podioItemId === _activeSafetyId) {
-          _projects[i].safetyPlan = plan; break;
-        }
+        if (_projects[i].podioItemId === _activeSafetyId) { _projects[i].safetyPlan = plan; break; }
       }
       closeSafety();
-    } else {
-      alert('Save failed: ' + (data.error || 'Unknown'));
-    }
+    } else { alert('Save failed: ' + (data.error || 'Unknown')); }
   })
   .catch(function(e){ alert('Error: ' + e.message); })
   .finally(function(){ btn.textContent = 'Save Safety Plan'; btn.disabled = false; });
 }
 
-// ── FINANCIAL DATA ────────────────────────────────────────────
+// ── SCOPE REPORT (stub — will open job detail) ────────────────
+
+function openScopeReport(podioItemId, scopeName) {
+  // Will open full job detail with that scope tab active
+  // For now: navigate to job detail page (to be built)
+  alert('Opening ' + scopeName + ' report for this project.\n\nFull job detail page coming next.');
+}
+
+// ── MAINTENANCE REPORT ────────────────────────────────────────
+
+function openMaintenanceReport(podioItemId) {
+  var p = _projects.find(function(x){ return x.podioItemId === podioItemId; });
+  if (p && p.name && p.name.toLowerCase().indexOf('camas') !== -1) {
+    // Camas NW 38th — link to Camas Report Generator
+    alert('Launching Camas Monthly Report generator…\n(camas_report.html — coming soon)');
+  } else {
+    alert('Opening maintenance report for this project.');
+  }
+}
+
+// ── FINANCIAL ────────────────────────────────────────────────
 
 function openFinancial(podioItemId) {
   var p = _projects.find(function(x){ return x.podioItemId === podioItemId; });
@@ -494,58 +629,44 @@ function closeFinancial() {
 function checkFinancialPw() {
   var pw = document.getElementById('financial-pw').value;
   fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'checkPassword', password: pw })
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'checkPassword', password:pw })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.success && data.authorized) {
       var p = _projects.find(function(x){ return x.podioItemId === _activeFinancialId; });
+      var wageType = p.portalStage === 'Maintenance' ? 'Base Wage' : 'Prevailing Wage';
       var rows = [
-        ['Project Class',  p.projectClass || '—'],
-        ['Prime / Sub',    p.primeSub     || '—'],
-        ['Contract No.',   p.contractNumber || '—'],
-        ['Podio Stage',    p.podioStage   || '—'],
-        ['Date Added',     p.dateAdded    || '—'],
-        ['Wage Type',      p.portalStage === 'Maintaining' ? 'Base Wage' : 'Prevailing Wage']
+        ['Project Class',  p.projectClass   || '—'],
+        ['Prime / Sub',    p.primeSub        || '—'],
+        ['Contract No.',   p.contractNumber  || '—'],
+        ['Podio Stage',    p.podioStage      || '—'],
+        ['Date Added',     p.dateAdded       || '—'],
+        ['Wage Type',      wageType]
       ];
-      var html = rows.map(function(r){
+      document.getElementById('financial-rows').innerHTML = rows.map(function(r){
         return '<div class="financial-row"><span class="financial-label">' + r[0] +
                '</span><span class="financial-value">' + esc(r[1]) + '</span></div>';
       }).join('');
-      document.getElementById('financial-rows').innerHTML = html;
       document.getElementById('financial-pw-form').style.display = 'none';
       document.getElementById('financial-data-view').style.display = 'block';
     } else {
       var err = document.getElementById('financial-pw-error');
-      err.textContent = 'Incorrect password.';
-      err.style.display = 'block';
+      err.textContent = 'Incorrect password.'; err.style.display = 'block';
     }
   });
 }
 
-// ── CAMAS REPORT BUTTON ───────────────────────────────────────
-
-function openCamasReport(podioItemId) {
-  // Link to the standalone Camas report page (to be built)
-  // For now: alert with project context
-  alert('Camas Monthly Report — launching report generator for this project.');
-  // Future: window.location.href = 'camas_report.html?project=' + podioItemId;
-}
-
-// ── SYNC FROM PODIO ───────────────────────────────────────────
+// ── SYNC ─────────────────────────────────────────────────────
 
 function syncFromPodio() {
   if (!isAuthorized()) { alert('Only authorized users can sync from Podio.'); return; }
   var btn = document.querySelector('.btn-sync');
-  btn.textContent = '↻ Syncing…';
-  btn.disabled = true;
-
+  btn.textContent = '↻ Syncing…'; btn.disabled = true;
   fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'syncProjects', email: _currentUserEmail })
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'syncProjects', email:_currentUserEmail })
   })
   .then(function(r){ return r.json(); })
   .then(function(){ loadProjects(); })
@@ -553,7 +674,7 @@ function syncFromPodio() {
   .finally(function(){ btn.textContent = '↻ Sync Podio'; btn.disabled = false; });
 }
 
-// ── UTILITIES ─────────────────────────────────────────────────
+// ── UTILITIES ────────────────────────────────────────────────
 
 function esc(str) {
   if (!str) return '';
