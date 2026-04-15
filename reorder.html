@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reorder Supplies</title>
+<meta name="theme-color" content="#2d5a27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green-dark:#2d5a27;--green-mid:#4a7c3f;--green-light:#7ab648;
+  --green-pale:#e8f5e2;--gray-light:#f5f5f2;--gray-mid:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;
+  --shadow:0 2px 12px rgba(45,90,39,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:var(--text);min-height:100vh;}
+button,input,select,textarea{font-family:inherit;}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--green-dark) 0%,var(--green-mid) 60%,var(--green-light) 100%);padding:2rem;}
+#login-screen h1{font-family:'Playfair Display',serif;color:#fff;font-size:2rem;margin-bottom:0.25rem;text-align:center;}
+#login-screen p{color:rgba(255,255,255,0.75);margin-bottom:2rem;text-align:center;}
+.login-box{background:white;border-radius:12px;padding:2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.25);}
+.login-box label{display:block;font-weight:600;font-size:0.85rem;color:var(--green-dark);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;}
+.login-box input{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;margin-bottom:1rem;transition:border-color 0.2s;}
+.login-box input:focus{outline:none;border-color:var(--green-mid);}
+.btn-login{width:100%;padding:0.85rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+.btn-login:hover{background:var(--green-mid);}
+.error-msg{color:var(--red);font-size:0.875rem;margin-top:0.5rem;display:none;}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.app-header{background:var(--green-dark);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.app-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.2rem;}
+.btn-portal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.35rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;}
+.btn-portal:hover{background:rgba(255,255,255,0.25);}
+
+/* ── REORDER ── */
+.wrap{padding:1.25rem;max-width:680px;margin:0 auto;}
+.page-sub{font-size:0.85rem;color:var(--gray-mid);margin-bottom:1.25rem;}
+.job-row{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:1.25rem;}
+.job-row label{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);}
+.job-row input{padding:0.65rem 0.85rem;border:2px solid var(--border);border-radius:8px;font-size:0.95rem;transition:border-color 0.2s;}
+.job-row input:focus{outline:none;border-color:var(--green-mid);}
+.reorder-item{border:2px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.85rem;transition:border-color 0.2s,background 0.2s;}
+.reorder-item.selected{border-color:var(--green-mid);background:var(--green-pale);}
+.reorder-item-top{display:flex;align-items:center;gap:0.75rem;cursor:pointer;}
+.reorder-item-top input[type="checkbox"]{width:18px;height:18px;flex-shrink:0;accent-color:var(--green-dark);cursor:pointer;}
+.reorder-item-name{font-weight:600;font-size:0.95rem;flex:1;}
+.reorder-item-vendor{font-size:0.78rem;color:var(--gray-mid);white-space:nowrap;}
+.reorder-item-details{display:none;margin-top:0.85rem;padding-top:0.85rem;border-top:1px solid var(--border);}
+.reorder-item.selected .reorder-item-details{display:block;}
+.last-order-badge{display:inline-block;background:rgba(74,124,63,0.12);color:var(--green-dark);font-size:0.8rem;font-weight:600;border-radius:5px;padding:0.28rem 0.65rem;margin-bottom:0.75rem;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;}
+.form-group label{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);display:block;margin-bottom:0.3rem;}
+.form-group input{padding:0.55rem 0.75rem;border:2px solid var(--border);border-radius:6px;font-size:0.9rem;background:white;width:100%;transition:border-color 0.2s;}
+.form-group input:focus{outline:none;border-color:var(--green-mid);}
+.notes-wrap label{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);display:block;margin-bottom:0.3rem;}
+.notes-wrap textarea{width:100%;padding:0.55rem 0.75rem;border:2px solid var(--border);border-radius:6px;font-size:0.88rem;resize:vertical;min-height:58px;transition:border-color 0.2s;}
+.notes-wrap textarea:focus{outline:none;border-color:var(--green-mid);}
+.footer{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;padding-bottom:2rem;}
+.btn-submit{padding:0.8rem 1.75rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-submit:hover{background:var(--green-mid);}
+.btn-submit:disabled{background:#aaa;cursor:not-allowed;}
+.btn-clear{padding:0.8rem 1.25rem;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:8px;font-size:1rem;cursor:pointer;}
+.success-box{display:none;background:#eaf7ea;border:1px solid var(--green-light);border-radius:8px;padding:1rem 1.25rem;color:var(--green-dark);font-weight:600;margin-top:1rem;font-size:0.92rem;line-height:1.65;}
+.success-box.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <h1>🛒 Reorder Supplies</h1>
+  <p>Flag low stock — sends vendor email</p>
+  <div class="login-box">
+    <label>Your Name</label>
+    <input type="text" id="login-name" placeholder="First Last" autocomplete="name">
+    <label>Portal Password</label>
+    <input type="password" id="login-pass" placeholder="Enter password" onkeypress="if(event.key==='Enter')doLogin()">
+    <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
+    <button class="btn-login" style="margin-top:0.5rem" onclick="doLogin()">Access</button>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="app-header">
+    <h2>🛒 Reorder Supplies</h2>
+    <button class="btn-portal" onclick="window.location.href='bella_terra_portal_html.html'">← Portal</button>
+  </div>
+  <div class="wrap">
+    <p class="page-sub">Check items running low. Last order amounts shown for reference.</p>
+    <div class="job-row">
+      <label>Job / Project Name</label>
+      <input type="text" id="reorder-job" value="Hydroseed Residential">
+    </div>
+    <div id="reorder-items"></div>
+    <div class="footer">
+      <button class="btn-submit" id="submit-btn" onclick="submitReorder()">📤 Send Reorder Request</button>
+      <button class="btn-clear" onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="success-box" id="reorder-success"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENTIALS — update here only, nowhere else
+// ═══════════════════════════════════════════════
+var PORTAL_PW   = 'bellaterra';
+var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
+var CC_EMAILS   = ['Rena@1BellaTerra.com','Office@1BellaTerra.com'];
+
+// ═══════════════════════════════════════════════
+// PRODUCTS — add or edit items here
+// ═══════════════════════════════════════════════
+var PRODUCTS = [
+  {id:'mulch',     product:'Mulch',               nameOfProduct:'50/50 Mulch',           supplier:'Cascade Geo', vendorEmail:'travis.riehl@cascadegeos.com', reorderAmt:5,  reorderUnit:'Pallet', triggerAmt:1,  triggerUnit:'Pallet'},
+  {id:'tackifier', product:'Tackifier',            nameOfProduct:'Soil Binder',           supplier:'Simplot',     vendorEmail:'Sean.Watts@simplot.com',       reorderAmt:2,  reorderUnit:'Jug',    triggerAmt:1,  triggerUnit:'Jug'},
+  {id:'fert',      product:'Fertilizer',           nameOfProduct:'16-16-16 Slow Release', supplier:'Simplot',     vendorEmail:'Sean.Watts@simplot.com',       reorderAmt:40, reorderUnit:'Bags',   triggerAmt:5,  triggerUnit:'Bags Left'},
+  {id:'rye',       product:'Perennial Rye Seed',   nameOfProduct:'Birdie Per. Rye',       supplier:'Ewing',       vendorEmail:'bsteyskal@ewingos.com',        reorderAmt:40, reorderUnit:'Bags',   triggerAmt:5,  triggerUnit:'Bags Left'},
+  {id:'fescue',    product:'Turf-Type Tall Fescue',nameOfProduct:'RFT - Barenburg',       supplier:'Simplot',     vendorEmail:'Sean.Watts@simplot.com',       reorderAmt:20, reorderUnit:'Bags',   triggerAmt:3,  triggerUnit:'Bags Left'}
+];
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+var currentEmployee = '';
+
+function doLogin(){
+  var name = document.getElementById('login-name').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var err  = document.getElementById('login-error');
+  if(pass !== PORTAL_PW){ err.style.display='block'; return; }
+  err.style.display='none';
+  currentEmployee = name;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildItems();
+}
+document.getElementById('login-pass').addEventListener('keypress', e=>{ if(e.key==='Enter') doLogin(); });
+
+// ═══════════════════════════════════════════════
+// BUILD ITEM LIST
+// ═══════════════════════════════════════════════
+function buildItems(){
+  var wrap = document.getElementById('reorder-items');
+  wrap.innerHTML = '';
+  PRODUCTS.forEach(p=>{
+    var div = document.createElement('div');
+    div.className = 'reorder-item';
+    div.id = 'ri-'+p.id;
+    div.innerHTML = `
+      <div class="reorder-item-top" onclick="toggleItem('${p.id}')">
+        <input type="checkbox" id="chk-${p.id}" onclick="event.stopPropagation();toggleItem('${p.id}')">
+        <span class="reorder-item-name">${p.product} <span style="font-weight:400;color:#666;font-size:0.85rem;">(${p.nameOfProduct})</span></span>
+        <span class="reorder-item-vendor">${p.supplier}</span>
+      </div>
+      <div class="reorder-item-details">
+        <div class="last-order-badge">📦 Last order: ${p.reorderAmt} ${p.reorderUnit} · Reorder trigger: ≤${p.triggerAmt} ${p.triggerUnit}</div>
+        <div class="detail-grid">
+          <div class="form-group"><label>Qty to Order</label><input type="number" id="qty-${p.id}" min="1" value="${p.reorderAmt}"></div>
+          <div class="form-group"><label>Unit</label><input type="text" id="unit-${p.id}" value="${p.reorderUnit}"></div>
+        </div>
+        <div class="notes-wrap">
+          <label>Notes (optional)</label>
+          <textarea id="notes-${p.id}" placeholder="Special instructions…"></textarea>
+        </div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function toggleItem(id){
+  var item = document.getElementById('ri-'+id);
+  var chk  = document.getElementById('chk-'+id);
+  var sel  = !item.classList.contains('selected');
+  item.classList.toggle('selected', sel);
+  chk.checked = sel;
+}
+
+function clearAll(){
+  PRODUCTS.forEach(p=>{
+    document.getElementById('chk-'+p.id).checked = false;
+    document.getElementById('ri-'+p.id).classList.remove('selected');
+  });
+  document.getElementById('reorder-success').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════
+function submitReorder(){
+  var job      = document.getElementById('reorder-job').value.trim() || 'Hydroseed Residential';
+  var selected = PRODUCTS.filter(p=>document.getElementById('chk-'+p.id).checked);
+  if(!selected.length){ alert('Please check at least one item.'); return; }
+
+  var byVendor = {};
+  selected.forEach(p=>{
+    var qty   = document.getElementById('qty-'+p.id).value || p.reorderAmt;
+    var unit  = document.getElementById('unit-'+p.id).value || p.reorderUnit;
+    var notes = document.getElementById('notes-'+p.id).value.trim();
+    if(!byVendor[p.vendorEmail]) byVendor[p.vendorEmail]={supplier:p.supplier,email:p.vendorEmail,items:[]};
+    byVendor[p.vendorEmail].items.push({product:p.product,name:p.nameOfProduct,qty,unit,lastOrder:p.reorderAmt+' '+p.reorderUnit,notes});
+  });
+
+  var date = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var groups = Object.values(byVendor);
+  var btn = document.getElementById('submit-btn');
+  btn.disabled=true; btn.textContent='⏳ Sending…';
+  var sent = 0;
+
+  function next(){
+    if(sent >= groups.length){
+      var msg = document.getElementById('reorder-success');
+      msg.textContent = '✅ Reorder sent to '+[...new Set(selected.map(p=>p.supplier))].join(', ')+'. '+selected.length+' item(s) requested.';
+      msg.classList.add('show');
+      btn.disabled=false; btn.textContent='📤 Send Reorder Request';
+      clearAll();
+      return;
+    }
+    var v = groups[sent];
+    var itemLines = v.items.map(it=>{
+      var l = it.product+' ('+it.name+') — Qty: '+it.qty+' '+it.unit+' | Last order: '+it.lastOrder;
+      if(it.notes) l += ' | Notes: '+it.notes;
+      return l;
+    }).join('\n');
+    fetch(APPS_SCRIPT,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({vendorEmail:v.email,vendorName:v.supplier,ccEmails:CC_EMAILS.join(','),jobName:job,employee:currentEmployee,date,items:itemLines,type:'Hydroseeding Supply Reorder'})
+    }).then(()=>{ sent++; next(); }).catch(()=>{ sent++; next(); });
+  }
+  next();
+}
+</script>
+</body>
+</html>

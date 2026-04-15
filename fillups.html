@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fill-Up Locations</title>
+<meta name="theme-color" content="#2d5a27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ── BASE ── */
+:root{
+  --green-dark:#2d5a27;--green-mid:#4a7c3f;--green-light:#7ab648;
+  --green-pale:#e8f5e2;--gray-light:#f5f5f2;--gray-mid:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;--gold:#c8961e;
+  --blue:#1a6b8a;--shadow:0 2px 12px rgba(45,90,39,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:var(--text);min-height:100vh;}
+button,input{font-family:inherit;}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--green-dark) 0%,var(--green-mid) 60%,var(--green-light) 100%);padding:2rem;}
+#login-screen h1{font-family:'Playfair Display',serif;color:#fff;font-size:2rem;margin-bottom:0.25rem;text-align:center;}
+#login-screen p{color:rgba(255,255,255,0.75);margin-bottom:2rem;text-align:center;}
+.login-box{background:white;border-radius:12px;padding:2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.25);}
+.login-box label{display:block;font-weight:600;font-size:0.85rem;color:var(--green-dark);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;}
+.login-box input{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;margin-bottom:1rem;transition:border-color 0.2s;}
+.login-box input:focus{outline:none;border-color:var(--green-mid);}
+.btn-login{width:100%;padding:0.85rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+.btn-login:hover{background:var(--green-mid);}
+.error-msg{color:var(--red);font-size:0.875rem;margin-top:0.5rem;display:none;}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.app-header{background:var(--green-dark);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.app-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.2rem;}
+.btn-portal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.35rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;}
+.btn-portal:hover{background:rgba(255,255,255,0.25);}
+
+/* ── SECTIONS ── */
+.section{display:none;padding:1.25rem;max-width:700px;margin:0 auto;}
+.section.active{display:block;}
+.region-btn{width:100%;padding:1rem 1.25rem;background:#f5f5f2;border:2px solid var(--border);border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--green-dark);cursor:pointer;text-align:left;margin-bottom:0.75rem;transition:border-color 0.2s;}
+.region-btn:hover{border-color:var(--green-light);}
+.region-btn.featured{background:var(--green-dark);color:white;border-color:var(--green-dark);}
+.region-btn.featured:hover{background:var(--green-mid);border-color:var(--green-mid);}
+.back-btn{background:none;border:none;color:var(--green-dark);cursor:pointer;font-size:0.9rem;font-weight:600;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.3rem;}
+.info-box{border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.9rem;font-weight:600;}
+.info-green{background:var(--green-pale);border:1.5px solid var(--green-light);color:var(--green-dark);}
+.info-gold{background:#fff3cd;border:1.5px solid var(--gold);color:#7a5a00;}
+.info-red{background:#fdeaea;border:2px solid var(--red);color:var(--red);}
+.info-blue{background:#e5eefb;border:1.5px solid #3d7fd4;color:#0a3260;}
+.location-card{background:white;border-radius:10px;padding:1.25rem;margin-bottom:0.75rem;border:1.5px solid var(--border);}
+.location-card h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--green-dark);margin-bottom:0.4rem;}
+.tab-row{display:flex;margin-bottom:1rem;}
+.tab-btn{flex:1;padding:0.65rem;background:#f5f5f2;color:var(--green-dark);border:2px solid var(--border);font-family:inherit;font-size:0.9rem;cursor:pointer;font-weight:600;transition:all 0.2s;}
+.tab-btn:first-child{border-radius:8px 0 0 8px;}
+.tab-btn:last-child{border-radius:0 8px 8px 0;}
+.tab-btn.active{background:var(--green-dark);color:white;border-color:var(--green-dark);}
+.pdf-frame{width:100%;height:58vh;border:1px solid var(--border);border-radius:8px;display:block;}
+.action-btn{width:100%;padding:1.1rem 1.25rem;background:var(--green-pale);border:2px solid var(--green-light);border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;color:var(--green-dark);cursor:pointer;text-align:left;font-weight:700;margin-bottom:0.75rem;transition:background 0.2s;}
+.action-btn:hover{background:#d0ecc0;}
+.action-btn-dark{background:var(--green-dark);color:white;border-color:var(--green-dark);}
+.action-btn-dark:hover{background:var(--green-mid);border-color:var(--green-mid);}
+.action-btn sub{display:block;font-family:'Source Sans 3',sans-serif;font-size:0.8rem;font-weight:400;color:#4a7c3f;margin-top:0.25rem;}
+.action-btn-dark sub{color:rgba(255,255,255,0.75);}
+.field-label{display:block;font-weight:600;font-size:0.82rem;color:var(--green-dark);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;}
+.field-input{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;transition:border-color 0.2s;margin-bottom:1rem;}
+.field-input:focus{outline:none;border-color:var(--green-mid);}
+.submit-btn{width:100%;padding:0.85rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-bottom:0.75rem;}
+.submit-btn:hover{background:var(--green-mid);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.success-box{display:none;background:var(--green-pale);border:1.5px solid var(--green-light);border-radius:8px;padding:0.75rem 1rem;font-size:0.9rem;color:var(--green-dark);font-weight:600;margin-bottom:0.75rem;}
+.err-box{display:none;color:var(--red);font-size:0.875rem;margin-bottom:0.75rem;}
+a.map-link{display:flex;align-items:center;gap:0.5rem;color:var(--blue);font-size:1rem;font-weight:600;text-decoration:none;margin-bottom:0.85rem;}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <h1>💧 Fill-Up Locations</h1>
+  <p>Hydrant maps &amp; fill stations</p>
+  <div class="login-box">
+    <label>Your Name</label>
+    <input type="text" id="login-name" placeholder="First Last" autocomplete="name">
+    <label>Portal Password</label>
+    <input type="password" id="login-pass" placeholder="Enter password" onkeypress="if(event.key==='Enter')doLogin()">
+    <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
+    <button class="btn-login" style="margin-top:0.5rem" onclick="doLogin()">Access</button>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="app-header">
+    <h2>💧 Fill-Up Locations</h2>
+    <button class="btn-portal" onclick="window.location.href='bella_terra_portal_html.html'">← Portal</button>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div class="section active" id="section-menu">
+    <p style="font-size:0.9rem;color:var(--gray-mid);margin-bottom:1.25rem;margin-top:0.5rem;">Select a fill location or hydrant map.</p>
+    <button class="region-btn" onclick="show('cc')">🗺 Clark County</button>
+    <button class="region-btn" onclick="show('corvallis')">🗺 Corvallis</button>
+    <button class="region-btn" onclick="show('clackamas')">🗺 Clackamas Water</button>
+    <button class="region-btn" onclick="show('hillsboro')">🗺 Hillsboro</button>
+    <button class="region-btn featured" onclick="show('kelso')">📍 Kelso</button>
+  </div>
+
+  <!-- CLARK COUNTY -->
+  <div class="section" id="section-cc">
+    <button class="back-btn" onclick="show('menu')">← Fill-Up Locations</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1rem;">🗺 Clark County Hydrants</h3>
+    <div class="info-box info-green">📋 Log all fill-ups. Submit photos to office every 6 months.</div>
+    <object data="clark_county_hydrants.pdf" type="application/pdf" class="pdf-frame">
+      <div style="width:100%;height:58vh;border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f8f9f5;text-align:center;padding:2rem;">
+        <div style="font-size:2.5rem;margin-bottom:.75rem;">🗺️</div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:.5rem;">Clark County Hydrant Map</div>
+        <div style="font-size:.85rem;color:var(--gray-mid);margin-bottom:1.25rem;">Upload <strong>clark_county_hydrants.pdf</strong> to GitHub to display the map here.</div>
+        <div style="font-size:.82rem;color:var(--green-dark);background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:.65rem 1rem;">
+          📞 For hydrant locations contact the office: <strong>(360) 606-5616</strong>
+        </div>
+      </div>
+    </object>
+  </div>
+
+  <!-- CORVALLIS -->
+  <div class="section" id="section-corvallis">
+    <button class="back-btn" onclick="show('menu')">← Fill-Up Locations</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1rem;">🗺 Corvallis Fill Locations</h3>
+    <div class="info-box info-gold">🔑 SCADA key required. Access is tracked electronically.</div>
+    <div class="location-card">
+      <h4>Location 1</h4>
+      <div style="font-size:0.95rem;color:#555;">📍 Address: <em>TBD</em></div>
+      <div style="font-size:0.85rem;color:var(--gray-mid);margin-top:0.25rem;">🕐 Hours: TBD</div>
+    </div>
+    <div class="location-card">
+      <h4>Location 2</h4>
+      <div style="font-size:0.95rem;color:#555;">📍 Address: <em>TBD</em></div>
+      <div style="font-size:0.85rem;color:var(--gray-mid);margin-top:0.25rem;">🕐 Hours: TBD</div>
+    </div>
+  </div>
+
+  <!-- CLACKAMAS -->
+  <div class="section" id="section-clackamas">
+    <button class="back-btn" onclick="show('menu')">← Fill-Up Locations</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1rem;">🗺 Clackamas Water Hydrants</h3>
+    <div class="info-box info-red">⚠️ CRW hydrant verification is required prior to use. Contact CRW before filling.</div>
+    <div class="info-box info-green">📋 Log all fill-ups. Submit photos to office monthly on the 1st of each month.</div>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-north" onclick="clackamasTab('north')">North Service Area</button>
+      <button class="tab-btn" id="tab-south" onclick="clackamasTab('south')">South Service Area</button>
+    </div>
+    <div id="panel-north">
+      <iframe src="clackamas_hydrants_north.pdf" class="pdf-frame"></iframe>
+    </div>
+    <div id="panel-south" style="display:none;">
+      <iframe src="clackamas_hydrants_south.pdf" class="pdf-frame"></iframe>
+    </div>
+  </div>
+
+  <!-- HILLSBORO -->
+  <div class="section" id="section-hillsboro">
+    <button class="back-btn" onclick="show('menu')">← Fill-Up Locations</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1rem;">🗺 Hillsboro Fill Station</h3>
+    <div class="location-card">
+      <h4>Fill Station</h4>
+      <a href="https://www.google.com/maps?q=390+W+Main+St,+Hillsboro,+OR+97123" target="_blank" class="map-link">
+        📍 390 W Main St, Hillsboro, OR 97123 ↗
+      </a>
+      <div class="info-box info-red" style="margin-bottom:0.65rem;">⚠️ Payment required at time of each refill</div>
+      <div class="info-box info-blue" style="margin-bottom:0;">🕐 Hours: 8:00 AM – 5:00 PM</div>
+    </div>
+  </div>
+
+  <!-- KELSO -->
+  <div class="section" id="section-kelso">
+    <button class="back-btn" onclick="show('menu')">← Fill-Up Locations</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1rem;">📍 Kelso Fill Station</h3>
+    <a href="https://www.google.com/maps?q=46.119167,-122.896306" target="_blank" style="display:block;background:var(--green-pale);border:2px solid var(--green-light);border-radius:10px;padding:1.1rem 1.25rem;text-decoration:none;color:var(--green-dark);font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:0.75rem;">
+      📍 Location — Open in Google Maps
+      <div style="font-family:'Source Sans 3',sans-serif;font-size:0.8rem;color:#4a7c3f;font-weight:400;margin-top:0.25rem;">Parrott Way, Kelso WA · near Blue Heron Aviation</div>
+    </a>
+    <button class="action-btn" id="kelso-notify-btn" onclick="kelsoNotify(this)">
+      📧 Notify Kelso — We're Filling Up
+      <sub>Sends notification email to Kelso Water</sub>
+    </button>
+    <div class="success-box" id="kelso-notify-ok">✅ Notification sent to Kelso.</div>
+    <button class="action-btn action-btn-dark" onclick="show('kelso-total')">
+      📊 Submit Daily Total to Kelso
+      <sub>Submit gallons + send text reminder</sub>
+    </button>
+  </div>
+
+  <!-- KELSO DAILY TOTAL -->
+  <div class="section" id="section-kelso-total">
+    <button class="back-btn" onclick="show('kelso')">← Kelso</button>
+    <h3 style="font-family:'Playfair Display',serif;color:var(--green-dark);margin-bottom:1.25rem;">📊 Submit Daily Total — Kelso</h3>
+    <label class="field-label">Gallons Filled Today</label>
+    <input type="number" id="kelso-gallons" min="0" placeholder="e.g. 2500" class="field-input">
+    <label class="field-label">Date</label>
+    <input type="date" id="kelso-date" class="field-input">
+    <label class="field-label">Crew Lead</label>
+    <input type="text" id="kelso-lead" class="field-input" style="background:#f5f5f5;color:#888;" readonly>
+    <div class="err-box" id="kelso-total-err"></div>
+    <button class="submit-btn" id="kelso-total-btn" onclick="submitKelsoTotal(this)">📤 Submit Daily Total</button>
+    <div class="success-box" id="kelso-total-ok"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENTIALS — update here only, nowhere else
+// ═══════════════════════════════════════════════
+var PORTAL_PW   = 'bellaterra';
+var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
+var CS_USER     = 'Bids@1bellaterra.com';
+var CS_KEY      = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
+var CS_FROM     = '+13602251125';
+
+var CREW_PHONES = {
+  'Brydon Bellika':      '+13605609860',
+  'Rena Bellika':        '+13606065616',
+  'Garrett Booker':      '+13605602290',
+  'Elynn Alholinna':     '+19063701837',
+  'Juan Gonzalez':       '+13602067159',
+  'Emily Greer':         '+13609072420',
+  'Heather Hooper':      '+19712607063',
+  'Joe Jumalon':         '+15038576952',
+  'Ethan Kludt-Painter': '+19075184130',
+  'Evaristo Lopez':      '+13607236463',
+  'Adriane North':       '+13609214013',
+  'Liz Prather':         '+13609802969',
+  'Randy Schmeusser':    '+13606013173',
+  'Robert Serna':        '+19712372452',
+  'Kevin Willbur':       '+13607986759'
+};
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+var currentEmployee = '';
+
+function doLogin(){
+  var name = document.getElementById('login-name').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var err  = document.getElementById('login-error');
+  if(pass !== PORTAL_PW){ err.style.display='block'; return; }
+  err.style.display='none';
+  currentEmployee = name;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('kelso-lead').value = currentEmployee;
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('kelso-date').value = today;
+}
+document.getElementById('login-pass').addEventListener('keypress', e=>{ if(e.key==='Enter') doLogin(); });
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function show(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// CLACKAMAS TABS
+// ═══════════════════════════════════════════════
+function clackamasTab(tab){
+  document.getElementById('panel-north').style.display = tab==='north' ? 'block' : 'none';
+  document.getElementById('panel-south').style.display = tab==='south' ? 'block' : 'none';
+  document.getElementById('tab-north').classList.toggle('active', tab==='north');
+  document.getElementById('tab-south').classList.toggle('active', tab==='south');
+}
+
+// ═══════════════════════════════════════════════
+// KELSO — NOTIFY
+// ═══════════════════════════════════════════════
+function kelsoNotify(btn){
+  btn.disabled=true; btn.style.opacity='0.6';
+  var payload={
+    type:'Kelso_Fill_Notification',
+    to:'egeiszler@kelso.gov,dmackin@kelso.gov',
+    cc:'Rena@1BellaTerra.com,Office@1BellaTerra.com',
+    from:'Team@1BellaTerra.com',
+    subject:'Bella Terra LLC \u2014 Hydrant Fill Notification',
+    body:'Bella Terra LLC is notifying you that we will be filling up at the designated spot shortly.',
+    employee:currentEmployee
+  };
+  fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
+    .then(()=>kelsoNotifyDone(btn)).catch(()=>kelsoNotifyDone(btn));
+}
+function kelsoNotifyDone(btn){
+  btn.disabled=false; btn.style.opacity='1';
+  var ok=document.getElementById('kelso-notify-ok');
+  ok.style.display='block';
+  setTimeout(()=>{ ok.style.display='none'; },5000);
+}
+
+// ═══════════════════════════════════════════════
+// KELSO — DAILY TOTAL
+// ═══════════════════════════════════════════════
+function submitKelsoTotal(btn){
+  var gallons = document.getElementById('kelso-gallons').value.trim();
+  var date    = document.getElementById('kelso-date').value;
+  var lead    = document.getElementById('kelso-lead').value||currentEmployee||'Unknown';
+  var errEl   = document.getElementById('kelso-total-err');
+  errEl.style.display='none';
+  if(!gallons||isNaN(gallons)||Number(gallons)<0){
+    errEl.textContent='Please enter a valid gallons amount.';
+    errEl.style.display='block'; return;
+  }
+  btn.disabled=true; btn.textContent='⏳ Submitting…';
+  var emailBody='Bella Terra LLC daily fill total for '+date+': '+gallons+' gallons. Crew Lead: '+lead+'.';
+  var payload={
+    type:'Kelso_Daily_Fill_Total',
+    to:'egeiszler@kelso.gov,dmackin@kelso.gov',
+    cc:'Rena@1BellaTerra.com,Office@1BellaTerra.com',
+    subject:'Bella Terra LLC \u2014 Daily Fill Total',
+    body:emailBody,
+    date:date,gallons:gallons,crew_lead:lead,employee:currentEmployee
+  };
+  fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
+    .then(()=>kelsoTotalSendText(btn,lead)).catch(()=>kelsoTotalSendText(btn,lead));
+}
+function kelsoTotalSendText(btn,lead){
+  var phone=CREW_PHONES[lead]||null;
+  if(!phone){ kelsoTotalDone(btn,'nophone'); return; }
+  var now=new Date();
+  var sendAt=new Date(now.getFullYear(),now.getMonth(),now.getDate(),16,30,0);
+  if(now>=sendAt){
+    kelsoSendTextNow(phone); kelsoTotalDone(btn,'sent');
+  } else {
+    localStorage.setItem('kelso_pending_text',JSON.stringify({phone:phone,sendAfter:sendAt.getTime()}));
+    var delay=sendAt.getTime()-now.getTime();
+    setTimeout(()=>{ kelsoSendTextNow(phone); localStorage.removeItem('kelso_pending_text'); },delay);
+    kelsoTotalDone(btn,'scheduled');
+  }
+}
+function kelsoSendTextNow(phone){
+  var auth=btoa(CS_USER+':'+CS_KEY);
+  var msg="Reminder: Don't forget to submit your Kelso daily fill total in the portal.";
+  fetch('https://rest.clicksend.com/v3/sms/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:phone,body:msg}]})}).catch(()=>{});
+}
+function kelsoTotalDone(btn,status){
+  btn.disabled=false; btn.textContent='📤 Submit Daily Total';
+  var ok=document.getElementById('kelso-total-ok');
+  if(status==='sent')       ok.textContent='✅ Daily total submitted. Text reminder sent.';
+  else if(status==='scheduled') ok.textContent='✅ Daily total submitted. Text reminder scheduled for 4:30 PM.';
+  else                      ok.textContent='✅ Daily total submitted. Phone number not found — remind crew lead manually.';
+  ok.style.display='block';
+}
+
+// Check for pending Kelso text on load
+(function(){
+  var raw=localStorage.getItem('kelso_pending_text');
+  if(!raw) return;
+  try{
+    var data=JSON.parse(raw);
+    if(Date.now()>=data.sendAfter){ localStorage.removeItem('kelso_pending_text'); kelsoSendTextNow(data.phone); }
+    else{ var delay=data.sendAfter-Date.now(); setTimeout(()=>{ kelsoSendTextNow(data.phone); localStorage.removeItem('kelso_pending_text'); },delay); }
+  }catch(e){ localStorage.removeItem('kelso_pending_text'); }
+})();
+</script>
+</body>
+</html>
