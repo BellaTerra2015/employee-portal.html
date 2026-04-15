@@ -398,10 +398,33 @@ function addPhotos(areaId, input) {
   if (!area) return;
   Array.from(input.files).forEach(file => {
     const r = new FileReader();
-    r.onload = e => { area.photos.push(e.target.result); save(); renderStagingAreas(); setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b)b.classList.add('open'); },10); };
+    r.onload = async e => {
+      const base64 = e.target.result;
+      // Show locally immediately
+      area.photos.push(base64);
+      save(); renderStagingAreas();
+      setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b)b.classList.add('open'); },10);
+      // Upload to Google Drive
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'uploadPhoto',
+            image: base64,
+            filename: area.name.replace(/\s+/g,'-') + '_' + Date.now() + '.jpg',
+            areaName: area.name,
+            timestamp: new Date().toLocaleString()
+          })
+        });
+        const data = await res.json();
+        if (data.success) showToast('📷 Photo saved to Drive');
+        else showToast('⚠ Local only — Drive upload failed');
+      } catch(e) {
+        showToast('⚠ Local only — no connection');
+      }
+    };
     r.readAsDataURL(file);
   });
-  showToast('Photos added');
 }
 
 /* ── REPORT ── */
