@@ -396,8 +396,9 @@ function removeArea(id) {
 function addPhotos(areaId, input) {
   const area = state.stagingAreas.find(a=>a.id===areaId);
   if (!area) return;
-  const files = Array.from(input.files);
+ const files = Array.from(input.files);
   if (!files.length) return;
+  input.value = '';
   files.forEach(file => {
     const r = new FileReader();
     r.onload = async e => {
@@ -435,8 +436,7 @@ if (grid) {
     };
     r.readAsDataURL(file);
   });
-  input.value = '';
-}
+ }
 
 /* ── REPORT ── */
 function getTotals() {
