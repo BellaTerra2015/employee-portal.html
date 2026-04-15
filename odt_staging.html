@@ -405,7 +405,15 @@ function addPhotos(areaId, input) {
       // Show locally immediately
       if (!area.photos) area.photos = [];
       area.photos.push(base64);
-      save(); renderStagingAreas();
+      save();
+// Update photo grid directly without full re-render
+const grid = document.getElementById('photos-'+areaId);
+if (grid) {
+  const img = document.createElement('img');
+  img.className = 'photo-thumb';
+  img.src = base64;
+  grid.insertBefore(img, grid.querySelector('.photo-add-btn'));
+}
       setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b)b.classList.add('open'); },10);
       // Upload to Google Drive
       try {
