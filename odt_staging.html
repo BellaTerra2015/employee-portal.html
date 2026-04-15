@@ -206,14 +206,22 @@ window.onload = function() {
 };
 
 function save() {
+  // Save state WITHOUT photos to avoid size limits
+  var stateToSave = {
+    loaded: state.loaded,
+    stagingAreas: state.stagingAreas.map(function(a) {
+      return {id:a.id, name:a.name, note:a.note, counts:a.counts, photos:[]};
+    }),
+    countyCount: state.countyCount
+  };
   localStorage.setItem('odt_state', JSON.stringify(state));
-  syncToSheet();
+  syncToSheet(stateToSave);
 }
 
-function syncToSheet() {
+function syncToSheet(stateToSave) {
   var badge = document.getElementById('syncBadge');
   badge.textContent = '● Syncing…';
-  fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({action:'saveState',state:state})})
+  fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify({action:'saveState',state:stateToSave||state})})
     .then(function(){ badge.textContent = '● Synced'; })
     .catch(function(){ badge.textContent = '● Local only'; });
 }
