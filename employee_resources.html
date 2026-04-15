@@ -145,6 +145,12 @@ button,input,select,textarea{font-family:inherit;}
 .hb-submit-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shd);margin-top:1rem;display:none;}
 .hb-submit-card h4{font-family:'Playfair Display',serif;color:var(--gd);margin-bottom:0.5rem;}
 .hb-submit-card .sig-desc{margin-bottom:1rem;}
+.doc-open-btn{display:inline-flex;align-items:center;gap:0.5rem;margin-top:0.5rem;padding:0.7rem 1.25rem;background:var(--gd);color:white;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.9rem;transition:background 0.2s;}
+.doc-open-btn:hover{background:var(--gm);}
+.doc-instruction{font-size:0.85rem;color:#555;margin-bottom:0.75rem;line-height:1.5;}
+.hb-master-wrap{background:white;border-radius:12px;padding:1.25rem 1.5rem;box-shadow:var(--shd);margin-bottom:1rem;border-left:4px solid var(--gd);}
+.hb-master-btn{font-size:1rem;padding:0.85rem 1.5rem;width:100%;justify-content:center;margin-top:0.75rem;}
+.ch-row{display:flex;align-items:center;gap:0.85rem;padding:0.85rem 1.1rem;}
 
 @media(max-width:540px){
   .tasks-grid{grid-template-columns:1fr;}
@@ -356,7 +362,7 @@ button,input,select,textarea{font-family:inherit;}
 // CREDENTIALS — update here only, nowhere else
 // ═══════════════════════════════════════════════
 var PORTAL_PW   = 'bellaterra';
-var ER_SCRIPT   = 'https://script.google.com/macros/s/AKfycbzbW5McYt3rJySawuk6nV4Mi22lu1psbz1EfDpd_po9gymTVlhm2o93dnNtGbSJquO1/exec';   // ← paste your new Apps Script URL here
+var ER_SCRIPT   = 'https://script.google.com/macros/s/AKfycbzbW5McYt3rJySawuk6nV4Mi22lu1psbz1EfDpd_po9gymTVlhm2o93dnNtGbSJquO1/exec';
 var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
 var CC_EMAILS   = ['Rena@1BellaTerra.com','payroll@1BellaTerra.com','Office@1BellaTerra.com'];
 
@@ -459,9 +465,21 @@ function renderHandbook(chapters){
     wrap.innerHTML='<div class="loading-msg">No handbook chapters found in the Handbook sheet.</div>';
     return;
   }
+  // Find the master handbook URL from whichever chapter row has one
+  var handbookUrl='';
+  chapters.forEach(function(c){ if(!handbookUrl && c.content && c.content.startsWith('http')) handbookUrl=c.content; });
+
   hbRequired=chapters.filter(function(c){ return c.requiresInitials; }).map(function(c){ return c.order; });
   document.getElementById('hb-total').textContent=hbRequired.length;
-  wrap.innerHTML=chapters.map(buildChapter).join('');
+
+  var masterBlock='<div class="hb-master-wrap">'+
+    '<p class="doc-instruction">Open the handbook and read all sections. When you are done, come back here and initial each required chapter below.</p>'+
+    (handbookUrl
+      ? '<a class="doc-open-btn hb-master-btn" href="'+handbookUrl+'" target="_blank">📄 Open Employee Handbook</a>'
+      : '<p style="color:var(--gm2);font-size:0.85rem;font-style:italic;">Handbook link not added to sheet yet.</p>')+
+    '</div>';
+
+  wrap.innerHTML=masterBlock+chapters.map(buildChapter).join('');
   updateHbProgress();
 }
 
@@ -470,14 +488,12 @@ function buildChapter(ch){
   var typeLabel=needsInit?'✍ Initial required after reading':'📘 Read — No initials required';
   var typeCls  =needsInit?'needs-init':'';
   return '<div class="hb-chapter" id="hb-ch-'+ch.order+'">'+
-    '<div class="ch-header" onclick="toggleCh(this)">'+
+    '<div class="ch-row">'+
     '<div class="ch-num" id="ch-num-'+ch.order+'">'+ch.order+'</div>'+
     '<div class="ch-title-wrap">'+
     '<div class="ch-title">'+esc(ch.title)+'</div>'+
     '<div class="ch-type '+typeCls+'" id="ch-type-'+ch.order+'">'+typeLabel+'</div>'+
-    '</div><span class="ch-arrow">▼</span></div>'+
-    '<div class="ch-body">'+
-    '<div class="ch-content">'+parseContent(ch.content||'')+'</div>'+
+    '</div></div>'+
     (needsInit?
       '<div class="init-block">'+
       '<p>Initial to confirm you have read and understood this section.</p>'+
@@ -486,28 +502,7 @@ function buildChapter(ch){
       '<button class="btn-initial" onclick="saveInitial('+ch.order+')">Confirm Initials</button>'+
       '<div class="init-done" id="done-'+ch.order+'">✅ Initialed</div>'+
       '</div></div>':'')+
-    '</div></div>';
-}
-
-function parseContent(text){
-  // Simple format: ## Heading, - bullet, blank line = new paragraph
-  var lines=text.split('\n'), html='', inList=false;
-  lines.forEach(function(line){
-    line=line.trim();
-    if(!line){ if(inList){html+='</ul>';inList=false;} return; }
-    if(line.startsWith('## ')){
-      if(inList){html+='</ul>';inList=false;}
-      html+='<h4>'+esc(line.slice(3))+'</h4>';
-    } else if(line.startsWith('- ')||line.startsWith('• ')){
-      if(!inList){html+='<ul>';inList=true;}
-      html+='<li>'+esc(line.slice(2))+'</li>';
-    } else {
-      if(inList){html+='</ul>';inList=false;}
-      html+='<p>'+esc(line)+'</p>';
-    }
-  });
-  if(inList) html+='</ul>';
-  return html;
+    '</div>';
 }
 
 function toggleCh(header){
