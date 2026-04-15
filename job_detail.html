@@ -388,14 +388,10 @@ function buildBarkPanel() {
 // ── PLANT SHIP / STAGE ────────────────────────────────────────
 function buildShipStagePanel() {
   var id = _project ? encodeURIComponent(_project.podioItemId) : '';
-  return '<div class="card" style="padding:0;overflow:hidden;">' +
-    '<div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">' +
-    '<h4 style="margin:0;">🌿 Plant Ship / Stage</h4>' +
-    '<span style="font-size:.78rem;color:var(--gray-mid);">Pull tickets · Staging counts · Inspection report</span>' +
-    '</div>' +
-    '<iframe src="odt_staging.html?projectId=' + id + '" ' +
-    'style="width:100%;height:calc(100vh - 180px);border:none;display:block;"></iframe>' +
-    '</div>';
+  var url = 'odt_staging.html?projectId=' + id;
+  window.location.href = url;
+  return '<div class="card" style="padding:1rem 1.25rem;text-align:center;color:#888;">Opening Plant Staging…</div>';
+}
 }
   // ── DELIVERY LOG ──────────────────────────────────────────────
 function buildDeliveryPanel() {
