@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Job Report — Bella Terra</title>
+<meta name="theme-color" content="#2d5a27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gd:#2d5a27;--gm:#4a7c3f;--gl:#7ab648;
+  --pale:#e8f5e2;--bg:#f5f5f2;--gray:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;
+  --gold:#8B6914;--gold-pale:#fffbea;--gold-border:#e8d48a;
+  --shd:0 2px 12px rgba(45,90,39,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+button,input,select,textarea{font-family:inherit;}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--gd) 0%,var(--gm) 60%,var(--gl) 100%);padding:2rem;}
+#login-screen h1{font-family:'Playfair Display',serif;color:#fff;font-size:2rem;margin-bottom:0.2rem;text-align:center;}
+#login-screen p{color:rgba(255,255,255,0.75);margin-bottom:2rem;text-align:center;}
+.login-box{background:white;border-radius:12px;padding:2rem;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,0.25);}
+.login-box label{display:block;font-weight:700;font-size:0.8rem;color:var(--gd);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.05em;}
+.login-box input{width:100%;padding:0.7rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;margin-bottom:1rem;}
+.login-box input:focus{outline:none;border-color:var(--gm);}
+.btn-login{width:100%;padding:0.85rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.25rem;}
+.btn-login:hover{background:var(--gm);}
+.login-err{color:var(--red);font-size:0.85rem;margin-top:0.5rem;display:none;}
+
+/* APP SHELL */
+#app{display:none;flex-direction:column;min-height:100vh;}
+.app-header{background:var(--gd);padding:0.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.app-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.1rem;line-height:1.2;}
+.app-header .meta{font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:2px;}
+.btn-portal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.35rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.82rem;flex-shrink:0;}
+.btn-portal:hover{background:rgba(255,255,255,0.25);}
+
+/* STATUS BADGE */
+.status-badge{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:0.15rem 0.5rem;border-radius:4px;margin-top:3px;display:inline-block;}
+.badge-active{background:var(--gl);color:white;}
+.badge-complete{background:#1a6b8a;color:white;}
+.badge-archived{background:var(--gray);color:white;}
+
+/* TAB STRIP */
+.tab-strip{display:flex;overflow-x:auto;background:rgba(0,0,0,0.25);scrollbar-width:none;}
+.tab-strip::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:0.65rem 1rem;border:none;background:transparent;color:rgba(255,255,255,0.65);cursor:pointer;font-size:0.82rem;font-weight:600;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:color 0.15s;}
+.tab-btn.active{color:white;border-bottom-color:var(--gl);}
+.tab-btn:hover:not(.active){color:rgba(255,255,255,0.9);}
+
+/* CONTENT AREA */
+.tab-panel{padding:1.25rem;max-width:740px;margin:0 auto;padding-bottom:3rem;}
+
+/* CARDS & FORMS */
+.card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shd);margin-bottom:1rem;}
+.card h4{font-family:'Playfair Display',serif;color:var(--gd);font-size:1.05rem;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:2px solid var(--pale);}
+.f{margin-bottom:0.85rem;}
+.f label{display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gd);margin-bottom:0.35rem;}
+.f input,.f select,.f textarea{width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.93rem;font-family:inherit;transition:border-color 0.2s;}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gm);}
+.f textarea{resize:vertical;min-height:70px;}
+.f input[readonly]{background:#f5f5f5;color:var(--gray);}
+.f .hint{font-size:0.75rem;color:var(--gray);margin-top:0.3rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.65rem;}
+.gold-field{border-color:var(--gold-border)!important;background:var(--gold-pale)!important;}
+.gold-label{color:var(--gold)!important;}
+
+/* SUBMIT BUTTON */
+.submit-btn{width:100%;padding:0.8rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:0.95rem;font-weight:700;cursor:pointer;margin-top:0.5rem;transition:background 0.2s;}
+.submit-btn:hover:not(:disabled){background:var(--gm);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.ok-box{display:none;background:var(--pale);border:1px solid var(--gl);border-radius:8px;padding:0.75rem 1rem;margin-top:0.75rem;font-weight:600;color:var(--gd);font-size:0.9rem;}
+.err-box{display:none;background:#fdeaea;border:1px solid var(--red);border-radius:8px;padding:0.75rem 1rem;margin-top:0.75rem;font-weight:600;color:var(--red);font-size:0.9rem;}
+
+/* SECTION TAGS */
+.tag-row{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;}
+.tag-row select{flex:1;padding:0.55rem 0.8rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.9rem;font-family:inherit;}
+.tag-add-btn{padding:0.55rem 1rem;background:var(--gd);color:white;border:none;border-radius:7px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:0.35rem;min-height:8px;margin-top:0.35rem;}
+.sec-tag{background:var(--pale);color:var(--gd);border:1px solid var(--gl);border-radius:5px;padding:0.2rem 0.55rem;font-size:0.78rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;}
+.sec-tag button{background:none;border:none;color:var(--gm);cursor:pointer;font-size:0.75rem;line-height:1;padding:0;}
+
+/* DYNAMIC ROWS */
+.dyn-row{background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:1rem;margin-bottom:0.65rem;position:relative;}
+.dyn-row .rm-row{position:absolute;top:0.5rem;right:0.65rem;background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;line-height:1;}
+.add-row-btn{width:100%;padding:0.65rem;background:white;border:2px dashed var(--border);border-radius:8px;color:var(--gm);font-weight:700;cursor:pointer;font-size:0.9rem;margin-bottom:0.85rem;}
+.add-row-btn:hover{border-color:var(--gl);background:var(--pale);}
+
+/* PHOTO UPLOAD */
+.photo-section{border:1.5px solid var(--border);border-radius:9px;padding:1rem;background:var(--bg);}
+.photo-instructions{background:#fff3cd;border:1px solid #ffc107;border-radius:7px;padding:0.7rem 0.85rem;font-size:0.82rem;color:#7d5a00;margin-bottom:0.75rem;line-height:1.5;}
+.photo-drop{border:2px dashed var(--border);border-radius:8px;padding:1.1rem;text-align:center;cursor:pointer;font-size:0.88rem;color:var(--gray);background:white;transition:all 0.15s;}
+.photo-drop:hover{border-color:var(--gl);background:var(--pale);color:var(--gd);}
+.photo-count{font-size:0.75rem;color:var(--gray);margin-top:0.35rem;text-align:center;}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.75rem;}
+.ph-thumb{position:relative;aspect-ratio:1;border-radius:7px;overflow:hidden;background:#eee;}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;}
+.ph-loading{display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;}
+.ph-rm{position:absolute;top:3px;right:3px;background:rgba(192,57,43,0.85);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.ph-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:white;font-size:0.58rem;padding:2px 4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* PLANS TAB */
+.plan-slot{border:1.5px solid var(--border);border-radius:9px;padding:1rem 1.1rem;margin-bottom:0.65rem;background:white;}
+.plan-slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.35rem;}
+.plan-slot-label{font-weight:700;font-size:0.9rem;color:var(--gd);}
+.plan-updated{font-size:0.72rem;color:var(--gray);}
+.plan-view-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;background:var(--gd);color:white;border-radius:7px;text-decoration:none;font-size:0.85rem;font-weight:700;}
+.plan-view-btn:hover{background:var(--gm);}
+.plan-no-link{font-size:0.85rem;color:var(--gray);font-style:italic;}
+.plan-edit-area{margin-top:0.65rem;display:none;}
+.plan-link-input{width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--gold-border);border-radius:7px;font-size:0.85rem;font-family:inherit;background:var(--gold-pale);margin-bottom:0.5rem;}
+.plan-save-btn{padding:0.5rem 1.1rem;background:var(--gm);color:white;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-size:0.85rem;}
+.edit-btn{padding:0.4rem 0.85rem;background:var(--pale);color:var(--gd);border:2px solid var(--gl);border-radius:7px;cursor:pointer;font-size:0.82rem;font-weight:700;}
+.edit-notice{background:var(--gold-pale);border:1px solid var(--gold-border);border-radius:7px;padding:0.6rem 0.85rem;font-size:0.82rem;color:var(--gold);margin-bottom:0.85rem;}
+.email-gate{background:var(--pale);border:2px solid var(--gl);border-radius:9px;padding:1rem;margin-bottom:1rem;}
+.email-gate label{font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--gd);display:block;margin-bottom:0.35rem;letter-spacing:0.05em;}
+.email-gate input{width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.93rem;font-family:inherit;margin-bottom:0.5rem;}
+.email-gate-btn{padding:0.55rem 1.25rem;background:var(--gd);color:white;border:none;border-radius:7px;font-weight:700;cursor:pointer;}
+
+/* ARCHIVE VIEW */
+.archive-banner{background:#fff3cd;border:2px solid #ffc107;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.25rem;}
+.archive-banner h3{font-family:'Playfair Display',serif;color:#7d5a00;font-size:1.3rem;margin-bottom:0.5rem;}
+.archive-banner p{font-size:0.9rem;color:#7d5a00;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;}
+.summary-stat{background:white;border-radius:10px;padding:1rem 1.25rem;box-shadow:var(--shd);text-align:center;}
+.summary-stat .val{font-size:1.8rem;font-weight:700;color:var(--gd);font-family:'Playfair Display',serif;}
+.summary-stat .lbl{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray);margin-top:0.25rem;}
+.species-list{background:white;border-radius:10px;padding:1.1rem 1.25rem;box-shadow:var(--shd);margin-bottom:1rem;}
+.species-list h5{font-weight:700;color:var(--gd);margin-bottom:0.65rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;}
+.species-row{display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid var(--pale);font-size:0.9rem;}
+.species-row:last-child{border:none;}
+.btn-wake{width:100%;padding:0.9rem;background:var(--gm);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:0.5rem;}
+.btn-wake:hover{background:var(--gd);}
+.btn-archive{width:100%;padding:0.75rem;background:white;color:var(--gray);border:2px solid var(--border);border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.5rem;}
+.btn-archive:hover{border-color:var(--gray);}
+
+/* LOADING */
+.loading-wrap{padding:3rem 1.25rem;text-align:center;color:var(--gd);}
+.loading-wrap .spin{font-size:2.5rem;display:block;margin-bottom:0.75rem;animation:spin 1.2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* COMPLETE TAB */
+.complete-warning{background:#fdeaea;border:1.5px solid var(--red);border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;color:var(--red);margin-bottom:1rem;line-height:1.5;}
+.complete-info{background:var(--pale);border:1.5px solid var(--gl);border-radius:8px;padding:0.85rem 1rem;font-size:0.9rem;color:var(--gd);margin-bottom:1rem;}
+
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr;}.summary-grid{grid-template-columns:1fr;}.photo-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <h1 id="login-title">📋 Job Report</h1>
+  <p id="login-subtitle">Bella Terra LLC</p>
+  <div class="login-box">
+    <label>Your Name</label>
+    <input type="text" id="login-name" placeholder="First Last" autocomplete="name">
+    <label>Portal Password</label>
+    <input type="password" id="login-pass" placeholder="Enter password" onkeypress="if(event.key==='Enter')doLogin()">
+    <p class="login-err" id="login-err"></p>
+    <button class="btn-login" onclick="doLogin()">Access</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <h2 id="job-name-display">Loading…</h2>
+        <span class="status-badge" id="status-badge"></span>
+      </div>
+      <div class="meta" id="job-meta"></div>
+    </div>
+    <button class="btn-portal" onclick="window.location.href='bella_terra_portal_html.html'">← Portal</button>
+  </div>
+  <div id="tab-header" style="background:var(--gd);position:sticky;top:60px;z-index:19;">
+    <div class="tab-strip" id="tab-strip"></div>
+  </div>
+  <div class="tab-panel" id="tab-panel">
+    <div class="loading-wrap"><span class="spin">⏳</span>Loading job…</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENTIALS — update here only
+// ═══════════════════════════════════════════════
+var PORTAL_PW    = 'bellaterra';
+var APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
+var PHOTO_SCRIPT = 'https://script.google.com/macros/s/AKfycbzsm6p9b-UeNkxE-1DAo16ayZ2uQ-dCdDuwjieIxt-Js8og6C10g3HBBcAUf_s6mJng/exec';
+var MAX_PHOTOS   = 15;
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+var JOB          = null;
+var JOB_ID       = new URLSearchParams(window.location.search).get('job') || '';
+var currentEmployee = '';
+var currentTab   = 'plans';
+var photoState   = {};   // { tabId: [{name,mimeType,dataUrl}] }
+var secTagState  = {};   // { tabId: [tagStr] }
+var rowCounts    = {};   // { 'plant':0,'ship':0,'hydro':0 }
+var plansEditMode = false;
+var plansEmail   = '';
+
+// ═══════════════════════════════════════════════
+// TAB DEFINITIONS
+// ═══════════════════════════════════════════════
+var TAB_ORDER_STD  = ['plans','staging','soils','compost','irrigation','shipment','planting','bark','hydroseeding','stormwater','complete'];
+var TAB_ORDER_WSDOT= ['plans','staging','soils','bark','shipment','planting','hydroseeding','stormwater','complete'];
+
+var TAB_META = {
+  plans:        {label:'📋 Plans'},
+  staging:      {label:'📦 Plant Staging'},
+  soils:        {label:'🏔️ Soils'},
+  compost:      {label:'🌿 Compost'},
+  irrigation:   {label:'💦 Irrigation'},
+  shipment:     {label:'🚚 Shipment'},
+  planting:     {label:'🌱 Planting'},
+  bark:         {label:'🌬️ CAD Bark'},
+  hydroseeding: {label:'💧 Hydroseeding'},
+  stormwater:   {label:'🌊 Stormwater'},
+  complete:     {label:'✅ Complete'}
+};
+
+var PLAN_SLOTS = [
+  {key:'planting',     label:'Planting Plan',      phases:['planting']},
+  {key:'bark',         label:'Bark / Compost Plan', phases:['bark','compost']},
+  {key:'hydroseeding', label:'Hydroseeding Plan',   phases:['hydroseeding']},
+  {key:'irrigation',   label:'Irrigation Plan',     phases:['irrigation']},
+  {key:'stormwater',   label:'Stormwater Plan',     phases:['stormwater']},
+  {key:'asbuilt',      label:'As-Built',            phases:[]},
+  {key:'changeorder',  label:'Change Order',         phases:[]}
+];
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+function doLogin(){
+  var name = document.getElementById('login-name').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var err  = document.getElementById('login-err');
+  if(!name){err.textContent='Please enter your name.';err.style.display='block';return;}
+  if(pass !== PORTAL_PW){err.textContent='Incorrect password.';err.style.display='block';return;}
+  currentEmployee = name;
+  err.style.display='none';
+  document.getElementById('login-screen').style.display='none';
+  if(!JOB_ID){
+    document.getElementById('app').style.display='flex';
+    document.getElementById('tab-panel').innerHTML='<div class="card"><h4>No Job Specified</h4><p>Open this page with a link like: <code>job_page.html?job=olympic_discovery_trail</code></p></div>';
+    return;
+  }
+  document.getElementById('app').style.display='flex';
+  loadJob();
+}
+document.getElementById('login-pass').addEventListener('keypress',function(e){if(e.key==='Enter')doLogin();});
+
+// ═══════════════════════════════════════════════
+// LOAD JOB
+// ═══════════════════════════════════════════════
+async function loadJob(){
+  document.getElementById('tab-strip').innerHTML='';
+  document.getElementById('tab-panel').innerHTML='<div class="loading-wrap"><span class="spin">⏳</span>Loading job…</div>';
+  try{
+    var res  = await fetch(APPS_SCRIPT+'?action=getJob&jobId='+encodeURIComponent(JOB_ID));
+    var data = await res.json();
+    if(data.error) throw new Error(data.error);
+    JOB = data;
+    renderJob();
+  } catch(e){
+    document.getElementById('tab-panel').innerHTML=`
+      <div class="card" style="border:2px solid var(--red);">
+        <h4 style="color:var(--red);">⚠️ Could Not Load Job</h4>
+        <p style="margin-bottom:1rem;font-size:0.9rem;">${e.message}</p>
+        <button class="submit-btn" onclick="loadJob()">↺ Try Again</button>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RENDER JOB
+// ═══════════════════════════════════════════════
+function renderJob(){
+  document.getElementById('page-title').textContent = JOB.name+' — Bella Terra';
+  document.getElementById('login-title').textContent = '📋 '+JOB.name;
+  document.getElementById('job-name-display').textContent = JOB.name;
+  document.getElementById('job-meta').textContent = [JOB.jobNum?'Job #'+JOB.jobNum:'',JOB.location,JOB.contractType].filter(Boolean).join(' · ');
+
+  var badge = document.getElementById('status-badge');
+  badge.textContent = JOB.status;
+  badge.className = 'status-badge badge-'+(JOB.status||'active').toLowerCase();
+
+  if(JOB.status==='Archived'){
+    document.getElementById('tab-strip').innerHTML='<button class="tab-btn active">📦 Archive</button>';
+    renderArchive();
+    return;
+  }
+
+  var order = (JOB.phaseOrder==='wsdot') ? TAB_ORDER_WSDOT : TAB_ORDER_STD;
+  var tabs  = order.filter(function(t){
+    if(t==='plans'||t==='complete') return true;
+    if(t==='staging') return JOB.phases.indexOf('planting')>=0||JOB.phases.indexOf('shipment')>=0;
+    return JOB.phases.indexOf(t)>=0;
+  });
+
+  var strip = document.getElementById('tab-strip');
+  strip.innerHTML = tabs.map(function(t,i){
+    return '<button class="tab-btn'+(i===0?' active':'')+'" id="tb-'+t+'" onclick="switchTab(\''+t+'\')">'+(TAB_META[t]||{label:t}).label+'</button>';
+  }).join('');
+
+  currentTab = tabs[0];
+  renderTab(currentTab);
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  var btn=document.getElementById('tb-'+id); if(btn) btn.classList.add('active');
+  currentTab=id;
+  renderTab(id);
+}
+
+function renderTab(id){
+  var panel=document.getElementById('tab-panel');
+  var fn={plans:renderPlans,staging:renderStaging,bark:renderBark,planting:renderPlanting,shipment:renderShipment,hydroseeding:renderHydro,soils:renderSoils,compost:renderCompost,irrigation:renderIrrigation,stormwater:renderStormwater,complete:renderComplete}[id];
+  if(!fn){panel.innerHTML='<div class="card"><p>Tab coming soon.</p></div>';return;}
+  panel.innerHTML=fn();
+  // Auto-fill dates + employee fields
+  ['bark-date','plant-date','ship-date','hydro-date','complete-date','staging-date','soils-date','compost-date','irr-date','storm-date']
+    .forEach(function(f){var el=document.getElementById(f);if(el)el.value=todayStr();});
+  ['bark-lead','plant-lead','ship-lead','hydro-lead','complete-lead','staging-lead']
+    .forEach(function(f){var el=document.getElementById(f);if(el)el.value=currentEmployee;});
+  // Re-render photo grid if there are already photos in state
+  if(photoState[id]&&photoState[id].length) renderPhotoGrid(id);
+}
+
+// ═══════════════════════════════════════════════
+// MULTI-PHOTO SYSTEM
+// ═══════════════════════════════════════════════
+function photoAreaHtml(tabId, instructions){
+  var instHtml = instructions ? '<div class="photo-instructions">'+instructions+'</div>' : '';
+  return '<div class="photo-section">'+instHtml+
+    '<div class="photo-drop" onclick="document.getElementById(\'ph-in-'+tabId+'\').click()">📷 Tap to add photos</div>'+
+    '<input type="file" id="ph-in-'+tabId+'" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(\''+tabId+'\',event)">'+
+    '<div class="photo-count" id="ph-count-'+tabId+'">0 / '+MAX_PHOTOS+' photos selected</div>'+
+    '<div class="photo-grid" id="ph-grid-'+tabId+'"></div>'+
+  '</div>';
+}
+
+function handlePhotoSelect(tabId, event){
+  if(!photoState[tabId]) photoState[tabId]=[];
+  var files=Array.from(event.target.files);
+  var remaining=MAX_PHOTOS-photoState[tabId].length;
+  files.slice(0,remaining).forEach(function(file){
+    var entry={name:file.name,mimeType:file.type,dataUrl:null};
+    var idx=photoState[tabId].length;
+    photoState[tabId].push(entry);
+    compressPhoto(file,function(dataUrl){
+      if(photoState[tabId][idx]) photoState[tabId][idx].dataUrl=dataUrl;
+      renderPhotoGrid(tabId);
+    });
+  });
+  if(files.length>remaining&&remaining>=0) alert('Maximum '+MAX_PHOTOS+' photos. '+(files.length-remaining)+' photo(s) were not added.');
+  event.target.value='';
+  renderPhotoGrid(tabId);
+  updatePhotoCount(tabId);
+}
+
+function compressPhoto(file, callback){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var max=1400, ratio=Math.min(max/img.width,max/img.height,1);
+      canvas.width=Math.round(img.width*ratio);
+      canvas.height=Math.round(img.height*ratio);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      callback(canvas.toDataURL('image/jpeg',0.78));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(tabId, idx){
+  if(photoState[tabId]) photoState[tabId].splice(idx,1);
+  renderPhotoGrid(tabId);
+  updatePhotoCount(tabId);
+}
+
+function renderPhotoGrid(tabId){
+  var grid=document.getElementById('ph-grid-'+tabId); if(!grid) return;
+  var photos=photoState[tabId]||[];
+  if(!photos.length){grid.innerHTML='';return;}
+  grid.innerHTML=photos.map(function(p,i){
+    return '<div class="ph-thumb">'+
+      (p.dataUrl?'<img src="'+p.dataUrl+'">'+'<div class="ph-name">'+p.name+'</div>':'<div class="ph-loading">⏳</div>')+
+      '<button class="ph-rm" onclick="removePhoto(\''+tabId+'\','+i+')">✕</button>'+
+    '</div>';
+  }).join('');
+  updatePhotoCount(tabId);
+}
+
+function updatePhotoCount(tabId){
+  var el=document.getElementById('ph-count-'+tabId); if(!el) return;
+  var n=(photoState[tabId]||[]).length;
+  el.textContent=n+' / '+MAX_PHOTOS+' photos selected';
+  el.style.color=n>=MAX_PHOTOS?'var(--red)':'var(--gray)';
+}
+
+async function uploadPhotos(tabId, reportType, species){
+  var photos=(photoState[tabId]||[]).filter(function(p){return p.dataUrl;});
+  if(!photos.length) return {saved:0,total:0};
+  var results={saved:0,total:photos.length};
+  // Batch in groups of 5
+  for(var i=0;i<photos.length;i+=5){
+    var batch=photos.slice(i,i+5).map(function(p){return{name:p.name,mimeType:p.mimeType,base64:p.dataUrl};});
+    try{
+      var res=await fetch(PHOTO_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({jobName:JOB.name,reportType:reportType,reportDate:todayStr(),species:species||null,photos:batch})});
+      var d=await res.json();
+      if(d.success) results.saved+=(d.saved||0);
+    }catch(e){ /* log but continue */ }
+  }
+  return results;
+}
+
+// ═══════════════════════════════════════════════
+// SECTION TAGS
+// ═══════════════════════════════════════════════
+function secTagHtml(tabId){
+  var secs=JOB.sections||[];
+  if(!secs.length) return '<div class="f"><label>Sections Worked</label><input type="text" id="'+tabId+'-secs" placeholder="e.g. B1, B3, W2"></div>';
+  return '<div class="f"><label>Plan Sections Worked</label>'+
+    '<div class="tag-row">'+
+    '<select id="sec-sel-'+tabId+'"><option value="">Select section…</option>'+secs.map(function(s){return'<option>'+s+'</option>';}).join('')+'</select>'+
+    '<button class="tag-add-btn" onclick="addSecTag(\''+tabId+'\')">+ Add</button>'+
+    '</div>'+
+    '<div class="tags-wrap" id="sec-tags-'+tabId+'"></div></div>';
+}
+
+function addSecTag(tabId){
+  var sel=document.getElementById('sec-sel-'+tabId); if(!sel||!sel.value) return;
+  if(!secTagState[tabId]) secTagState[tabId]=[];
+  if(secTagState[tabId].indexOf(sel.value)<0) secTagState[tabId].push(sel.value);
+  renderSecTags(tabId); sel.value='';
+}
+
+function removeSecTag(tabId,val){
+  if(secTagState[tabId]) secTagState[tabId]=secTagState[tabId].filter(function(t){return t!==val;});
+  renderSecTags(tabId);
+}
+
+function renderSecTags(tabId){
+  var wrap=document.getElementById('sec-tags-'+tabId); if(!wrap) return;
+  wrap.innerHTML=(secTagState[tabId]||[]).map(function(t){return'<span class="sec-tag">'+t+'<button onclick="removeSecTag(\''+tabId+'\',\''+t+'\')">✕</button></span>';}).join('');
+}
+
+function getSecTags(tabId){
+  if(secTagState[tabId]&&secTagState[tabId].length) return secTagState[tabId].join(', ');
+  var el=document.getElementById(tabId+'-secs'); return el?el.value:'';
+}
+
+// ═══════════════════════════════════════════════
+// DYNAMIC ROWS
+// ═══════════════════════════════════════════════
+function addRow(type){
+  if(!rowCounts[type]) rowCounts[type]=0;
+  rowCounts[type]++;
+  var id=rowCounts[type];
+  var html='';
+  if(type==='plant'){
+    html='<div class="dyn-row" id="plant-row-'+id+'">'+'<button class="rm-row" onclick="removeRow(\'plant\','+id+')">✕</button>'+
+      '<div class="g3"><div class="f"><label>Species</label><input type="text" id="pl-sp-'+id+'" placeholder="e.g. Red Alder"></div>'+
+      '<div class="f"><label>Qty</label><input type="number" id="pl-qty-'+id+'" min="0" placeholder="0" onchange="calcPlantTotal()"></div>'+
+      '<div class="f"><label>Container</label><input type="text" id="pl-cont-'+id+'" placeholder="1gal / plug"></div></div>'+
+      '<div class="g2"><div class="f"><label>Source</label><select id="pl-src-'+id+'"><option>Bella Terra Nursery</option><option>Vendor</option><option>Owner Furnished</option></select></div>'+
+      '<div class="f"><label>Section / Area</label><input type="text" id="pl-sec-'+id+'" placeholder="B1, W3…"></div></div>'+
+      '<div class="f"><label style="color:var(--gold)">⚠ Field Change Note</label><input type="text" id="pl-chg-'+id+'" class="gold-field" placeholder="Any deviation from plan…"></div>'+
+    '</div>';
+  } else if(type==='ship'){
+    html='<div class="dyn-row" id="ship-row-'+id+'">'+'<button class="rm-row" onclick="removeRow(\'ship\','+id+')">✕</button>'+
+      '<div class="g3"><div class="f"><label>Species / Item</label><input type="text" id="sh-sp-'+id+'" placeholder="e.g. Douglas Fir"></div>'+
+      '<div class="f"><label>Quantity</label><input type="number" id="sh-qty-'+id+'" min="0" placeholder="0"></div>'+
+      '<div class="f"><label>Container</label><input type="text" id="sh-cont-'+id+'" placeholder="1gal / plug"></div></div>'+
+      '<div class="g2"><div class="f"><label>Condition</label><select id="sh-cond-'+id+'"><option>Good</option><option>Fair — noted</option><option>Damaged — rejected</option><option>Substituted — noted</option></select></div>'+
+      '<div class="f"><label>Condition Notes</label><input type="text" id="sh-note-'+id+'" placeholder="Optional detail…"></div></div>'+
+    '</div>';
+  } else if(type==='hydro'){
+    html='<div class="dyn-row" id="hydro-row-'+id+'">'+'<button class="rm-row" onclick="removeRow(\'hydro\','+id+')">✕</button>'+
+      '<div class="g2"><div class="f"><label>Load #</label><input type="text" id="hy-load-'+id+'" placeholder="Load 1"></div>'+
+      '<div class="f"><label>Acres This Load</label><input type="number" id="hy-ac-'+id+'" min="0" step="0.01" placeholder="0.00"></div></div>'+
+      '<div class="g2"><div class="f"><label>Seed Mix</label><input type="text" id="hy-mix-'+id+'" placeholder="Mix name / type"></div>'+
+      '<div class="f"><label>Mulch Rate (lb/ac)</label><input type="number" id="hy-mr-'+id+'" min="0" placeholder="0"></div></div>'+
+      '<div class="g2"><div class="f"><label>Section / Area</label><input type="text" id="hy-sec-'+id+'" placeholder="B1, Roadside…"></div>'+
+      '<div class="f"><label>Field Note</label><input type="text" id="hy-fn-'+id+'" placeholder="Optional…"></div></div>'+
+    '</div>';
+  }
+  var container=document.getElementById(type+'-rows');
+  if(container) container.insertAdjacentHTML('beforeend',html);
+}
+
+function removeRow(type,id){
+  var el=document.getElementById(type+'-row-'+id); if(el) el.remove();
+  if(type==='plant') calcPlantTotal();
+}
+
+function calcPlantTotal(){
+  var total=0;
+  document.querySelectorAll('[id^="pl-qty-"]').forEach(function(el){total+=parseInt(el.value)||0;});
+  var t=document.getElementById('plant-total'); if(t) t.value=total;
+}
+
+function getPlantRows(){
+  var rows=[]; var max=rowCounts['plant']||0;
+  for(var i=1;i<=max;i++){
+    var sp=document.getElementById('pl-sp-'+i); if(!sp) continue;
+    rows.push({species:sp.value,quantity:v('pl-qty-'+i),container:v('pl-cont-'+i),source:v('pl-src-'+i),section:v('pl-sec-'+i),change:v('pl-chg-'+i)});
+  } return rows;
+}
+
+function getShipRows(){
+  var rows=[]; var max=rowCounts['ship']||0;
+  for(var i=1;i<=max;i++){
+    var sp=document.getElementById('sh-sp-'+i); if(!sp) continue;
+    rows.push({species:sp.value,quantity:v('sh-qty-'+i),container:v('sh-cont-'+i),condition:v('sh-cond-'+i),note:v('sh-note-'+i)});
+  } return rows;
+}
+
+function getHydroRows(){
+  var rows=[]; var max=rowCounts['hydro']||0;
+  for(var i=1;i<=max;i++){
+    var el=document.getElementById('hy-load-'+i); if(!el) continue;
+    rows.push({load:el.value,acres:v('hy-ac-'+i),seedMix:v('hy-mix-'+i),mulchRate:v('hy-mr-'+i),section:v('hy-sec-'+i),note:v('hy-fn-'+i)});
+  } return rows;
+}
+
+// ═══════════════════════════════════════════════
+// TAB RENDERS
+// ═══════════════════════════════════════════════
+function renderPlans(){
+  var slots=PLAN_SLOTS.filter(function(s){
+    if(!s.phases.length) return true;
+    return s.phases.some(function(p){return JOB.phases.indexOf(p)>=0;});
+  });
+  var editBtn=plansEditMode
+    ?'<button class="edit-btn" onclick="exitPlansEdit()">✕ Done Editing</button>'
+    :'<button class="edit-btn" onclick="enterPlansEdit()">✏️ Edit Plans</button>';
+
+  var emailGate=plansEditMode?
+    '<div class="email-gate"><label>Your @1BellaTerra.com Email</label><input type="email" id="plans-email" value="'+plansEmail+'" placeholder="yourname@1bellaterra.com" oninput="plansEmail=this.value"><p style="font-size:0.75rem;color:var(--gray);margin-top:0.25rem;">Required to save plan links</p></div>':'';
+
+  var notice=plansEditMode?'<div class="edit-notice">✏️ Editing mode — paste Google Drive links below and click Save for each plan.</div>':'';
+
+  var slotsHtml=slots.map(function(slot){
+    var plan=(JOB.plans&&JOB.plans[slot.key])||null;
+    var hasLink=plan&&plan.link;
+    var viewBtn=hasLink?'<a href="'+plan.link+'" target="_blank" class="plan-view-btn">📄 View Plan</a>':'<span class="plan-no-link">No plan uploaded yet</span>';
+    var updatedNote=hasLink?'<span class="plan-updated">'+plan.updatedBy+' · '+fmtDate(plan.updatedDate)+'</span>':'';
+    var editArea=plansEditMode?
+      '<div class="plan-edit-area" style="display:block;">'+
+        '<input type="url" id="link-'+slot.key+'" class="plan-link-input" value="'+(hasLink?plan.link:'')+'" placeholder="Paste Google Drive link…">'+
+        '<button class="plan-save-btn" onclick="savePlan(\''+slot.key+'\',\''+slot.label+'\')">💾 Save '+slot.label+'</button>'+
+        '<span class="ok-box" id="plan-ok-'+slot.key+'" style="display:inline-block;margin-left:0.5rem;padding:0.35rem 0.65rem;font-size:0.8rem;"></span>'+
+      '</div>':'';
+    return '<div class="plan-slot"><div class="plan-slot-header"><span class="plan-slot-label">'+slot.label+'</span>'+updatedNote+'</div>'+viewBtn+editArea+'</div>';
+  }).join('');
+
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:2px solid var(--pale);">'+
+    '<h4 style="margin:0;padding:0;border:none;">📋 Project Plans</h4>'+editBtn+'</div>'+notice+emailGate+slotsHtml+'</div>';
+}
+
+function enterPlansEdit(){ plansEditMode=true; renderTab('plans'); }
+function exitPlansEdit(){ plansEditMode=false; plansEmail=''; renderTab('plans'); }
+
+async function savePlan(key,label){
+  var link=(document.getElementById('link-'+key)||{}).value||'';
+  var email=plansEmail.trim();
+  var okEl=document.getElementById('plan-ok-'+key);
+  if(!link){alert('Please paste a Google Drive link first.');return;}
+  if(!email.toLowerCase().endsWith('@1bellaterra.com')){alert('Please enter your @1BellaTerra.com email above.');return;}
+  if(okEl){okEl.textContent='Saving…';okEl.style.display='inline-block';okEl.style.color='var(--gray)';}
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveJobPlan',jobId:JOB_ID,planType:key,link:link,email:email})});
+    var d=await res.json();
+    if(d.success){
+      if(!JOB.plans) JOB.plans={};
+      JOB.plans[key]={link:link,updatedBy:email,updatedDate:new Date().toLocaleDateString()};
+      if(okEl){okEl.textContent='✅ Saved';okEl.style.color='var(--gd)';}
+    } else { if(okEl){okEl.textContent='❌ '+(d.error||'Error');okEl.style.color='var(--red)';} }
+  } catch(e){ if(okEl){okEl.textContent='❌ Network error';okEl.style.color='var(--red)';} }
+}
+
+// ── PLANT STAGING ──
+function renderStaging(){
+  return '<div class="card"><h4>📦 Plant Staging Log</h4>'+
+    '<div class="f"><label>Date</label><input type="date" id="staging-date"></div>'+
+    '<div class="f"><label>Logged By</label><input type="text" id="staging-lead" readonly></div>'+
+    '<div class="f"><label>Species / Lot</label><input type="text" id="staging-species" placeholder="e.g. Red Alder 1-gal" autocomplete="off"></div>'+
+    '<div class="f"><label>Quantity Received</label><input type="number" id="staging-qty" min="0" placeholder="0"></div>'+
+    '<div class="f"><label>Condition Notes</label><input type="text" id="staging-cond" placeholder="Good / any damage noted…"></div>'+
+    '<div class="f"><label>Site Photos</label>'+
+      photoAreaHtml('staging','📷 Step 1: Close-up of the plant tag (species + lot #). 📷 Step 2: Step back to show plants staged in rows of 10×10.')+
+    '</div>'+
+    '<button class="submit-btn" onclick="submitStaging(this)">📤 Submit Staging Log</button>'+
+    '<div class="ok-box" id="staging-ok"></div><div class="err-box" id="staging-err"></div>'+
+  '</div>';
+}
+
+async function submitStaging(btn){
+  var species=v('staging-species'); if(!species){showErr('staging-err','Species / Lot is required.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var photoResult=await uploadPhotos('staging','Plant Staging',species);
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:'Plant_Staging',employee:currentEmployee,date:v('staging-date'),photoCount:photoResult.saved,reportData:{species:species,qty:v('staging-qty'),condition:v('staging-cond')}});
+    showOk('staging-ok','✅ Staging log saved. '+photoResult.saved+' photo(s) uploaded to Drive.');
+    document.getElementById('staging-species').value='';document.getElementById('staging-qty').value='';document.getElementById('staging-cond').value='';
+    photoState['staging']=[]; renderPhotoGrid('staging'); updatePhotoCount('staging');
+  } catch(e){ showErr('staging-err','❌ '+e.message); }
+  btn.disabled=false; btn.textContent='📤 Submit Staging Log';
+}
+
+// ── CAD BARK ──
+function renderBark(){
+  return '<div class="card"><h4>🌬️ CAD Bark Daily Report</h4>'+
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="bark-date"></div>'+
+    '<div class="f"><label>Crew Lead</label><input type="text" id="bark-lead" readonly></div></div>'+
+    '<div class="f"><label>Crew Members on Site</label><input type="text" id="bark-crew" placeholder="Comma-separated names"></div>'+
+    '<div class="g2"><div class="f"><label>Hours on Site</label><input type="number" id="bark-hours" min="0" step="0.5" placeholder="0"></div>'+
+    '<div class="f"><label>Cubic Yards Placed</label><input type="number" id="bark-cy" min="0" step="0.5" placeholder="0"></div></div>'+
+    secTagHtml('bark')+
+    '<div class="f"><label class="gold-label">⚠ Field Changes / Notes</label><textarea id="bark-changes" class="gold-field" rows="3" placeholder="Spacing changes, overages moved between sections, inspector notes…"></textarea></div>'+
+    '<div class="f"><label>General Notes</label><textarea id="bark-notes" rows="3" placeholder="Conditions, observations…"></textarea></div>'+
+    '<div class="f"><label>Site Photos (up to '+MAX_PHOTOS+')</label>'+photoAreaHtml('bark')+'</div>'+
+    '<button class="submit-btn" onclick="submitBark(this)">📤 Submit Bark Report</button>'+
+    '<div class="ok-box" id="bark-ok"></div><div class="err-box" id="bark-err"></div></div>';
+}
+
+async function submitBark(btn){
+  if(!v('bark-date')){showErr('bark-err','Date is required.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var pr=await uploadPhotos('bark','CAD Bark Report');
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:'CAD_Bark_Daily',employee:currentEmployee,date:v('bark-date'),photoCount:pr.saved,reportData:{crew_lead:v('bark-lead'),crew_members:v('bark-crew'),hours:v('bark-hours'),cubic_yards:v('bark-cy'),plan_sections:getSecTags('bark'),field_changes:v('bark-changes'),notes:v('bark-notes')}});
+    showOk('bark-ok','✅ Report submitted. '+pr.saved+' photo(s) saved to Drive.');
+    secTagState['bark']=[]; photoState['bark']=[]; renderPhotoGrid('bark'); updatePhotoCount('bark');
+    renderSecTags('bark'); document.getElementById('bark-changes').value='';document.getElementById('bark-notes').value='';document.getElementById('bark-crew').value='';document.getElementById('bark-hours').value='';document.getElementById('bark-cy').value='';
+  }catch(e){showErr('bark-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='📤 Submit Bark Report';
+}
+
+// ── PLANTING ──
+function renderPlanting(){
+  rowCounts['plant']=0;
+  return '<div class="card"><h4>🌱 Planting Daily Report</h4>'+
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="plant-date"></div>'+
+    '<div class="f"><label>Crew Lead</label><input type="text" id="plant-lead" readonly></div></div>'+
+    '<div class="g2"><div class="f"><label>Crew Members</label><input type="text" id="plant-crew" placeholder="Comma-separated names"></div>'+
+    '<div class="f"><label>Hours on Site</label><input type="number" id="plant-hours" min="0" step="0.5" placeholder="0"></div></div>'+
+    '<div class="f"><label>Total Plants Today</label><input type="number" id="plant-total" readonly value="0" style="background:#f5f5f5;font-weight:700;color:var(--gd);"></div>'+
+    '</div>'+
+    '<div id="plant-rows"></div>'+
+    '<button class="add-row-btn" onclick="addRow(\'plant\')">＋ Add Plant Species Row</button>'+
+    '<div class="card">'+
+    '<div class="f"><label class="gold-label">⚠ Overall Field Changes</label><textarea id="plant-changes" class="gold-field" rows="3" placeholder="GC direction, spacing changes, plants moved between sections…"></textarea></div>'+
+    '<div class="f"><label>General Notes</label><textarea id="plant-notes" rows="3" placeholder="Conditions, observations…"></textarea></div>'+
+    '<div class="f"><label>Site Photos (up to '+MAX_PHOTOS+')</label>'+photoAreaHtml('planting')+'</div>'+
+    '<button class="submit-btn" onclick="submitPlanting(this)">📤 Submit Planting Report</button>'+
+    '<div class="ok-box" id="plant-ok"></div><div class="err-box" id="plant-err"></div></div>';
+}
+
+async function submitPlanting(btn){
+  if(!v('plant-date')){showErr('plant-err','Date is required.');return;}
+  var rows=getPlantRows();
+  if(!rows.length){showErr('plant-err','Add at least one plant species row.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var pr=await uploadPhotos('planting','Planting Report');
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:'Planting_Daily',employee:currentEmployee,date:v('plant-date'),photoCount:pr.saved,reportData:{crew_lead:v('plant-lead'),crew_members:v('plant-crew'),hours:v('plant-hours'),total_plants:v('plant-total'),plant_rows:rows,field_changes:v('plant-changes'),notes:v('plant-notes')}});
+    showOk('plant-ok','✅ Report submitted. '+pr.saved+' photo(s) saved to Drive.');
+    photoState['planting']=[]; renderPhotoGrid('planting'); updatePhotoCount('planting');
+    document.getElementById('plant-rows').innerHTML=''; rowCounts['plant']=0; calcPlantTotal();
+    document.getElementById('plant-changes').value='';document.getElementById('plant-notes').value='';document.getElementById('plant-crew').value='';document.getElementById('plant-hours').value='';
+  }catch(e){showErr('plant-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='📤 Submit Planting Report';
+}
+
+// ── SHIPMENT ──
+function renderShipment(){
+  rowCounts['ship']=0;
+  return '<div class="card"><h4>🚚 Plant Shipment / Delivery Log</h4>'+
+    '<div class="g2"><div class="f"><label>Delivery Date</label><input type="date" id="ship-date"></div>'+
+    '<div class="f"><label>Logged By</label><input type="text" id="ship-lead" readonly></div></div>'+
+    '<div class="g2"><div class="f"><label>Vendor / Nursery</label><input type="text" id="ship-vendor" placeholder="Vendor name"></div>'+
+    '<div class="f"><label>Invoice / PO #</label><input type="text" id="ship-po" placeholder="Invoice or PO number"></div></div>'+
+    '</div>'+
+    '<div id="ship-rows"></div>'+
+    '<button class="add-row-btn" onclick="addRow(\'ship\')">＋ Add Species / Item Row</button>'+
+    '<div class="card">'+
+    '<div class="f"><label>Overall Delivery Notes</label><textarea id="ship-notes" rows="3" placeholder="Overall quality, substitutions, damages…"></textarea></div>'+
+    '<div class="f"><label>Delivery Photos (up to '+MAX_PHOTOS+')</label>'+photoAreaHtml('shipment')+'</div>'+
+    '<button class="submit-btn" onclick="submitShipment(this)">📤 Submit Delivery Log</button>'+
+    '<div class="ok-box" id="ship-ok"></div><div class="err-box" id="ship-err"></div></div>';
+}
+
+async function submitShipment(btn){
+  if(!v('ship-date')){showErr('ship-err','Date is required.');return;}
+  var rows=getShipRows();
+  if(!rows.length){showErr('ship-err','Add at least one species/item row.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var pr=await uploadPhotos('shipment','Delivery Log');
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:'Plant_Shipment',employee:currentEmployee,date:v('ship-date'),photoCount:pr.saved,reportData:{logged_by:v('ship-lead'),vendor:v('ship-vendor'),po:v('ship-po'),delivery_rows:rows,notes:v('ship-notes')}});
+    showOk('ship-ok','✅ Delivery log submitted. '+pr.saved+' photo(s) saved to Drive.');
+    photoState['shipment']=[]; renderPhotoGrid('shipment'); updatePhotoCount('shipment');
+    document.getElementById('ship-rows').innerHTML=''; rowCounts['ship']=0;
+    document.getElementById('ship-notes').value='';document.getElementById('ship-vendor').value='';document.getElementById('ship-po').value='';
+  }catch(e){showErr('ship-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='📤 Submit Delivery Log';
+}
+
+// ── HYDROSEEDING ──
+function renderHydro(){
+  rowCounts['hydro']=0;
+  return '<div class="card"><h4>💧 Hydroseeding Daily Report</h4>'+
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="hydro-date"></div>'+
+    '<div class="f"><label>Crew Lead</label><input type="text" id="hydro-lead" readonly></div></div>'+
+    '<div class="g2"><div class="f"><label>Crew Members</label><input type="text" id="hydro-crew" placeholder="Comma-separated names"></div>'+
+    '<div class="f"><label>Hours on Site</label><input type="number" id="hydro-hours" min="0" step="0.5" placeholder="0"></div></div>'+
+    '</div>'+
+    '<div id="hydro-rows"></div>'+
+    '<button class="add-row-btn" onclick="addRow(\'hydro\')">＋ Add Tank Load Row</button>'+
+    '<div class="card">'+
+    '<div class="f"><label class="gold-label">⚠ Field Changes / Mix Rate Deviations</label><textarea id="hydro-changes" class="gold-field" rows="3" placeholder="Mix rate changes, GC direction…"></textarea></div>'+
+    '<div class="g2"><div class="f"><label>Inspector Name</label><input type="text" id="hydro-inspector" placeholder="Inspector (if present)"></div>'+
+    '<div class="f"><label>Inspector Measured Acres</label><input type="number" id="hydro-insp-acres" min="0" step="0.01" placeholder="0.00"></div></div>'+
+    '<div class="f"><label>General Notes</label><textarea id="hydro-notes" rows="3" placeholder="Conditions, observations…"></textarea></div>'+
+    '<div class="f"><label>Site Photos (up to '+MAX_PHOTOS+')</label>'+photoAreaHtml('hydroseeding')+'</div>'+
+    '<button class="submit-btn" onclick="submitHydro(this)">📤 Submit Hydroseeding Report</button>'+
+    '<div class="ok-box" id="hydro-ok"></div><div class="err-box" id="hydro-err"></div></div>';
+}
+
+async function submitHydro(btn){
+  if(!v('hydro-date')){showErr('hydro-err','Date is required.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var pr=await uploadPhotos('hydroseeding','Hydroseeding Report');
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:'Hydroseeding_Daily',employee:currentEmployee,date:v('hydro-date'),photoCount:pr.saved,reportData:{crew_lead:v('hydro-lead'),crew_members:v('hydro-crew'),hours:v('hydro-hours'),load_rows:getHydroRows(),field_changes:v('hydro-changes'),inspector:v('hydro-inspector'),inspector_acres:v('hydro-insp-acres'),notes:v('hydro-notes')}});
+    showOk('hydro-ok','✅ Report submitted. '+pr.saved+' photo(s) saved to Drive.');
+    photoState['hydroseeding']=[]; renderPhotoGrid('hydroseeding'); updatePhotoCount('hydroseeding');
+    document.getElementById('hydro-rows').innerHTML=''; rowCounts['hydro']=0;
+    document.getElementById('hydro-changes').value='';document.getElementById('hydro-notes').value='';document.getElementById('hydro-crew').value='';document.getElementById('hydro-hours').value='';
+  }catch(e){showErr('hydro-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='📤 Submit Hydroseeding Report';
+}
+
+// ── SIMPLE TABS (soils, compost, irrigation, stormwater) ──
+function renderSoils(){ return simpleReportTab('soils','🏔️ Soils Report','soils-date','soils-crew','soils-hours','soils-notes','Soils_Report','soils'); }
+function renderCompost(){ return simpleReportTab('compost','🌿 Compost / Mulch Report','compost-date','compost-crew','compost-hours','compost-notes','Compost_Report','compost'); }
+function renderIrrigation(){ return simpleReportTab('irrigation','💦 Irrigation Daily Report','irr-date','irr-crew','irr-hours','irr-notes','Irrigation_Report','irrigation'); }
+function renderStormwater(){ return simpleReportTab('stormwater','🌊 Stormwater / Pond Report','storm-date','storm-crew','storm-hours','storm-notes','Stormwater_Report','stormwater'); }
+
+function simpleReportTab(tabId,title,dateId,crewId,hoursId,notesId,reportType,photoKey){
+  return '<div class="card"><h4>'+title+'</h4>'+
+    '<div class="g2"><div class="f"><label>Date</label><input type="date" id="'+dateId+'"></div>'+
+    '<div class="f"><label>Crew Members</label><input type="text" id="'+crewId+'" placeholder="Comma-separated names"></div></div>'+
+    '<div class="f"><label>Hours on Site</label><input type="number" id="'+hoursId+'" min="0" step="0.5" placeholder="0"></div>'+
+    secTagHtml(tabId)+
+    '<div class="f"><label>Notes</label><textarea id="'+notesId+'" rows="4" placeholder="Work completed, conditions, observations…"></textarea></div>'+
+    '<div class="f"><label>Site Photos (up to '+MAX_PHOTOS+')</label>'+photoAreaHtml(tabId)+'</div>'+
+    '<button class="submit-btn" onclick="submitSimple(\''+tabId+'\',\''+reportType+'\',\''+dateId+'\',\''+crewId+'\',\''+hoursId+'\',\''+notesId+'\',this)">📤 Submit Report</button>'+
+    '<div class="ok-box" id="'+tabId+'-ok"></div><div class="err-box" id="'+tabId+'-err"></div></div>';
+}
+
+async function submitSimple(tabId,type,dateId,crewId,hoursId,notesId,btn){
+  if(!v(dateId)){showErr(tabId+'-err','Date is required.');return;}
+  btn.disabled=true; btn.textContent='⏳ Uploading…';
+  var pr=await uploadPhotos(tabId,type.replace(/_/g,' '));
+  try{
+    await postReport({action:'submitJobReport',jobId:JOB_ID,reportType:type,employee:currentEmployee,date:v(dateId),photoCount:pr.saved,reportData:{crew:v(crewId),hours:v(hoursId),sections:getSecTags(tabId),notes:v(notesId)}});
+    showOk(tabId+'-ok','✅ Report submitted. '+pr.saved+' photo(s) saved to Drive.');
+    photoState[tabId]=[]; renderPhotoGrid(tabId); updatePhotoCount(tabId);
+    secTagState[tabId]=[]; renderSecTags(tabId);
+    document.getElementById(notesId).value='';
+  }catch(e){showErr(tabId+'-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='📤 Submit Report';
+}
+
+// ── JOB COMPLETE ──
+function renderComplete(){
+  if(JOB.status==='Complete'){
+    return '<div class="card"><h4>✅ Job Complete</h4>'+
+      '<div class="complete-info">This job was marked complete on '+fmtDate(JOB.completionDate)+'.</div>'+
+      '<p style="font-size:0.9rem;color:var(--gray);margin-bottom:1.25rem;">This job will automatically move to Archive mode 1 year after the completion date.</p>'+
+      '<button class="btn-archive" onclick="confirmArchive()">📦 Archive This Job Now</button></div>';
+  }
+  return '<div class="card" style="border:2px solid var(--red);">'+
+    '<h4 style="color:var(--red);">✅ Mark Job Complete</h4>'+
+    '<div class="complete-warning">⚠ Warning: Marking this job complete begins the 1-year countdown to automatic archiving. All daily reports should be submitted before proceeding.</div>'+
+    '<div class="email-gate"><label>Your @1BellaTerra.com Email (required)</label><input type="email" id="complete-email" placeholder="yourname@1bellaterra.com"></div>'+
+    '<div class="g2"><div class="f"><label>Crew Lead</label><input type="text" id="complete-lead" readonly></div>'+
+    '<div class="f"><label>Completion Date</label><input type="date" id="complete-date"></div></div>'+
+    '<div class="f"><label>Final Notes</label><textarea id="complete-notes" rows="4" placeholder="Summary of work, outstanding items, handoff notes…"></textarea></div>'+
+    '<button class="submit-btn od-submit-red" style="background:var(--red);" onclick="submitComplete(this)">✅ Confirm Job Complete</button>'+
+    '<div class="ok-box" id="complete-ok"></div><div class="err-box" id="complete-err"></div></div>';
+}
+
+async function submitComplete(btn){
+  var email=v('complete-email');
+  if(!email.toLowerCase().endsWith('@1bellaterra.com')){showErr('complete-err','Must use a @1BellaTerra.com email address.');return;}
+  if(!v('complete-date')){showErr('complete-err','Completion date is required.');return;}
+  if(!confirm('Mark this job complete? This starts the 1-year archive countdown.')) return;
+  btn.disabled=true; btn.textContent='⏳ Saving…';
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'markJobComplete',jobId:JOB_ID,completionDate:v('complete-date'),notes:v('complete-notes'),email:email})});
+    var d=await res.json();
+    if(d.success){ JOB.status='Complete'; JOB.completionDate=v('complete-date'); document.getElementById('status-badge').textContent='Complete'; document.getElementById('status-badge').className='status-badge badge-complete'; showOk('complete-ok','✅ Job marked complete. Reports are now read-only.'); renderTab('complete'); }
+    else showErr('complete-err','❌ '+(d.error||'Error'));
+  }catch(e){showErr('complete-err','❌ '+e.message);}
+  btn.disabled=false; btn.textContent='✅ Confirm Job Complete';
+}
+
+async function confirmArchive(){
+  if(!confirm('Archive this job now? It will go to read-only mode. You can wake it up later.')) return;
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'archiveJob',jobId:JOB_ID})});
+    var d=await res.json();
+    if(d.success){ JOB.status='Archived'; renderJob(); }
+  }catch(e){ alert('Error archiving job: '+e.message); }
+}
+
+// ── ARCHIVE VIEW ──
+function renderArchive(){
+  var sum=JOB.summary||{};
+  var speciesRows=sum.plantsBySpecies?Object.entries(sum.plantsBySpecies).map(function(pair){return'<div class="species-row"><span>'+pair[0]+'</span><strong>'+pair[1]+' plants</strong></div>';}).join(''):'<div style="color:var(--gray);font-size:0.85rem;">No planting data found.</div>';
+  document.getElementById('tab-panel').innerHTML=
+    '<div class="archive-banner"><div style="font-size:2.5rem;margin-bottom:0.5rem;">📦</div>'+
+    '<h3>Job Archived</h3><p>Completed: '+fmtDate(JOB.completionDate)+'&nbsp;·&nbsp;Archived: '+fmtDate(JOB.archiveDate)+'</p></div>'+
+    '<div class="summary-grid">'+
+    '<div class="summary-stat"><div class="val">'+(sum.totalCompostCY||0)+'</div><div class="lbl">CY Compost / Bark</div></div>'+
+    '<div class="summary-stat"><div class="val">'+(sum.totalPlants||0)+'</div><div class="lbl">Total Plants</div></div>'+
+    '<div class="summary-stat"><div class="val">'+(sum.reportCount||0)+'</div><div class="lbl">Reports Submitted</div></div>'+
+    '</div>'+
+    '<div class="species-list"><h5>Plants by Species</h5>'+speciesRows+'</div>'+
+    '<button class="btn-wake" onclick="wakeJob()">☀️ Wake Up This Job</button>';
+}
+
+async function wakeJob(){
+  if(!confirm('Wake up this job? It will return to Active status.')) return;
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'wakeJob',jobId:JOB_ID})});
+    var d=await res.json();
+    if(d.success){ JOB.status='Complete'; renderJob(); }
+    else alert('Error: '+(d.error||'Could not wake job'));
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function v(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtDate(s){ if(!s) return 'N/A'; try{ return new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){return s;} }
+
+function showOk(id,msg){ var el=document.getElementById(id); if(el){el.textContent=msg;el.style.display='block';el.className='ok-box';setTimeout(function(){el.style.display='none';},7000);} }
+function showErr(id,msg){ var el=document.getElementById(id); if(el){el.textContent=msg;el.style.display='block';el.className='err-box';} }
+
+async function postReport(payload){
+  var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+  var d=await res.json();
+  if(!d.success) throw new Error(d.error||'Server error');
+  return d;
+}
+</script>
+</body>
+</html>

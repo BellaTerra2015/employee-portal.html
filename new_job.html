@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Job — Bella Terra</title>
+<meta name="theme-color" content="#2d5a27">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gd:#2d5a27;--gm:#4a7c3f;--gl:#7ab648;
+  --pale:#e8f5e2;--bg:#f5f5f2;--gray:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;
+  --shd:0 2px 12px rgba(45,90,39,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+button,input,select,textarea{font-family:inherit;}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--gd) 0%,var(--gm) 60%,var(--gl) 100%);padding:2rem;}
+#login-screen h1{font-family:'Playfair Display',serif;color:#fff;font-size:2rem;margin-bottom:0.25rem;text-align:center;}
+#login-screen p{color:rgba(255,255,255,0.75);margin-bottom:2rem;text-align:center;}
+.login-box{background:white;border-radius:12px;padding:2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.25);}
+.login-box label{display:block;font-weight:700;font-size:0.8rem;color:var(--gd);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.05em;}
+.login-box input{width:100%;padding:0.7rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:1rem;margin-bottom:1rem;}
+.login-box input:focus{outline:none;border-color:var(--gm);}
+.btn-login{width:100%;padding:0.85rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;}
+.btn-login:hover{background:var(--gm);}
+.login-err{color:var(--red);font-size:0.85rem;margin-top:0.5rem;display:none;}
+
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.app-header{background:var(--gd);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.app-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.2rem;}
+.btn-portal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.35rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;}
+.btn-portal:hover{background:rgba(255,255,255,0.25);}
+
+/* WIZARD */
+.wrap{padding:1.5rem;max-width:620px;margin:0 auto;padding-bottom:3rem;}
+
+/* STEP INDICATOR */
+.steps{display:flex;align-items:center;margin-bottom:2rem;gap:0;}
+.step-dot{display:flex;flex-direction:column;align-items:center;flex:1;}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--gray);transition:all 0.2s;position:relative;z-index:1;}
+.step-circle.done{background:var(--gl);border-color:var(--gl);color:white;}
+.step-circle.active{background:var(--gd);border-color:var(--gd);color:white;}
+.step-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray);margin-top:0.35rem;text-align:center;}
+.step-label.active{color:var(--gd);}
+.step-line{flex:1;height:2px;background:var(--border);margin-top:-18px;transition:background 0.2s;}
+.step-line.done{background:var(--gl);}
+
+/* CARDS */
+.card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shd);margin-bottom:1rem;}
+.card h3{font-family:'Playfair Display',serif;color:var(--gd);font-size:1.15rem;margin-bottom:0.35rem;}
+.card .subtitle{font-size:0.85rem;color:var(--gray);margin-bottom:1.5rem;}
+.f{margin-bottom:0.85rem;}
+.f label{display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gd);margin-bottom:0.35rem;}
+.f input,.f select,.f textarea{width:100%;padding:0.65rem 0.9rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.93rem;font-family:inherit;transition:border-color 0.2s;}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gm);}
+.f .hint{font-size:0.75rem;color:var(--gray);margin-top:0.3rem;}
+.f .err{font-size:0.78rem;color:var(--red);margin-top:0.3rem;display:none;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+
+/* PHASE CHECKBOXES */
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.5rem;}
+.phase-card{border:2px solid var(--border);border-radius:10px;padding:0.85rem 1rem;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:0.75rem;background:white;}
+.phase-card:hover{border-color:var(--gl);background:var(--pale);}
+.phase-card.selected{border-color:var(--gd);background:var(--pale);}
+.phase-card input[type=checkbox]{width:18px;height:18px;accent-color:var(--gd);flex-shrink:0;}
+.phase-icon{font-size:1.4rem;flex-shrink:0;}
+.phase-info .name{font-weight:700;font-size:0.9rem;color:var(--gd);}
+.phase-info .desc{font-size:0.75rem;color:var(--gray);margin-top:2px;}
+
+/* ORDER PREVIEW */
+.order-preview{background:var(--pale);border:2px solid var(--gl);border-radius:10px;padding:1rem 1.25rem;}
+.order-preview h5{font-weight:700;font-size:0.82rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gd);margin-bottom:0.75rem;}
+.order-list{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.order-tag{background:var(--gd);color:white;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.8rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;}
+.order-arrow{color:var(--gm);font-weight:700;font-size:0.9rem;}
+
+/* CONTRACT TYPE NOTE */
+.type-note{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:0.65rem 0.85rem;font-size:0.82rem;color:#7d5a00;margin-top:0.5rem;display:none;}
+
+/* RESULT */
+.result-card{background:var(--pale);border:2px solid var(--gl);border-radius:14px;padding:2rem;text-align:center;}
+.result-card .big{font-size:3rem;margin-bottom:0.75rem;}
+.result-card h3{font-family:'Playfair Display',serif;color:var(--gd);font-size:1.4rem;margin-bottom:0.5rem;}
+.result-card p{color:var(--gray);font-size:0.9rem;margin-bottom:1.25rem;}
+.job-link-box{background:white;border:2px solid var(--gl);border-radius:8px;padding:0.85rem 1rem;font-family:monospace;font-size:0.85rem;word-break:break-all;margin-bottom:1.25rem;color:var(--gd);}
+.btn-copy{padding:0.65rem 1.5rem;background:var(--gd);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem;margin-right:0.5rem;}
+.btn-open{padding:0.65rem 1.5rem;background:white;color:var(--gd);border:2px solid var(--gd);border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem;}
+
+/* NAV BUTTONS */
+.nav-row{display:flex;gap:0.75rem;margin-top:1.25rem;}
+.btn-next{flex:1;padding:0.85rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;}
+.btn-next:hover{background:var(--gm);}
+.btn-back{padding:0.85rem 1.5rem;background:white;color:var(--gray);border:2px solid var(--border);border-radius:8px;font-size:1rem;cursor:pointer;}
+.btn-back:hover{border-color:var(--gray);}
+
+.err-global{background:#fdeaea;border:1.5px solid var(--red);border-radius:8px;padding:0.75rem 1rem;color:var(--red);font-size:0.88rem;font-weight:600;display:none;margin-top:0.75rem;}
+
+@media(max-width:500px){.g2,.phase-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <h1>➕ New Job Setup</h1>
+  <p>Bella Terra LLC — Job Wizard</p>
+  <div class="login-box">
+    <label>Portal Password</label>
+    <input type="password" id="login-pass" placeholder="Enter password" onkeypress="if(event.key==='Enter')doLogin()">
+    <p class="login-err" id="login-err">Incorrect password.</p>
+    <button class="btn-login" style="margin-top:0.5rem" onclick="doLogin()">Access</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="app-header">
+    <h2>➕ New Job Setup</h2>
+    <button class="btn-portal" onclick="window.location.href='bella_terra_portal_html.html'">← Portal</button>
+  </div>
+  <div class="wrap">
+
+    <!-- STEP INDICATOR -->
+    <div class="steps" id="step-indicator">
+      <div class="step-dot">
+        <div class="step-circle active" id="sc-1">1</div>
+        <div class="step-label active" id="sl-1">Job Info</div>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-dot">
+        <div class="step-circle" id="sc-2">2</div>
+        <div class="step-label" id="sl-2">Phases</div>
+      </div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-dot">
+        <div class="step-circle" id="sc-3">3</div>
+        <div class="step-label" id="sl-3">Review</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: JOB INFO -->
+    <div id="step-1">
+      <div class="card">
+        <h3>Job Information</h3>
+        <p class="subtitle">Enter the basic details for this job.</p>
+        <div class="f">
+          <label>Job Name <span style="color:var(--red)">*</span></label>
+          <input type="text" id="job-name" placeholder="e.g. Ridgeline Restoration Phase 2" autocomplete="off">
+          <div class="hint">This becomes the page title and folder name in Drive.</div>
+        </div>
+        <div class="g2">
+          <div class="f">
+            <label>Job # / Contract #</label>
+            <input type="text" id="job-num" placeholder="e.g. 2601">
+          </div>
+          <div class="f">
+            <label>County, State</label>
+            <input type="text" id="job-location" placeholder="e.g. Clark County, WA">
+          </div>
+        </div>
+        <div class="g2">
+          <div class="f">
+            <label>Billing Code</label>
+            <input type="text" id="job-billing" placeholder="Optional">
+          </div>
+          <div class="f">
+            <label>Contract Type <span style="color:var(--red)">*</span></label>
+            <select id="job-contract" onchange="onContractChange()">
+              <option value="">Select…</option>
+              <option value="County">County</option>
+              <option value="WSDOT">WSDOT</option>
+              <option value="ODOT">ODOT</option>
+              <option value="Private">Private</option>
+              <option value="City">City</option>
+              <option value="Tribal">Tribal</option>
+            </select>
+          </div>
+        </div>
+        <div class="type-note" id="wsdot-note">
+          ⚠️ <strong>WSDOT / ODOT job:</strong> Tab order will be set to Bark first, then Planting (no irrigation assumed). You can adjust phases on the next screen.
+        </div>
+        <div class="err-global" id="err-1"></div>
+        <div class="nav-row">
+          <button class="btn-next" onclick="goStep2()">Next: Select Phases →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: PHASES -->
+    <div id="step-2" style="display:none;">
+      <div class="card">
+        <h3>Select Job Phases</h3>
+        <p class="subtitle">Check every type of work that applies to this job. Only the tabs you check will appear on the job page.</p>
+        <div class="phase-grid" id="phase-grid">
+          <!-- populated by JS -->
+        </div>
+        <div style="margin-top:1.25rem;" id="order-wrap">
+          <div class="order-preview">
+            <h5>Tab order for this job</h5>
+            <div class="order-list" id="order-preview-list"></div>
+          </div>
+        </div>
+        <div class="err-global" id="err-2"></div>
+        <div class="nav-row">
+          <button class="btn-back" onclick="goStep1()">← Back</button>
+          <button class="btn-next" onclick="goStep3()">Review &amp; Create →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: REVIEW + CREATE -->
+    <div id="step-3" style="display:none;">
+      <div class="card">
+        <h3>Review &amp; Create</h3>
+        <p class="subtitle">Confirm everything looks right, then create the job page.</p>
+        <div style="background:var(--bg);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;" id="review-block"></div>
+        <div class="err-global" id="err-3"></div>
+        <div class="nav-row">
+          <button class="btn-back" onclick="goStep2()">← Back</button>
+          <button class="btn-next" id="create-btn" onclick="createJob()">✅ Create Job Page</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="step-result" style="display:none;">
+      <div class="result-card">
+        <div class="big">🌿</div>
+        <h3 id="result-name">Job Created!</h3>
+        <p>Your job page is ready. Bookmark this link and share it with your crew.</p>
+        <div class="job-link-box" id="result-link"></div>
+        <button class="btn-copy" onclick="copyLink()">📋 Copy Link</button>
+        <button class="btn-open" onclick="openJob()">→ Open Job Page</button>
+        <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+          <button onclick="resetWizard()" style="background:none;border:none;color:var(--gm);cursor:pointer;font-weight:700;font-size:0.9rem;">➕ Create Another Job</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENTIALS
+// ═══════════════════════════════════════════════
+var PORTAL_PW   = 'bellaterra';
+var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
+
+// ═══════════════════════════════════════════════
+// PHASE DEFINITIONS
+// ═══════════════════════════════════════════════
+var PHASES = [
+  {key:'soils',        icon:'🏔️', name:'Soils',              desc:'Soil prep, erosion control'},
+  {key:'irrigation',   icon:'💦', name:'Irrigation',          desc:'In-ground irrigation install'},
+  {key:'compost',      icon:'🌿', name:'Compost / Mulch',     desc:'Compost spread, mulch application'},
+  {key:'shipment',     icon:'🚚', name:'Plant Delivery',      desc:'Vendor & nursery deliveries'},
+  {key:'planting',     icon:'🌱', name:'Planting',            desc:'Tree & shrub planting'},
+  {key:'bark',         icon:'🌬️', name:'CAD Bark Blowing',   desc:'Bark chip application'},
+  {key:'hydroseeding', icon:'💧', name:'Hydroseeding',        desc:'Hydroseed application'},
+  {key:'stormwater',   icon:'🌊', name:'Stormwater / Pond',   desc:'Stormwater & pond planting'}
+];
+
+var ORDER_STD  = ['soils','irrigation','compost','shipment','planting','bark','hydroseeding','stormwater'];
+var ORDER_WSDOT= ['soils','bark','shipment','planting','hydroseeding','stormwater'];
+
+var PHASE_ICONS = {};
+PHASES.forEach(function(p){ PHASE_ICONS[p.key]=p.icon; });
+
+var selectedPhases = [];
+var createdJobId   = '';
+var createdJobName = '';
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+function doLogin(){
+  var pass=document.getElementById('login-pass').value;
+  var err=document.getElementById('login-err');
+  if(pass!==PORTAL_PW){err.style.display='block';return;}
+  err.style.display='none';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildPhaseGrid();
+}
+document.getElementById('login-pass').addEventListener('keypress',function(e){if(e.key==='Enter')doLogin();});
+
+// ═══════════════════════════════════════════════
+// PHASE GRID
+// ═══════════════════════════════════════════════
+function buildPhaseGrid(){
+  var grid=document.getElementById('phase-grid');
+  grid.innerHTML=PHASES.map(function(p){
+    return '<label class="phase-card" id="pc-'+p.key+'" onclick="togglePhase(\''+p.key+'\')" style="cursor:pointer;">'+
+      '<input type="checkbox" id="ph-'+p.key+'" onchange="updateOrder()" onclick="event.stopPropagation()">'+
+      '<span class="phase-icon">'+p.icon+'</span>'+
+      '<div class="phase-info"><div class="name">'+p.name+'</div><div class="desc">'+p.desc+'</div></div>'+
+    '</label>';
+  }).join('');
+}
+
+function togglePhase(key){
+  var cb=document.getElementById('ph-'+key);
+  cb.checked=!cb.checked;
+  var card=document.getElementById('pc-'+key);
+  card.classList.toggle('selected',cb.checked);
+  updateOrder();
+}
+
+function updateOrder(){
+  selectedPhases=PHASES.filter(function(p){var cb=document.getElementById('ph-'+p.key);return cb&&cb.checked;}).map(function(p){return p.key;});
+  var contract=document.getElementById('job-contract').value;
+  var isWsdot=(contract==='WSDOT'||contract==='ODOT');
+  var baseOrder=isWsdot?ORDER_WSDOT:ORDER_STD;
+  var ordered=baseOrder.filter(function(k){return selectedPhases.indexOf(k)>=0;});
+  // always add plans + staging + complete at logical positions
+  var displayOrder=['Plans'];
+  if(ordered.indexOf('planting')>=0||ordered.indexOf('shipment')>=0) displayOrder.push('Plant Staging');
+  ordered.forEach(function(k){ displayOrder.push(PHASE_ICONS[k]+' '+k.charAt(0).toUpperCase()+k.slice(1)); });
+  displayOrder.push('✅ Complete');
+
+  var list=document.getElementById('order-preview-list');
+  list.innerHTML=displayOrder.map(function(t,i){
+    return '<span class="order-tag">'+t+'</span>'+(i<displayOrder.length-1?'<span class="order-arrow">→</span>':'');
+  }).join('');
+}
+
+function onContractChange(){
+  var val=document.getElementById('job-contract').value;
+  var note=document.getElementById('wsdot-note');
+  note.style.display=(val==='WSDOT'||val==='ODOT')?'block':'none';
+  updateOrder();
+}
+
+// ═══════════════════════════════════════════════
+// STEP NAVIGATION
+// ═══════════════════════════════════════════════
+function setStep(n){
+  [1,2,3].forEach(function(i){
+    var s=document.getElementById('step-'+i); if(s) s.style.display=(i===n)?'block':'none';
+    var circle=document.getElementById('sc-'+i); var label=document.getElementById('sl-'+i);
+    if(i<n){circle.className='step-circle done';label.className='step-label';}
+    else if(i===n){circle.className='step-circle active';label.className='step-label active';}
+    else{circle.className='step-circle';label.className='step-label';}
+    if(i<3){var line=document.getElementById('line-'+i);if(line) line.className='step-line'+(i<n?' done':'');}
+  });
+}
+
+function goStep1(){ setStep(1); }
+
+function goStep2(){
+  var name=document.getElementById('job-name').value.trim();
+  var contract=document.getElementById('job-contract').value;
+  var err=document.getElementById('err-1');
+  err.style.display='none';
+  if(!name){err.textContent='Job Name is required.';err.style.display='block';return;}
+  if(!contract){err.textContent='Contract Type is required.';err.style.display='block';return;}
+  setStep(2);
+  updateOrder();
+}
+
+function goStep3(){
+  var err=document.getElementById('err-2');
+  err.style.display='none';
+  if(selectedPhases.length===0){err.textContent='Select at least one phase.';err.style.display='block';return;}
+  buildReview();
+  setStep(3);
+}
+
+function buildReview(){
+  var name=document.getElementById('job-name').value.trim();
+  var num=document.getElementById('job-num').value.trim();
+  var loc=document.getElementById('job-location').value.trim();
+  var billing=document.getElementById('job-billing').value.trim();
+  var contract=document.getElementById('job-contract').value;
+  var isWsdot=(contract==='WSDOT'||contract==='ODOT');
+  var baseOrder=isWsdot?ORDER_WSDOT:ORDER_STD;
+  var ordered=baseOrder.filter(function(k){return selectedPhases.indexOf(k)>=0;});
+
+  var rows=[
+    ['Job Name',name],
+    num?['Job #',num]:null,
+    loc?['Location',loc]:null,
+    billing?['Billing Code',billing]:null,
+    ['Contract Type',contract],
+    ['Phase Order',isWsdot?'WSDOT / ODOT (Bark before Planting)':'Standard'],
+    ['Phases',ordered.map(function(k){var p=PHASES.find(function(x){return x.key===k;});return p?p.icon+' '+p.name:k;}).join(', ')]
+  ].filter(Boolean);
+
+  document.getElementById('review-block').innerHTML=rows.map(function(r){
+    return '<div style="display:flex;padding:0.5rem 0;border-bottom:1px solid var(--pale);gap:1rem;">'+
+      '<span style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--gray);width:110px;flex-shrink:0;">'+r[0]+'</span>'+
+      '<span style="font-size:0.9rem;color:var(--text);">'+r[1]+'</span></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// CREATE JOB
+// ═══════════════════════════════════════════════
+async function createJob(){
+  var btn=document.getElementById('create-btn');
+  var err=document.getElementById('err-3');
+  err.style.display='none';
+  btn.disabled=true; btn.textContent='⏳ Creating…';
+
+  var name     = document.getElementById('job-name').value.trim();
+  var contract = document.getElementById('job-contract').value;
+  var isWsdot  = (contract==='WSDOT'||contract==='ODOT');
+
+  var payload={
+    action:'createJob',
+    name:     name,
+    jobNum:   document.getElementById('job-num').value.trim(),
+    location: document.getElementById('job-location').value.trim(),
+    billing:  document.getElementById('job-billing').value.trim(),
+    contractType: contract,
+    phases:   selectedPhases,
+    phaseOrder: isWsdot?'wsdot':'standard'
+  };
+
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    var data=await res.json();
+    if(data.success){
+      createdJobId   = data.jobId;
+      createdJobName = data.name;
+      showResult();
+    } else {
+      err.textContent='❌ '+(data.error||'Server error. Try again.');
+      err.style.display='block';
+    }
+  }catch(e){
+    err.textContent='❌ Network error: '+e.message;
+    err.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='✅ Create Job Page';
+}
+
+function showResult(){
+  [1,2,3].forEach(function(i){var s=document.getElementById('step-'+i);if(s)s.style.display='none';});
+  [1,2,3].forEach(function(i){
+    var c=document.getElementById('sc-'+i); if(c) c.className='step-circle done';
+    var l=document.getElementById('sl-'+i); if(l) l.className='step-label';
+    var ln=document.getElementById('line-'+i); if(ln) ln.className='step-line done';
+  });
+  var jobUrl='job_page.html?job='+createdJobId;
+  document.getElementById('result-name').textContent=createdJobName+' — Created!';
+  document.getElementById('result-link').textContent=jobUrl;
+  document.getElementById('step-result').style.display='block';
+}
+
+function copyLink(){
+  var url=document.getElementById('result-link').textContent;
+  navigator.clipboard.writeText(url).then(function(){alert('Link copied!');}).catch(function(){alert(url);});
+}
+
+function openJob(){
+  window.location.href=document.getElementById('result-link').textContent;
+}
+
+function resetWizard(){
+  selectedPhases=[];
+  document.getElementById('step-result').style.display='none';
+  document.getElementById('job-name').value='';
+  document.getElementById('job-num').value='';
+  document.getElementById('job-location').value='';
+  document.getElementById('job-billing').value='';
+  document.getElementById('job-contract').value='';
+  document.getElementById('wsdot-note').style.display='none';
+  PHASES.forEach(function(p){
+    var cb=document.getElementById('ph-'+p.key); if(cb) cb.checked=false;
+    var card=document.getElementById('pc-'+p.key); if(card) card.classList.remove('selected');
+  });
+  setStep(1);
+}
+</script>
+</body>
+</html>

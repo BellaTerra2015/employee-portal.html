@@ -118,8 +118,7 @@ button,input,select,textarea{font-family:inherit;}
 .reorder-success{display:none;background:#eaf7ea;border:1px solid var(--green-light);border-radius:8px;padding:1rem 1.25rem;color:var(--green-dark);font-weight:600;margin-top:1rem;font-size:0.92rem;line-height:1.65;}
 .reorder-success.show{display:block;}
 
-/* ── EMPLOYEE RESOURCES ── */
-#panel-resources{display:none;}
+/* Employee Resources → employee_resources.html (standalone page) */
 .panel-header{background:var(--green-dark);color:white;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;}
 .btn-back{background:transparent;color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.3);padding:0.4rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;}
 .panel-header h3{font-family:'Playfair Display',serif;font-size:1.2rem;}
@@ -461,13 +460,13 @@ button,input,select,textarea{font-family:inherit;}
           <h3>Fleet Management</h3>
           <p>Repair requests, maintenance log, inspections, accident reporting, and vehicle cards.</p>
         </a>
-        <div class="tile has-badge" onclick="showResources()">
+        <div class="tile has-badge" onclick="window.location.href='employee_resources.html'">
           <span class="tile-badge" id="res-badge">!</span>
           <div class="tile-icon">👥</div>
           <h3>Employee Resources</h3>
           <p>Handbook, required signatures, contacts, and HR documents.</p>
         </div>
-        <div class="tile" onclick="openServiceScheduler()">
+        <div class="tile" onclick="window.location.href='service_scheduler.html'">
           <div class="tile-icon">📋</div>
           <h3>Service Scheduler</h3>
           <p>Send day-before confirmation texts to tomorrow's customers.</p>
@@ -481,41 +480,7 @@ button,input,select,textarea{font-family:inherit;}
     </div>
   </div>
 
-  <!-- SCHEDULER PASSWORD MODAL -->
-  <div class="p-modal" id="scheduler-password-modal">
-    <div class="p-modal-box" style="max-width:420px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">📋 Service Scheduler</h3>
-        <button onclick="closeSchedulerPassword()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <p style="font-size:0.9rem;color:#666;margin-bottom:1.25rem;">Enter your scheduler password to access tomorrow's jobs.</p>
-      <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#2d5a27;margin-bottom:0.4rem;">Password</label>
-      <input type="password" id="scheduler-password"
-             onkeypress="if(event.key==='Enter')checkSchedulerPassword()"
-             style="width:100%;padding:0.75rem 1rem;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;margin-bottom:0.75rem;"
-             placeholder="Enter password">
-      <div id="scheduler-password-error" style="display:none;color:#c0392b;font-size:0.875rem;margin-bottom:0.75rem;">Incorrect password. Please try again.</div>
-      <button onclick="checkSchedulerPassword()"
-              style="width:100%;padding:0.85rem;background:#2d5a27;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">
-        Unlock Scheduler
-      </button>
-    </div>
-  </div>
-
-  <!-- SCHEDULER MODAL -->
-  <div class="p-modal" id="scheduler-modal">
-    <div class="p-modal-box" style="max-width:680px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">📋 Tomorrow's Confirmation Texts</h3>
-        <button onclick="closeServiceScheduler()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div id="scheduler-loading" style="display:none;text-align:center;padding:2rem;">
-        <div style="font-size:2rem;margin-bottom:0.75rem;">⏳</div>
-        <div style="color:#666;">Loading tomorrow's jobs from Google Calendar...</div>
-      </div>
-      <div id="scheduler-content"></div>
-    </div>
-  </div>
+  <!-- Service Scheduler → service_scheduler.html (standalone page) -->
 
   <!-- HYDRO MODAL -->
   <div class="p-modal" id="hydro-modal">
@@ -591,74 +556,7 @@ button,input,select,textarea{font-family:inherit;}
 
   <!-- Reorder Supplies → reorder.html (standalone page) -->
 
-  <!-- SCHEDULED JOBS PANEL -->
-  <div id="panel-scheduledjobs" style="display:none;min-height:100vh;background:var(--bg);">
-    <div style="background:var(--green-dark);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
-      <h2 style="font-family:'Playfair Display',serif;color:white;font-size:1.3rem;margin:0;">📅 Scheduled Jobs</h2>
-      <span id="sj-badge" style="font-size:0.8rem;color:rgba(255,255,255,0.75);"></span>
-    </div>
-    <div style="background:var(--green-dark);padding:4px 14px;border-top:1px solid rgba(255,255,255,0.1);">
-      <button class="btn-back" onclick="showTiles()" style="font-size:0.82rem;">← Back to Portal</button>
-    </div>
-
-    <!-- Category selector -->
-    <div id="sj-categories" style="padding:1.5rem;max-width:700px;margin:0 auto;">
-      <p style="font-size:0.9rem;color:var(--gray-mid);margin-bottom:1.25rem;">Select a job type to view active jobs and field reports.</p>
-      <div style="display:grid;gap:1rem;">
-        <button onclick="openSJCategory('hydroseeding')" style="display:flex;align-items:center;gap:1.25rem;background:white;border:2px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='#1a6b8a'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="font-size:2.2rem;">💧</span>
-          <div><div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:#1a6b8a;margin-bottom:0.2rem;">Hydroseeding</div><div style="font-size:0.82rem;color:var(--gray-mid);">Active hydroseed contracts and daily reports</div></div>
-          <span style="margin-left:auto;color:var(--gray-mid);font-size:1.3rem;">›</span>
-        </button>
-        <button onclick="openSJCategory('barkblowing')" style="display:flex;align-items:center;gap:1.25rem;background:white;border:2px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='#b85c00'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="font-size:2.2rem;">🌬️</span>
-          <div><div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:#b85c00;margin-bottom:0.2rem;">Bark Blowing</div><div style="font-size:0.82rem;color:var(--gray-mid);">Active bark blowing jobs and crew reports</div></div>
-          <span style="margin-left:auto;color:var(--gray-mid);font-size:1.3rem;">›</span>
-        </button>
-        <button onclick="openSJCategory('landscape')" style="display:flex;align-items:center;gap:1.25rem;background:white;border:2px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green-dark)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="font-size:2.2rem;">🌱</span>
-          <div><div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--green-dark);margin-bottom:0.2rem;">Ongoing Landscape Jobs</div><div style="font-size:0.82rem;color:var(--gray-mid);">Planting, restoration, and maintenance contracts</div></div>
-          <span style="margin-left:auto;color:var(--gray-mid);font-size:1.3rem;">›</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Job list view (filtered by category) -->
-    <div id="sj-job-list" style="display:none;padding:1.25rem;max-width:700px;margin:0 auto;"></div>
-
-    <!-- Job detail view -->
-    <div id="sj-detail" style="display:none;">
-      <div style="background:var(--green-dark);padding:1rem 1.25rem;">
-        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;">
-          <button onclick="closeSJDetail()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:0.35rem 0.75rem;cursor:pointer;font-size:0.82rem;">‹ Jobs</button>
-          <div>
-            <div id="sj-detail-title" style="font-family:'Playfair Display',serif;color:white;font-size:1.2rem;"></div>
-            <div id="sj-detail-status" style="font-size:0.78rem;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;"></div>
-          </div>
-        </div>
-        <div style="display:flex;overflow-x:auto;background:white;border-radius:8px;">
-          <button class="sj-step-btn" data-step="pullsheet" onclick="showSJStep('pullsheet',this)">Pull Sheet</button>
-          <button class="sj-step-btn" data-step="shipping" onclick="showSJStep('shipping',this)">Shipping</button>
-          <button class="sj-step-btn" data-step="sitecount" onclick="showSJStep('sitecount',this)">Site Count</button>
-          <button class="sj-step-btn" data-step="inspection" onclick="showSJStep('inspection',this)">Inspection</button>
-          <button class="sj-step-btn" data-step="planting" onclick="showSJStep('planting',this)">Planting</button>
-          <button class="sj-step-btn" data-step="billing" onclick="showSJStep('billing',this)">Billing</button>
-          <button class="sj-step-btn" data-step="maintenance" onclick="showSJStep('maintenance',this)">Maintenance</button>
-          <button class="sj-step-btn" data-step="herbicide" onclick="showSJStep('herbicide',this)">Herbicide</button>
-        </div>
-      </div>
-      <div style="padding:1.25rem;max-width:700px;margin:0 auto;">
-        <div id="sj-step-pullsheet" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-shipping" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-sitecount" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-inspection" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-planting" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-billing" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-maintenance" class="sj-step" style="display:none;"></div>
-        <div id="sj-step-herbicide" class="sj-step" style="display:none;"></div>
-      </div>
-    </div>
-  </div>
+  <!-- SCHEDULED JOBS PANEL → service_scheduler.html (standalone page) -->
 
   <!-- JOBS LIST PANEL -->
   <div id="panel-jobs" style="display:none;min-height:100vh;background:var(--bg);">
@@ -836,81 +734,7 @@ button,input,select,textarea{font-family:inherit;}
 
   <!-- Log a Call → log_a_call.html (standalone page) -->
 
-  <!-- EMPLOYEE RESOURCES PANEL -->
-  <div id="panel-resources">
-    <div class="panel-header">
-      <button class="btn-back" onclick="showTiles()">← Back</button>
-      <h3>👥 Employee Resources</h3>
-    </div>
-    <div class="panel-content">
-      <div class="res-nav">
-        <button class="res-tab active" onclick="showSubPanel('sub-dashboard',this)">🏠 Overview</button>
-        <button class="res-tab" onclick="showSubPanel('sub-directory',this)">👷 Team Directory</button>
-        <button class="res-tab" onclick="showSubPanel('sub-contacts',this)">📋 Contacts</button>
-        <button class="res-tab" onclick="showSubPanel('sub-signatures',this)">✍️ Signatures <span class="badge" id="sig-badge">2</span></button>
-        <button class="res-tab" onclick="showSubPanel('sub-handbook',this)">📖 Handbook <span class="badge" id="handbook-badge">!</span></button>
-      </div>
-      <div class="sub-panel active" id="sub-dashboard">
-        <div class="welcome-card"><h3>Your To-Do List</h3><p>Complete required signatures and review your handbook. All signed documents are automatically sent to payroll.</p></div>
-        <div class="tasks-grid">
-          <div class="task-card annual" onclick="showSubPanel('sub-signatures',null)"><div class="task-label">📅 Annual · Due Jan 1</div><h4>4/10 Work Agreement</h4><p>Review and sign your annual 4/10 work schedule agreement.</p><div class="task-status" id="status-410">⚠ Signature required</div></div>
-          <div class="task-card required" onclick="showSubPanel('sub-signatures',null)"><div class="task-label">📋 Required</div><h4>Breaks &amp; Meal Period</h4><p>Acknowledge Washington State rest and meal break policies.</p><div class="task-status" id="status-breaks">⚠ Signature required</div></div>
-          <div class="task-card required" onclick="showSubPanel('sub-handbook',null)"><div class="task-label">📖 Required</div><h4>Employee Handbook</h4><p>Read all sections and initial the required chapters.</p><div class="task-status" id="status-handbook">⚠ Initials required</div></div>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-handbook">
-        <div class="section-header"><h3>Employee Handbook</h3><div class="divider"></div></div>
-        <div class="handbook-progress"><div class="progress-bar-wrap"><div class="progress-label">Handbook Completion</div><div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div><div class="progress-count"><span id="progress-num">0</span>/5</div></div>
-        <div class="complete-badge" id="handbook-complete"><h3>✅ Handbook Complete!</h3><p>All required sections initialed. Acknowledgments sent to payroll.</p></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-1">1</div><div class="chapter-title-wrap"><div class="chapter-title">About This Manual &amp; Company Overview</div><div class="chapter-type read-only">📘 Read — No initials required</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><p>While Bella Terra was established as, and is registered as, a limited liability corporation, we use the terms "Bella Terra, LLC," "Bella Terra," and "the Company" interchangeably throughout this manual.</p><p style="margin-top:0.75rem">Employees are encouraged to ask questions and provide feedback to their Team Leader, Foreman, Supervisor, or Management. Please bring any errors or suggestions to the attention of Heather Hooper.</p><h4>Purpose</h4><p>This manual is designed to develop clear communication of company policies and provide a positive contribution to team morale and operational success.</p></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-2">2</div><div class="chapter-title-wrap"><div class="chapter-title">New Employee Onboarding &amp; Required Forms</div><div class="chapter-type initial" id="type-2">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Pre-Hire Screening</h4><p>All potential employees are subject to pre-employment drug and alcohol testing.</p><h4>Required Forms Upon Hire</h4><ul><li><strong>USCIS Form I-9</strong> — Identity and employment authorization</li><li><strong>W-4</strong> — Federal tax withholding</li><li><strong>Direct Deposit Form</strong></li><li><strong>Trade Secret &amp; Non-Solicitation Agreement</strong></li><li><strong>4/10 Work Agreement</strong> (signed annually)</li><li><strong>Breaks &amp; Meal Period Acknowledgment</strong> (signed annually)</li></ul></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand the New Employee Onboarding section.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-2" maxlength="4"><button class="btn-initial" onclick="saveInitial(2)">Confirm Initials</button><div class="initial-done" id="done-2">✅ Initialed</div></div></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-3">3</div><div class="chapter-title-wrap"><div class="chapter-title">Operations, Scheduling &amp; Payroll</div><div class="chapter-type initial" id="type-3">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>4/10 Work Week</h4><p>Bella Terra operates on a 4/10 schedule — four 10-hour days per week.</p><h4>Rest and Meal Breaks</h4><ul><li>Paid 10-minute rest break for every 4 hours worked</li><li>Unpaid 30-minute meal break when working more than 5 hours</li><li>Breaks may not be skipped or waived to leave early</li></ul><h4>Payroll</h4><ul><li>Time cards must be accurately completed each day</li><li>Overtime is calculated on hours worked over 40 per week</li><li>Direct deposit is available and encouraged</li></ul></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's scheduling, break, and payroll policies.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-3" maxlength="4"><button class="btn-initial" onclick="saveInitial(3)">Confirm Initials</button><div class="initial-done" id="done-3">✅ Initialed</div></div></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-4">4</div><div class="chapter-title-wrap"><div class="chapter-title">Employee Health &amp; Welfare / Paid Sick Leave</div><div class="chapter-type read-only">📘 Read — No initials required</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Paid Sick Leave</h4><p>Employees earn 1 hour of paid sick leave for every 40 hours worked.</p><h4>Employer-Funded Medical Care</h4><p>Bella Terra covers up to 4 visits per year at <strong>Vital Care Primary &amp; Urgent Care</strong>, 1207 SE Rasmussen Blvd, Suite 119, Battle Ground, WA · (360) 723-0528</p></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-5">5</div><div class="chapter-title-wrap"><div class="chapter-title">Drug &amp; Alcohol Policy</div><div class="chapter-type initial" id="type-5">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Zero Tolerance Policy</h4><p>Bella Terra has a zero-tolerance policy for illegal substances and alcohol use during work hours.</p><h4>Marijuana — Washington State Notice</h4><p><strong>Any detectable level of marijuana impairment during work hours is prohibited.</strong></p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Drug &amp; Alcohol Policy.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-5" maxlength="4"><button class="btn-initial" onclick="saveInitial(5)">Confirm Initials</button><div class="initial-done" id="done-5">✅ Initialed</div></div></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-6">6</div><div class="chapter-title-wrap"><div class="chapter-title">Out-of-Town Project Housing Policy</div><div class="chapter-type initial" id="type-6">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Strictly Prohibited in Company Housing</h4><ul><li>Alcohol in any form</li><li>Illegal drugs or marijuana</li><li>Vaping or tobacco products indoors</li><li>Guests not employed by Bella Terra on the same project</li></ul><h4>Room Assignments &amp; Privacy</h4><p><strong>Any employee sharing housing with employees of a different gender will be assigned a private bedroom with a private or en-suite bathroom.</strong></p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and understand Bella Terra's Housing Policy.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-6" maxlength="4"><button class="btn-initial" onclick="saveInitial(6)">Confirm Initials</button><div class="initial-done" id="done-6">✅ Initialed</div></div></div></div></div>
-        <div class="handbook-chapter"><div class="chapter-header" onclick="toggleChapter(this)"><div class="chapter-num" id="num-7">7</div><div class="chapter-title-wrap"><div class="chapter-title">Trade Secret &amp; Non-Solicitation Agreement</div><div class="chapter-type initial" id="type-7">✍ Initial required after reading</div></div><span class="chapter-arrow">▼</span></div><div class="chapter-body"><div class="chapter-content"><h4>Protected Confidential Information</h4><ul><li>Hydroseeding application techniques, seed mixes, mulch formulas</li><li>Customer lists, contact information, pricing, and project history</li><li>Equipment settings, operational procedures, and efficiency methods</li></ul><h4>Non-Solicitation of Customers</h4><p>For <strong>18 months following separation</strong> from Bella Terra, you agree not to directly solicit any current Bella Terra customer.</p></div><div class="initial-block"><p><strong>Initial to confirm:</strong> I have read and agree to Bella Terra's Trade Secret &amp; Non-Solicitation policy.</p><div class="initial-row"><input type="text" placeholder="Initials" id="init-7" maxlength="4"><button class="btn-initial" onclick="saveInitial(7)">Confirm Initials</button><div class="initial-done" id="done-7">✅ Initialed</div></div></div></div></div>
-        <div id="handbook-submit-wrap" style="display:none;margin-top:1.5rem;"><div class="sig-card"><h4>Submit Handbook Acknowledgment</h4><div class="description">All required sections initialed. Submit to send your acknowledgment to payroll.</div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="hb-name" placeholder="First Last"></div><div class="form-group"><label>Date</label><input type="date" id="hb-date"></div></div><button class="btn-submit" onclick="submitHandbook()">📤 Submit Acknowledgment</button><div class="success-msg" id="hb-success">✅ Acknowledgment sent to payroll</div></div></div>
-      </div>
-      <div class="sub-panel" id="sub-signatures">
-        <div class="section-header"><h3>Required Signatures</h3><div class="divider"></div></div>
-        <div class="annual-info"><p><strong>Annual Documents:</strong> The 4/10 Work Agreement and Breaks &amp; Meal Period Acknowledgment must be signed at the start of each calendar year. Completed signatures are emailed to <strong>payroll&#64;1BellaTerra.com</strong>.</p></div>
-        <div class="sig-card"><h4>📅 4/10 Work Schedule Agreement</h4><div class="description">Must be signed at the beginning of each calendar year or upon first login on a new device.</div><div class="doc-preview"><h5>Bella Terra LLC — 4/10 Work Schedule Agreement</h5><p>I understand and agree to Bella Terra's 4/10 work schedule — four (4) ten (10) hour workdays per week. I understand that:</p><ul><li>My standard workday will be 10 hours, not including unpaid meal breaks</li><li>Overtime is calculated on hours in excess of 40 per workweek</li><li>My specific days and hours will be assigned by my supervisor and may vary seasonally</li><li>This agreement is reviewed and re-executed annually</li></ul></div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="410-name" placeholder="First Last"></div><div class="form-group"><label>Position</label><input type="text" id="410-position" placeholder="e.g. Hydroseeder Operator"></div></div><div class="form-row"><div class="form-group"><label>Date of Hire</label><input type="date" id="410-hire"></div><div class="form-group"><label>Today's Date</label><input type="date" id="410-date"></div></div><div class="sig-pad-wrap"><label>Employee Signature (draw below)</label><canvas class="sig-pad" id="canvas-410" width="500" height="120"></canvas><div class="sig-controls"><button class="btn-clear" onclick="clearSig('canvas-410')">✕ Clear</button><span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span></div></div><div class="consent-check"><input type="checkbox" id="consent-410"><label for="consent-410">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to the 4/10 Work Schedule Agreement.</label></div><button class="btn-submit" onclick="submitForm('410')">📤 Submit Agreement</button><div class="success-msg" id="success-410">✅ 4/10 Agreement submitted to payroll</div></div>
-        <div class="sig-card"><h4>🍽 Break &amp; Meal Period Acknowledgment</h4><div class="description">Washington State requires annual documentation that employees understand rest and meal break rights.</div><div class="doc-preview"><h5>Bella Terra — Break &amp; Meal Period Acknowledgment</h5><p><strong>Rest Breaks (Paid):</strong> 10 minutes for every 4 hours worked. Cannot be waived to leave early.</p><p style="margin-top:0.5rem"><strong>Meal Breaks (Unpaid):</strong> 30 minutes when working more than 5 hours.</p><ul style="margin-top:0.5rem"><li>Take your assigned breaks as scheduled</li><li>Immediately notify your supervisor if you cannot take a break</li></ul></div><div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="breaks-name" placeholder="First Last"></div><div class="form-group"><label>Position</label><input type="text" id="breaks-position" placeholder="e.g. Crew Member"></div></div><div class="form-row"><div class="form-group"><label>Date of Hire</label><input type="date" id="breaks-hire"></div><div class="form-group"><label>Today's Date</label><input type="date" id="breaks-date"></div></div><div class="sig-pad-wrap"><label>Employee Signature (draw below)</label><canvas class="sig-pad" id="canvas-breaks" width="500" height="120"></canvas><div class="sig-controls"><button class="btn-clear" onclick="clearSig('canvas-breaks')">✕ Clear</button><span style="font-size:0.78rem;color:var(--gray-mid);align-self:center">Draw with mouse or finger</span></div></div><div class="consent-check"><input type="checkbox" id="consent-breaks"><label for="consent-breaks">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to Bella Terra's Break &amp; Meal Period policies.</label></div><button class="btn-submit" onclick="submitForm('breaks')">📤 Submit Acknowledgment</button><div class="success-msg" id="success-breaks">✅ Acknowledgment submitted to payroll</div></div>
-      </div>
-      <div class="sub-panel" id="sub-contacts">
-        <div class="section-header"><h3>Contacts &amp; Resources</h3><div class="divider"></div></div>
-        <div class="resource-grid">
-          <a class="resource-card" href="https://www.lni.wa.gov/WorkplaceRights" target="_blank"><div class="resource-icon">⚖️</div><h4>WA Labor &amp; Industries</h4><p>Workplace rights, L&amp;I claims, safety resources.</p></a>
-          <a class="resource-card" href="https://www.vitalcarewa.com" target="_blank"><div class="resource-icon">🏥</div><h4>Vital Care Urgent Care</h4><p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p></a>
-          <div class="resource-card"><div class="resource-icon">📧</div><h4>HR / Office</h4><p>Liz Prather<br>office&#64;1BellaTerra.com</p></div>
-          <a class="resource-card" href="tel:3606065616"><div class="resource-icon">📞</div><h4>Safety — Rena Bellika</h4><p>(360) 606-5616</p></a>
-          <a class="resource-card" href="tel:3605609860"><div class="resource-icon">🦺</div><h4>Safety — Brydon Bellika</h4><p>(360) 560-9860</p></a>
-          <div class="resource-card"><div class="resource-icon">💵</div><h4>Payroll</h4><p>payroll&#64;1BellaTerra.com</p></div>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-directory">
-        <div class="section-header"><h3>👷 Team Directory</h3><div class="divider"></div></div>
-        <p style="font-size:0.85rem;color:var(--gray-mid);margin-bottom:1.5rem;">Tap a card to call. Listed alphabetically.</p>
-        <div class="resource-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
-          <div class="resource-card"><h4>Elynn Alholinna</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Nursery Lead · Field Crew</p><a href="tel:9063701837" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (906) 370-1837</a></div>
-          <div class="resource-card" style="border-left:3px solid var(--green-dark);"><h4>Brydon Bellika</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">VP · Co-Owner · Class A CDL</p><a href="tel:3605609860" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 560-9860</a><p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Call Brydon before Rena for field issues</p></div>
-          <div class="resource-card" style="border-left:3px solid var(--green-dark);"><h4>Rena Bellika</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Owner · Class B CDL</p><a href="tel:3606065616" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 606-5616</a><p style="font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.5rem;">Call Rena only if no one else can help</p></div>
-          <div class="resource-card" style="border-left:3px solid var(--green-dark);"><h4>Garrett Booker</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Superintendent · Class A CDL</p><a href="tel:3605602290" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 560-2290</a></div>
-          <div class="resource-card"><h4>Juan Gonzalez</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Field Crew · Bilingual EN/ES</p><a href="tel:3602067159" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 206-7159</a></div>
-          <div class="resource-card"><h4>Emily Greer</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Payroll · Onboarding</p><a href="tel:3609072420" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 907-2420</a></div>
-          <div class="resource-card"><h4>Heather Hooper</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Office/Admin · Wed–Fri</p><a href="tel:9712607063" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (971) 260-7063</a></div>
-          <div class="resource-card"><h4>Joe Jumalon</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Head Laborer · Bark Blowing</p><a href="tel:5038576952" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (503) 857-6952</a></div>
-          <div class="resource-card"><h4>Ethan Kludt-Painter</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Sales &amp; Logistics</p><a href="tel:9075184130" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (907) 518-4130</a></div>
-          <div class="resource-card"><h4>Evaristo Lopez</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Field Crew · Operator in Training</p><a href="tel:3607236463" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 723-6463</a></div>
-          <div class="resource-card"><h4>Adriane North</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Class A CDL · Wednesdays Only</p><a href="tel:13609214013" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 921-4013</a></div>
-          <div class="resource-card"><h4>Elizabeth (Liz) Prather</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Accounting &amp; HR</p><a href="tel:3609802969" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 980-2969</a></div>
-          <div class="resource-card"><h4>Randy Schmeusser</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Class A CDL · Field Crew</p><a href="tel:3606013173" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 601-3173</a></div>
-          <div class="resource-card" style="border-left:3px solid var(--green-dark);"><h4>Robert Serna</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Head Bark Blower · Class A CDL · Bilingual EN/ES</p><a href="tel:9712372452" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (971) 237-2452</a></div>
-          <div class="resource-card"><h4>Kevin Willbur</h4><p style="font-size:0.78rem;font-weight:700;color:var(--green-mid);text-transform:uppercase;margin-bottom:0.4rem;">Lead Estimator</p><a href="tel:3607986759" style="display:block;font-size:0.85rem;color:var(--blue-accent);text-decoration:none;">📱 (360) 798-6759</a></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Employee Resources → employee_resources.html (standalone page) -->
 
   <!-- ═══ NURSERY PANEL ═══ -->
   <div id="panel-nursery">
@@ -1317,15 +1141,13 @@ function showNursery(){
 }
 
 function showTiles(){
-  document.getElementById('panel-resources').style.display='none';
   document.getElementById('panel-nursery').style.display='none';
-  document.getElementById('panel-scheduledjobs').style.display='none';
   document.getElementById('panel-jobs').style.display='none';
   document.getElementById('panel-olydisco').style.display='none';
   document.getElementById('panel-log-call').style.display='none';
   document.getElementById('main-tiles').style.display='block';
 }
-function showResources(){document.getElementById('main-tiles').style.display='none';document.getElementById('panel-resources').style.display='block';}
+// Employee Resources → employee_resources.html (standalone page)
 function showSubPanel(id,btn){
   document.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -3107,276 +2929,7 @@ function loadSchollsValley(){
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('login-pass').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
 });
-  // ═══════════════════════════════════════════════
-// SERVICE SCHEDULER
-// ═══════════════════════════════════════════════
-const SCHEDULER_PASSWORD = 'BigGrass2026!';
-const APPS_SCRIPT_SCHEDULER_URL = 'https://script.google.com/macros/s/AKfycbzVCPFrgdetIrxKHqVi68ZVY7J3kS38HZycXLl_yq3_OTEiNlT_k5OfJPZWp-Vgt1rZ8Q/exec';
-
-let schedulerJobs = [];
-
-function openServiceScheduler() {
-  document.getElementById('scheduler-password').value = '';
-  document.getElementById('scheduler-password-error').style.display = 'none';
-  document.getElementById('scheduler-password-modal').classList.add('open');
-  setTimeout(() => document.getElementById('scheduler-password').focus(), 200);
-}
-
-function closeSchedulerPassword() {
-  document.getElementById('scheduler-password-modal').classList.remove('open');
-}
-
-function checkSchedulerPassword() {
-  const password = document.getElementById('scheduler-password').value;
-  if (password === SCHEDULER_PASSWORD) {
-    closeSchedulerPassword();
-    loadSchedulerJobs();
-  } else {
-    document.getElementById('scheduler-password-error').style.display = 'block';
-  }
-}
-
-function closeServiceScheduler() {
-  document.getElementById('scheduler-modal').classList.remove('open');
-}
-
-async function loadSchedulerJobs() {
-  document.getElementById('scheduler-modal').classList.add('open');
-  document.getElementById('scheduler-loading').style.display = 'block';
-  document.getElementById('scheduler-content').innerHTML = '';
-  
-  try {
-    const response = await fetch(APPS_SCRIPT_SCHEDULER_URL + '?action=getTomorrowJobs');
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    
-    schedulerJobs = data.jobs || [];
-    renderSchedulerJobs();
-    
-  } catch (error) {
-    document.getElementById('scheduler-content').innerHTML = `
-      <div style="background:var(--red-lt);border:2px solid var(--red);border-radius:10px;padding:1.5rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div>
-        <div style="font-weight:600;color:var(--red);margin-bottom:0.5rem;">Error Loading Jobs</div>
-        <div style="font-size:0.875rem;color:var(--text);">${error.message}</div>
-      </div>`;
-  }
-  
-  document.getElementById('scheduler-loading').style.display = 'none';
-}
-
-function renderSchedulerJobs() {
-  const content = document.getElementById('scheduler-content');
-  
-  if (!schedulerJobs.length) {
-    content.innerHTML = `
-      <div style="background:var(--green-pale);border:2px solid var(--green-light);border-radius:10px;padding:1.5rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">✅</div>
-        <div style="font-weight:600;color:var(--green-dark);">No jobs scheduled for tomorrow</div>
-      </div>`;
-    return;
-  }
-  
-  let html = `
-    <div style="background:var(--green-pale);border-radius:10px;padding:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;">
-      <span><strong>${schedulerJobs.length} job(s)</strong> scheduled for tomorrow. Uncheck any you don't want to text.</span>
-      <button onclick="toggleAllJobs()" id="select-all-btn"
-              style="padding:0.4rem 0.85rem;background:white;border:2px solid var(--green-mid);border-radius:7px;font-size:0.82rem;font-weight:600;color:var(--green-dark);cursor:pointer;white-space:nowrap;margin-left:1rem;">
-        Uncheck All
-      </button>
-    </div>`;
-
-  schedulerJobs.forEach((job, index) => {
-    html += `
-      <div id="job-card-${index}" style="background:white;border:2px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem;transition:opacity 0.2s;">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;">
-          <div style="display:flex;align-items:center;gap:0.75rem;">
-            <input type="checkbox" id="job-check-${index}" checked
-                   onchange="toggleJobSelection(${index})"
-                   style="width:20px;height:20px;accent-color:var(--green-dark);cursor:pointer;flex-shrink:0;">
-            <div>
-              <div style="font-weight:700;font-size:1.1rem;color:var(--green-dark);">${job.customerName}</div>
-              <div style="font-size:0.875rem;color:var(--gray-mid);margin-top:0.25rem;">${job.phone}</div>
-            </div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);">Calendar</div>
-            <div style="font-weight:600;color:var(--green-mid);">${job.calendar}</div>
-          </div>
-        </div>
-        
-        <div style="background:var(--gray-light);border-radius:8px;padding:1rem;margin-bottom:1rem;">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);margin-bottom:0.5rem;">Services</div>
-          ${job.services.map(s => `<div style="font-size:0.95rem;margin-bottom:0.25rem;">• ${s}</div>`).join('')}
-        </div>
-        
-        <div style="background:var(--gray-light);border-radius:8px;padding:1rem;margin-bottom:1rem;">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-mid);margin-bottom:0.5rem;">Address</div>
-          <div style="font-size:0.95rem;">${job.address}</div>
-        </div>
-        
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
-          <div>
-            <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green-dark);margin-bottom:0.4rem;">Start Time</label>
-            <input type="time" id="start-${index}" value="${job.startTime}" 
-                   onchange="updateJobTime(${index}, 'start', this.value)"
-                   style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;">
-          </div>
-          <div>
-            <label style="display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--green-dark);margin-bottom:0.4rem;">End Time</label>
-            <input type="time" id="end-${index}" value="${job.endTime}" 
-                   onchange="updateJobTime(${index}, 'end', this.value)"
-                   style="width:100%;padding:0.6rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;">
-          </div>
-          <div style="display:flex;align-items:flex-end;">
-            <button onclick="previewMessage(${index})" 
-                    style="width:100%;padding:0.6rem;background:var(--blue-accent);color:white;border:none;border-radius:7px;font-weight:600;cursor:pointer;">
-              👁 Preview
-            </button>
-          </div>
-        </div>
-        
-        <div id="preview-${index}" style="display:none;background:var(--green-pale);border:2px solid var(--green-light);border-radius:8px;padding:1rem;margin-top:1rem;font-family:monospace;font-size:0.85rem;white-space:pre-wrap;"></div>
-      </div>`;
-  });
-  
-  html += `
-    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
-      <button onclick="sendAllConfirmations()" id="send-btn"
-              style="flex:1;padding:1rem;background:var(--green-dark);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
-        📤 Send Confirmations (${schedulerJobs.length})
-      </button>
-      <button onclick="closeServiceScheduler()"
-              style="padding:1rem 1.5rem;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:10px;font-size:1rem;cursor:pointer;">
-        Cancel
-      </button>
-    </div>`;
-  
-  content.innerHTML = html;
-}
-
-function toggleJobSelection(index) {
-  const checked = document.getElementById(`job-check-${index}`).checked;
-  const card = document.getElementById(`job-card-${index}`);
-  card.style.opacity = checked ? '1' : '0.4';
-  card.style.borderColor = checked ? 'var(--border)' : '#ccc';
-  updateSendButton();
-}
-
-function toggleAllJobs() {
-  const allChecked = schedulerJobs.every((_, i) =>
-    document.getElementById(`job-check-${i}`)?.checked);
-  schedulerJobs.forEach((_, i) => {
-    const cb = document.getElementById(`job-check-${i}`);
-    if (cb) { cb.checked = !allChecked; toggleJobSelection(i); }
-  });
-  document.getElementById('select-all-btn').textContent = allChecked ? 'Check All' : 'Uncheck All';
-}
-
-function updateSendButton() {
-  const count = schedulerJobs.filter((_, i) =>
-    document.getElementById(`job-check-${i}`)?.checked).length;
-  const btn = document.getElementById('send-btn');
-  if (btn) {
-    btn.textContent = `📤 Send Confirmations (${count})`;
-    btn.disabled = count === 0;
-    btn.style.background = count === 0 ? '#aaa' : 'var(--green-dark)';
-  }
-}
-
-function updateJobTime(index, type, value) {
-  if (type === 'start') {
-    schedulerJobs[index].startTime = value;
-  } else {
-    schedulerJobs[index].endTime = value;
-  }
-}
-
-function previewMessage(index) {
-  const job = schedulerJobs[index];
-  const preview = document.getElementById(`preview-${index}`);
-  
-  const message = buildConfirmationMessage(job);
-  preview.textContent = message;
-  preview.style.display = 'block';
-}
-
-function buildConfirmationMessage(job) {
-  const start = formatTime(job.startTime);
-  const end = formatTime(job.endTime);
-  const date = job.date; // Already formatted as "April 8th"
-  
-  let serviceText;
-  if (job.services.length === 1) {
-    serviceText = `SERVICE: ${job.services[0]}`;
-  } else {
-    serviceText = `SERVICES:\n${job.services.map(s => `• ${s}`).join('\n')}`;
-  }
-  
-  return `Good news! ☀️ Bella Terra scheduled for tomorrow, ${date} between ${start} - ${end}.
-
-${serviceText}
-
-ADDRESS: ${job.address}
-
-Reply Y to confirm, D to delay or update, C to cancel.
-
-Questions? Call 360-225-1125`;
-}
-
-function formatTime(time24) {
-  const [hours, minutes] = time24.split(':');
-  const h = parseInt(hours);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-  return `${h12}:${minutes} ${ampm}`;
-}
-
-async function sendAllConfirmations() {
-  const selectedJobs = schedulerJobs.filter((_, i) =>
-    document.getElementById(`job-check-${i}`)?.checked);
-
-  if (selectedJobs.length === 0) {
-    alert('No customers selected. Check at least one box to send.');
-    return;
-  }
-
-  if (!confirm(`Send confirmation texts to ${selectedJobs.length} customer(s)?`)) {
-    return;
-  }
-
-  const button = document.getElementById('send-btn');
-  button.disabled = true;
-  button.textContent = 'Sending...';
-
-  try {
-    const response = await fetch(APPS_SCRIPT_SCHEDULER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'sendConfirmations',
-        jobs: selectedJobs
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      alert(`✅ Successfully sent ${result.sent} confirmation text(s)!`);
-      closeServiceScheduler();
-    } else {
-      throw new Error(result.error || 'Unknown error');
-    }
-    
-  } catch (error) {
-    alert(`❌ Error sending texts: ${error.message}`);
-    button.disabled = false;
-    updateSendButton();
-  }
-}
+  // Service Scheduler → service_scheduler.html (standalone page)
 
 // ═══════════════════════════════════════════════
 // JOBS / OLY DISCO
@@ -3405,7 +2958,7 @@ var plantRowCount = 0, shipRowCount = 0, hydroRowCount = 0;
 
 // ── Navigation ──
 function showJobs(){
-  ['main-tiles','panel-scheduledjobs','panel-resources','panel-nursery','panel-olydisco']
+  ['main-tiles','panel-nursery','panel-olydisco']
     .forEach(id=>{ var el=document.getElementById(id); if(el) el.style.display='none'; });
   document.getElementById('panel-jobs').style.display='block';
   renderJobsList();
