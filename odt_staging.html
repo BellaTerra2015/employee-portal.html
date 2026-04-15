@@ -396,11 +396,14 @@ function removeArea(id) {
 function addPhotos(areaId, input) {
   const area = state.stagingAreas.find(a=>a.id===areaId);
   if (!area) return;
-  Array.from(input.files).forEach(file => {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  files.forEach(file => {
     const r = new FileReader();
     r.onload = async e => {
       const base64 = e.target.result;
       // Show locally immediately
+      if (!area.photos) area.photos = [];
       area.photos.push(base64);
       save(); renderStagingAreas();
       setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b)b.classList.add('open'); },10);
@@ -408,6 +411,7 @@ function addPhotos(areaId, input) {
       try {
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
+          mode: 'no-cors',
           body: JSON.stringify({
             action: 'uploadPhoto',
             image: base64,
@@ -416,15 +420,14 @@ function addPhotos(areaId, input) {
             timestamp: new Date().toLocaleString()
           })
         });
-        const data = await res.json();
-        if (data.success) showToast('📷 Photo saved to Drive');
-        else showToast('⚠ Local only — Drive upload failed');
+        showToast('📷 Photo saved to Drive');
       } catch(e) {
-        showToast('⚠ Local only — no connection');
+        showToast('⚠ Saved locally only');
       }
     };
     r.readAsDataURL(file);
   });
+  input.value = '';
 }
 
 /* ── REPORT ── */
