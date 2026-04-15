@@ -350,7 +350,7 @@ function stagingAreaHTML(area) {
         <h4>📷 Staging Photos</h4>
         <div class="photo-grid" id="photos-${area.id}">
           ${photos}
-          <label class="photo-add-btn" for="fi-${area.id}"><span>+</span>Add</label>
+      <button class="photo-add-btn" onclick="document.getElementById('fi-${area.id}').click()"><span>+</span>Add</button>
           <input type="file" id="fi-${area.id}" accept="image/*" multiple onchange="addPhotos('${area.id}',this)">
         </div>
       </div>
