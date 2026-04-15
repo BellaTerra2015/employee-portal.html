@@ -7,27 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --soil: #2C2416;
-    --bark: #5C3D1E;
-    --moss: #4A6741;
-    --sage: #7A9970;
-    --straw: #D4B896;
-    --gold: #C9893A;
-    --cream: #F5EFE6;
-    --white: #FFFFFF;
-    --danger: #C0392B;
-    --success: #27AE60;
-    --radius: 10px;
+    --soil: #2C2416; --bark: #5C3D1E; --moss: #4A6741; --sage: #7A9970;
+    --straw: #D4B896; --gold: #C9893A; --cream: #F5EFE6; --white: #FFFFFF;
+    --danger: #C0392B; --success: #27AE60; --radius: 10px;
     --shadow: 0 2px 12px rgba(44,36,22,0.13);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--soil); min-height: 100vh; }
 
-  .header {
-    background: var(--soil); color: var(--straw); padding: 16px 20px 12px;
-    display: flex; align-items: center; gap: 14px;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 12px rgba(0,0,0,0.3);
-  }
+  .header { background: var(--soil); color: var(--straw); padding: 16px 20px 12px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
   .header-back { background: none; border: 1.5px solid var(--straw); color: var(--straw); border-radius: 6px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; }
   .header-title { flex: 1; }
   .header-title h1 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--gold); line-height: 1.1; }
@@ -52,11 +40,9 @@
   .manifest-table tr:last-child td { border-bottom: none; }
   .manifest-table tr.loaded { background: #f0faf3; }
   .manifest-table tr.loaded .species-name { text-decoration: line-through; opacity: 0.5; }
-
   .load-check { width: 28px; height: 28px; border-radius: 6px; border: 2px solid var(--sage); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; flex-shrink: 0; }
   .load-check.checked { background: var(--moss); border-color: var(--moss); color: white; }
 
-  /* ── STAGING DARK THEME ── */
   .staging-banner { background: #0a0a0a; color: #fff; text-align: center; padding: 20px 16px 16px; margin-bottom: 14px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
   .staging-banner h2 { font-family: 'Playfair Display', serif; font-size: 40px; letter-spacing: 8px; color: var(--gold); text-transform: uppercase; line-height: 1; }
   .staging-banner p { font-size: 12px; color: #777; margin-top: 6px; letter-spacing: 1px; }
@@ -85,7 +71,6 @@
   .staging-table td { padding: 10px 12px; border-bottom: 1px solid #1c1c1c; vertical-align: middle; color: #ddd; }
   .staging-table tr:last-child td { border-bottom: none; }
   .staging-table tr:hover td { background: #161616; }
-
   .s-name { font-size: 13px; font-weight: 600; color: #f0f0f0; }
   .s-bot { font-size: 11px; color: #666; font-style: italic; }
 
@@ -94,7 +79,6 @@
   .count-btn:active { background: #3a3a3a; }
   .count-display { width: 52px; height: 30px; text-align: center; font-size: 15px; font-weight: 700; border: 1.5px solid #333; border-radius: 6px; color: #fff; background: #0a0a0a; font-family: 'DM Sans', sans-serif; }
   .count-display:focus { outline: none; border-color: var(--gold); }
-
   .rows-badge { font-size: 11px; background: #222; color: var(--gold); border-radius: 10px; padding: 3px 9px; font-weight: 700; min-width: 54px; text-align: center; white-space: nowrap; display: inline-block; }
 
   .staging-total-bar { background: var(--gold); color: #0a0a0a; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -104,11 +88,11 @@
 
   .photo-section { padding: 12px 16px; border-top: 1px solid #222; background: #0d0d0d; }
   .photo-section h4 { color: #777; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .photo-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .photo-grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
   .photo-thumb { width: 72px; height: 72px; border-radius: 7px; object-fit: cover; border: 2px solid #333; }
-  .photo-add-btn { width: 72px; height: 72px; border-radius: 7px; border: 2px dashed #333; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-size: 11px; color: #666; }
-  .photo-add-btn span { font-size: 22px; }
-  input[type="file"] { display: none; }
+  .photo-add-btn { width: 72px; height: 72px; border-radius: 7px; border: 2px dashed #555; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-size: 11px; color: #888; font-family: 'DM Sans', sans-serif; }
+  .photo-add-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .photo-add-btn .plus { font-size: 24px; line-height: 1; }
 
   .source-tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; text-transform: uppercase; }
   .source-bt { background: #e8f5e9; color: var(--moss); }
@@ -139,7 +123,7 @@
     <h1>Olympic Discovery Trail</h1>
     <p>Jefferson County, WA · MP 7.3–10.5</p>
   </div>
-  <div class="sync-badge" id="syncBadge">● Saved</div>
+  <div class="sync-badge" id="syncBadge">● Loading…</div>
 </div>
 
 <div class="tab-bar">
@@ -153,8 +137,10 @@
   <div class="card">
     <div class="card-header">🌱 Pull Ticket — Bella Terra Nursery<span>Ready for pickup</span></div>
     <div class="card-body">
-      <table class="manifest-table"><thead><tr><th style="width:32px"></th><th>Species</th><th style="width:60px;text-align:right">Qty</th><th style="width:70px;text-align:right">Source</th></tr></thead>
-      <tbody id="btTbody"></tbody></table>
+      <table class="manifest-table">
+        <thead><tr><th style="width:32px"></th><th>Species</th><th style="width:60px;text-align:right">Qty</th><th style="width:70px;text-align:right">Source</th></tr></thead>
+        <tbody id="btTbody"></tbody>
+      </table>
       <div class="total-bar"><span>Total Plants</span><strong id="btTotal">0</strong></div>
     </div>
   </div>
@@ -162,8 +148,10 @@
     <div class="card-header">🏷️ PO — Clark Native Trees<span>Pickup 4/21/2026 ~10:30am</span></div>
     <div class="card-body">
       <div style="font-size:11px;color:var(--bark);margin-bottom:10px">Contact: Rena Bellika · 360-606-5616 · No substitutions</div>
-      <table class="manifest-table"><thead><tr><th style="width:32px"></th><th>Species</th><th style="width:60px;text-align:right">Qty</th><th style="width:70px;text-align:right">Source</th></tr></thead>
-      <tbody id="cnTbody"></tbody></table>
+      <table class="manifest-table">
+        <thead><tr><th style="width:32px"></th><th>Species</th><th style="width:60px;text-align:right">Qty</th><th style="width:70px;text-align:right">Source</th></tr></thead>
+        <tbody id="cnTbody"></tbody>
+      </table>
       <div class="total-bar"><span>Total Plants</span><strong id="cnTotal">0</strong></div>
     </div>
   </div>
@@ -194,8 +182,10 @@
     <div class="card-header">📊 Plant Count Comparison<span>Our count vs. County</span></div>
     <div class="card-body">
       <div style="font-size:12px;color:var(--bark);margin-bottom:12px">Enter county's count per species to compare. Export sends your documentation.</div>
-      <table class="report-table"><thead><tr><th>Species</th><th style="text-align:right">Our Count</th><th style="text-align:right">County</th><th style="text-align:center">Match?</th></tr></thead>
-      <tbody id="reportTbody"></tbody></table>
+      <table class="report-table">
+        <thead><tr><th>Species</th><th style="text-align:right">Our Count</th><th style="text-align:right">County</th><th style="text-align:center">Match?</th></tr></thead>
+        <tbody id="reportTbody"></tbody>
+      </table>
     </div>
   </div>
   <div class="export-bar">
@@ -204,36 +194,50 @@
   </div>
 </div>
 
+<!-- HIDDEN FILE INPUT — lives outside staging areas so it never gets destroyed -->
+<input type="file" id="global-photo-input" accept="image/*" multiple style="display:none">
+
 <div class="toast" id="toast"></div>
 
 <script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsm6p9b-UeNkxE-1DAo16ayZ2uQ-dCdDuwjieIxt-Js8og6C10g3HBBcAUf_s6mJng/exec';
+
 const BT_PLANTS = [
-  { id:'bt1', name:'Douglas Fir #1', botanical:'Pseudotsuga menziesii', qty:21, source:'bt' },
-  { id:'bt2', name:'Beaked Hazelnut #1', botanical:'Corylus cornuta', qty:25, source:'bt' },
+  { id:'bt1', name:'Douglas Fir #1',      botanical:'Pseudotsuga menziesii', qty:21,  source:'bt' },
+  { id:'bt2', name:'Beaked Hazelnut #1',  botanical:'Corylus cornuta',       qty:25,  source:'bt' },
 ];
 const CN_PLANTS = [
-  { id:'cn1', name:'Grand Fir #1', botanical:'Abies grandis', qty:21, source:'cn' },
-  { id:'cn2', name:'Big Leaf Maple #1', botanical:'Acer macrophyllum', qty:21, source:'cn' },
-  { id:'cn3', name:'Beaked Hazelnut / Mock Orange #1', botanical:'Corylus cornuta', qty:168, source:'cn' },
-  { id:'cn4', name:'Oregon Grape #1', botanical:'Mahonia aquifolium', qty:274, source:'cn' },
-  { id:'cn5', name:'Red Flowering Current #1', botanical:'Ribes sanguineum', qty:193, source:'cn' },
-  { id:'cn6', name:'Nootka Rose / Cluster Rose #1', botanical:'Rosa nutkana', qty:193, source:'cn' },
-  { id:'cn7', name:'Thimbleberry #1', botanical:'Rubus parviflorus', qty:193, source:'cn' },
-  { id:'cn8', name:'Snowberry #1', botanical:'Symphoricarpos albus', qty:274, source:'cn' },
+  { id:'cn1', name:'Grand Fir #1',                      botanical:'Abies grandis',          qty:21,  source:'cn' },
+  { id:'cn2', name:'Big Leaf Maple #1',                  botanical:'Acer macrophyllum',      qty:21,  source:'cn' },
+  { id:'cn3', name:'Beaked Hazelnut / Mock Orange #1',   botanical:'Corylus cornuta',        qty:168, source:'cn' },
+  { id:'cn4', name:'Oregon Grape #1',                    botanical:'Mahonia aquifolium',     qty:274, source:'cn' },
+  { id:'cn5', name:'Red Flowering Current #1',           botanical:'Ribes sanguineum',       qty:193, source:'cn' },
+  { id:'cn6', name:'Nootka Rose / Cluster Rose #1',      botanical:'Rosa nutkana',           qty:193, source:'cn' },
+  { id:'cn7', name:'Thimbleberry #1',                    botanical:'Rubus parviflorus',      qty:193, source:'cn' },
+  { id:'cn8', name:'Snowberry #1',                       botanical:'Symphoricarpos albus',   qty:274, source:'cn' },
 ];
 const ALL_SPECIES = [...BT_PLANTS, ...CN_PLANTS];
 
 let state = { loaded:{}, stagingAreas:[], countyCount:{} };
+let activePhotoAreaId = null;
 
+// ── INIT ──
 window.onload = async () => {
+  // Set up the single global file input handler
+  const globalInput = document.getElementById('global-photo-input');
+  globalInput.addEventListener('change', handlePhotoChange);
+
+  // Load state
   const saved = localStorage.getItem('odt_state');
   if (saved) { try { state = {...state, ...JSON.parse(saved)}; } catch(e){} }
   await loadFromSheet();
-  renderBTTable(); renderCNTable(); renderStagingAreas(); renderReport();
+  renderBTTable();
+  renderCNTable();
+  renderStagingAreas();
+  renderReport();
 };
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsm6p9b-UeNkxE-1DAo16ayZ2uQ-dCdDuwjieIxt-Js8og6C10g3HBBcAUf_s6mJng/exec';
-
+// ── SYNC ──
 function save() {
   localStorage.setItem('odt_state', JSON.stringify(state));
   syncToSheet();
@@ -254,16 +258,22 @@ async function syncToSheet() {
 }
 
 async function loadFromSheet() {
+  const badge = document.getElementById('syncBadge');
   try {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
     if (data.success && data.state) {
       state = {...state, ...data.state};
+      badge.textContent = '● Synced';
+    } else {
+      badge.textContent = '● Local';
     }
-  } catch(e) {}
+  } catch(e) {
+    badge.textContent = '● Local';
+  }
 }
 
-/* ── MANIFEST ── */
+// ── MANIFEST ──
 function renderBTTable() {
   document.getElementById('btTbody').innerHTML = BT_PLANTS.map(p => plantRow(p)).join('');
   document.getElementById('btTotal').textContent = BT_PLANTS.reduce((s,p)=>s+p.qty,0);
@@ -288,7 +298,7 @@ function toggleLoaded(id) {
   showToast(state.loaded[id] ? '✓ Marked loaded' : 'Unmarked');
 }
 
-/* ── STAGING ── */
+// ── STAGING ──
 function addStagingArea() {
   const name = document.getElementById('areaNameInput').value.trim();
   const note = document.getElementById('areaNoteInput').value.trim();
@@ -314,11 +324,12 @@ function renderStagingAreas() {
 function stagingAreaHTML(area) {
   const total = Object.values(area.counts).reduce((s,v)=>s+v,0);
   const rows10 = Math.floor(total/10);
+
   const rows = ALL_SPECIES.map(p => {
     const cnt = area.counts[p.id]||0;
     const r10 = Math.floor(cnt/10);
     return `<tr>
-      <td><div class="s-name">${p.name}</div><div class="s-bot">${p.botanical} &nbsp;<span class="source-tag source-${p.source}">${p.source==='bt'?'Nursery':'Clark'}</span></div></td>
+      <td><div class="s-name">${p.name}</div><div class="s-bot">${p.botanical}&nbsp;<span class="source-tag source-${p.source}">${p.source==='bt'?'Nursery':'Clark'}</span></div></td>
       <td style="text-align:right;color:#666;font-size:13px;font-weight:600">${p.qty}</td>
       <td style="text-align:right">
         <div class="count-input-wrap">
@@ -331,13 +342,18 @@ function stagingAreaHTML(area) {
     </tr>`;
   }).join('');
 
-  const photos = (area.photos||[]).map(src=>`<img class="photo-thumb" src="${src}">`).join('');
+  const photoThumbs = (area.photos||[]).map(src =>
+    `<img class="photo-thumb" src="${src}">`
+  ).join('');
 
   return `<div class="staging-area-card" id="areaCard-${area.id}">
     <div class="staging-area-header" onclick="toggleArea('${area.id}')">
       <div class="area-name-row">
         <span class="area-icon">📍</span>
-        <div><div class="area-name">${area.name}</div><div class="area-meta">${area.note||'No notes'}</div></div>
+        <div>
+          <div class="area-name">${area.name}</div>
+          <div class="area-meta">${area.note||'No notes'}</div>
+        </div>
       </div>
       <span class="area-toggle" id="tog-${area.id}">▼</span>
     </div>
@@ -349,13 +365,17 @@ function stagingAreaHTML(area) {
       <div class="photo-section">
         <h4>📷 Staging Photos</h4>
         <div class="photo-grid" id="photos-${area.id}">
-          ${photos}
-      <button class="photo-add-btn" onclick="document.getElementById('fi-${area.id}').click()"><span>+</span>Add</button>
-          <input type="file" id="fi-${area.id}" accept="image/*" multiple onchange="addPhotos('${area.id}',this)">
+          ${photoThumbs}
+          <button class="photo-add-btn" onclick="openPhotoInput('${area.id}')">
+            <span class="plus">+</span>Add Photo
+          </button>
         </div>
       </div>
       <div class="staging-total-bar">
-        <div><div class="t-label">Total Staged — ${area.name}</div><div class="t-sub">${rows10} complete rows of 10</div></div>
+        <div>
+          <div class="t-label">Total Staged — ${area.name}</div>
+          <div class="t-sub">${rows10} complete rows of 10</div>
+        </div>
         <div class="t-num">${total}</div>
       </div>
       <div style="padding:10px 16px;background:#0a0a0a;display:flex;justify-content:flex-end;">
@@ -363,6 +383,65 @@ function stagingAreaHTML(area) {
       </div>
     </div>
   </div>`;
+}
+
+// ── PHOTO HANDLING — uses one global input, never destroyed ──
+function openPhotoInput(areaId) {
+  activePhotoAreaId = areaId;
+  const input = document.getElementById('global-photo-input');
+  input.value = ''; // reset so same file can be chosen again
+  input.click();
+}
+
+function handlePhotoChange(e) {
+  const areaId = activePhotoAreaId;
+  if (!areaId) return;
+  const area = state.stagingAreas.find(a => a.id === areaId);
+  if (!area) return;
+
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async function(ev) {
+      const base64 = ev.target.result;
+
+      // Save to state
+      if (!area.photos) area.photos = [];
+      area.photos.push(base64);
+      save();
+
+      // Add thumbnail directly to DOM — no re-render
+      const grid = document.getElementById('photos-' + areaId);
+      if (grid) {
+        const img = document.createElement('img');
+        img.className = 'photo-thumb';
+        img.src = base64;
+        const addBtn = grid.querySelector('.photo-add-btn');
+        grid.insertBefore(img, addBtn);
+      }
+
+      // Upload to Google Drive
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify({
+            action: 'uploadPhoto',
+            image: base64,
+            filename: area.name.replace(/\s+/g, '-') + '_' + Date.now() + '.jpg',
+            areaName: area.name,
+            timestamp: new Date().toLocaleString()
+          })
+        });
+        showToast('📷 Photo saved to Drive');
+      } catch(err) {
+        showToast('📷 Saved locally');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function toggleArea(id) {
@@ -377,13 +456,16 @@ function adj(areaId, plantId, delta) {
   if (!area) return;
   area.counts[plantId] = Math.max(0,(area.counts[plantId]||0)+delta);
   save(); renderStagingAreas(); renderReport();
-  setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b){b.classList.add('open'); document.getElementById('tog-'+areaId).textContent='▲';} },10);
+  setTimeout(()=>{
+    const b = document.getElementById('body-'+areaId);
+    if (b) { b.classList.add('open'); document.getElementById('tog-'+areaId).textContent='▲'; }
+  }, 10);
 }
 
 function setCount(areaId, plantId, val) {
   const area = state.stagingAreas.find(a=>a.id===areaId);
   if (!area) return;
-  area.counts[plantId] = Math.max(0,parseInt(val)||0);
+  area.counts[plantId] = Math.max(0, parseInt(val)||0);
   save(); renderReport();
 }
 
@@ -393,56 +475,13 @@ function removeArea(id) {
   save(); renderStagingAreas(); renderReport();
 }
 
-function addPhotos(areaId, input) {
-  const area = state.stagingAreas.find(a=>a.id===areaId);
-  if (!area) return;
- const files = Array.from(input.files);
-  if (!files.length) return;
-  input.value = '';
-  files.forEach(file => {
-    const r = new FileReader();
-    r.onload = async e => {
-      const base64 = e.target.result;
-      // Show locally immediately
-      if (!area.photos) area.photos = [];
-      area.photos.push(base64);
-      save();
-// Update photo grid directly without full re-render
-const grid = document.getElementById('photos-'+areaId);
-if (grid) {
-  const img = document.createElement('img');
-  img.className = 'photo-thumb';
-  img.src = base64;
-  grid.insertBefore(img, grid.querySelector('.photo-add-btn'));
-}
-      setTimeout(()=>{ const b=document.getElementById('body-'+areaId); if(b)b.classList.add('open'); },10);
-      // Upload to Google Drive
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify({
-            action: 'uploadPhoto',
-            image: base64,
-            filename: area.name.replace(/\s+/g,'-') + '_' + Date.now() + '.jpg',
-            areaName: area.name,
-            timestamp: new Date().toLocaleString()
-          })
-        });
-        showToast('📷 Photo saved to Drive');
-      } catch(e) {
-        showToast('⚠ Saved locally only');
-      }
-    };
-    r.readAsDataURL(file);
-  });
- }
-
-/* ── REPORT ── */
+// ── REPORT ──
 function getTotals() {
-  const t={};
-  ALL_SPECIES.forEach(p=>{ t[p.id]=0; });
-  state.stagingAreas.forEach(a=>{ ALL_SPECIES.forEach(p=>{ t[p.id]+=(a.counts[p.id]||0); }); });
+  const t = {};
+  ALL_SPECIES.forEach(p => { t[p.id] = 0; });
+  state.stagingAreas.forEach(a => {
+    ALL_SPECIES.forEach(p => { t[p.id] += (a.counts[p.id]||0); });
+  });
   return t;
 }
 
@@ -470,38 +509,59 @@ function setCounty(pid, val) {
 
 function exportReport() {
   const totals = getTotals();
-  const lines = ['OLYMPIC DISCOVERY TRAIL — PLANT COUNT REPORT','Bella Terra LLC · '+new Date().toLocaleDateString(),'Jefferson County, WA · MP 7.3–10.5','','SPECIES                                    OUR COUNT   COUNTY   STATUS','─'.repeat(68)];
+  const lines = [
+    'OLYMPIC DISCOVERY TRAIL — PLANT COUNT REPORT',
+    'Bella Terra LLC · '+new Date().toLocaleDateString(),
+    'Jefferson County, WA · MP 7.3–10.5','',
+    'SPECIES                                    OUR COUNT   COUNTY   STATUS',
+    '─'.repeat(68)
+  ];
   ALL_SPECIES.forEach(p => {
-    const ours=totals[p.id]||0, county=state.countyCount[p.id]||'—';
-    const cn=parseInt(county), status=!isNaN(cn)?(cn===ours?'MATCH':'MISMATCH'):'PENDING';
+    const ours = totals[p.id]||0;
+    const county = state.countyCount[p.id]||'—';
+    const cn = parseInt(county);
+    const status = !isNaN(cn) ? (cn===ours?'MATCH':'MISMATCH') : 'PENDING';
     lines.push(p.name.padEnd(45)+String(ours).padStart(8)+'   '+String(county).padStart(6)+'   '+status);
   });
-  lines.push('','STAGING AREAS:');
-  state.stagingAreas.forEach(a => { const t=Object.values(a.counts).reduce((s,v)=>s+v,0); lines.push('  • '+a.name+' — '+t+' plants'+(a.note?' ('+a.note+')':'')); });
-  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='ODT_Plant_Count_'+new Date().toISOString().slice(0,10)+'.txt'; a.click();
+  lines.push('', 'STAGING AREAS:');
+  state.stagingAreas.forEach(a => {
+    const t = Object.values(a.counts).reduce((s,v)=>s+v,0);
+    lines.push('  • '+a.name+' — '+t+' plants'+(a.note?' ('+a.note+')':''));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  const el = document.createElement('a');
+  el.href = URL.createObjectURL(blob);
+  el.download = 'ODT_Plant_Count_'+new Date().toISOString().slice(0,10)+'.txt';
+  el.click();
   showToast('Report exported');
 }
 
 function copyReportText() {
-  const totals=getTotals();
-  const lines=['ODT Plant Count — Bella Terra LLC',new Date().toLocaleDateString(),''];
-  ALL_SPECIES.forEach(p => { const ours=totals[p.id]||0, county=state.countyCount[p.id]; lines.push(p.name+': '+ours+(county?' (county: '+county+')':'')); });
+  const totals = getTotals();
+  const lines = ['ODT Plant Count — Bella Terra LLC', new Date().toLocaleDateString(), ''];
+  ALL_SPECIES.forEach(p => {
+    const ours = totals[p.id]||0;
+    const county = state.countyCount[p.id];
+    lines.push(p.name+': '+ours+(county?' (county: '+county+')':''));
+  });
   navigator.clipboard.writeText(lines.join('\n'));
   showToast('Copied to clipboard');
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['manifest','staging','report'][i]===tab));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active', ['manifest','staging','report'][i]===tab)
+  );
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
-  if(tab==='report') renderReport();
+  if (tab==='report') renderReport();
 }
 
 function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 </script>
 </body>
