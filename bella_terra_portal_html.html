@@ -472,7 +472,7 @@ button,input,select,textarea{font-family:inherit;}
           <h3>Service Scheduler</h3>
           <p>Send day-before confirmation texts to tomorrow's customers.</p>
         </div>
-        <div class="tile" onclick="showLogCall()">
+        <div class="tile" onclick="window.location.href='log_a_call.html'">
           <div class="tile-icon">📞</div>
           <h3>Log a Call</h3>
           <p>Record incoming customer calls for hydroseeding and bark blowing inquiries.</p>
@@ -535,7 +535,7 @@ button,input,select,textarea{font-family:inherit;}
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Platform Policy</div>
           <div style="font-size:0.8rem;color:#888;">Operations and safety policy.</div>
         </a>
-        <div onclick="openReorder()" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
+        <div onclick="window.location.href='reorder.html'" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
           <div style="font-size:2rem;margin-bottom:0.5rem;">🛒</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Reorder Supplies</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Flag low stock → sends vendor email</div>
@@ -545,7 +545,7 @@ button,input,select,textarea{font-family:inherit;}
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">On Our Way — Hydroseed</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Search customer → text ETA</div>
         </div>
-        <div onclick="openFillUps()" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
+        <div onclick="window.location.href='fillups.html'" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
           <div style="font-size:2rem;margin-bottom:0.5rem;">🚿</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Fill-Ups</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Hydrant locations &amp; notifications</div>
@@ -564,174 +564,7 @@ button,input,select,textarea{font-family:inherit;}
     </div>
   </div>
 
-  <!-- FILL-UPS MODAL — main menu -->
-  <div class="p-modal" id="fillups-modal">
-    <div class="p-modal-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d5a27;">💧 Fill-Up Locations</h3>
-        <button onclick="closeFillUps()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <button onclick="openFillUpsCC()" style="width:100%;padding:1rem 1.25rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:#2d5a27;cursor:pointer;text-align:left;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='#d0dcc8'">🗺 Clark County</button>
-        <button onclick="openFillUpsCorvallis()" style="width:100%;padding:1rem 1.25rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:#2d5a27;cursor:pointer;text-align:left;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='#d0dcc8'">🗺 Corvallis</button>
-        <button onclick="openFillUpsClackamas()" style="width:100%;padding:1rem 1.25rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:#2d5a27;cursor:pointer;text-align:left;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='#d0dcc8'">🗺 Clackamas Water</button>
-        <button onclick="openFillUpsHillsboro()" style="width:100%;padding:1rem 1.25rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:#2d5a27;cursor:pointer;text-align:left;" onmouseover="this.style.borderColor='#7ab648'" onmouseout="this.style.borderColor='#d0dcc8'">🗺 Hillsboro</button>
-        <button onclick="openFillUpsKelso()" style="width:100%;padding:1rem 1.25rem;background:#2d5a27;border:2px solid #2d5a27;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;color:white;cursor:pointer;text-align:left;font-weight:700;" onmouseover="this.style.background='#4a7c3f'" onmouseout="this.style.background='#2d5a27'">📍 Kelso</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Clark County -->
-  <div class="p-modal" id="fillups-cc-modal">
-    <div class="p-modal-box" style="max-width:700px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">🗺 Clark County Hydrants</h3>
-        <button onclick="closeFillUpsCC()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="background:#e8f5e2;border:1.5px solid #7ab648;border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.9rem;color:#2d5a27;font-weight:600;">
-        📋 Log all fill-ups. Submit photos to office every 6 months.
-      </div>
-      <object data="clark_county_hydrants.pdf" type="application/pdf" style="width:100%;height:60vh;border:1px solid #d0dcc8;border-radius:8px;">
-        <div style="width:100%;height:60vh;border:1px solid #d0dcc8;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f8f9f5;text-align:center;padding:2rem;">
-          <div style="font-size:2.5rem;margin-bottom:.75rem;">🗺️</div>
-          <div style="font-weight:700;color:#2a2a2a;font-size:1rem;margin-bottom:.5rem;">Clark County Hydrant Map</div>
-          <div style="font-size:.85rem;color:#888;margin-bottom:1.25rem;">Upload <strong>clark_county_hydrants.pdf</strong> to the GitHub repository to display the map here.</div>
-          <div style="font-size:.82rem;color:#2d5a27;background:#e8f5e2;border:1px solid #7ab648;border-radius:8px;padding:.65rem 1rem;">
-            📞 For hydrant locations contact the office: <strong>(360) 606-5616</strong>
-          </div>
-        </div>
-      </object>
-      <button onclick="closeFillUpsCC()" style="width:100%;margin-top:1rem;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Fill-Up Locations</button>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Corvallis -->
-  <div class="p-modal" id="fillups-corvallis-modal">
-    <div class="p-modal-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">🗺 Corvallis Fill Locations</h3>
-        <button onclick="closeFillUpsCorvallis()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="background:#fff3cd;border:1.5px solid #c8961e;border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.9rem;color:#7a5a00;font-weight:600;">
-        🔑 SCADA key required. Access is tracked electronically.
-      </div>
-      <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;margin-bottom:0.75rem;">
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.4rem;font-weight:700;">Location 1</div>
-        <div style="font-size:0.95rem;color:#555;">📍 Address: <em>TBD</em></div>
-        <div style="font-size:0.85rem;color:#888;margin-top:0.25rem;">🕐 Hours: TBD</div>
-      </div>
-      <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;margin-bottom:1rem;">
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.4rem;font-weight:700;">Location 2</div>
-        <div style="font-size:0.95rem;color:#555;">📍 Address: <em>TBD</em></div>
-        <div style="font-size:0.85rem;color:#888;margin-top:0.25rem;">🕐 Hours: TBD</div>
-      </div>
-      <button onclick="closeFillUpsCorvallis()" style="width:100%;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Fill-Up Locations</button>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Clackamas Water -->
-  <div class="p-modal" id="fillups-clackamas-modal">
-    <div class="p-modal-box" style="max-width:700px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">🗺 Clackamas Water Hydrants</h3>
-        <button onclick="closeFillUpsClackamas()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="background:#fdeaea;border:2px solid #c0392b;border-radius:8px;padding:0.85rem 1rem;margin-bottom:0.75rem;font-size:0.9rem;color:#c0392b;font-weight:700;">
-        ⚠️ CRW hydrant verification is required prior to use. Contact CRW before filling.
-      </div>
-      <div style="background:#e8f5e2;border:1.5px solid #7ab648;border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.9rem;color:#2d5a27;font-weight:600;">
-        📋 Log all fill-ups. Submit photos to office monthly on the 1st of each month.
-      </div>
-      <div style="display:flex;margin-bottom:1rem;">
-        <button id="clackamas-tab-north" onclick="showClackamasTab('north')" style="flex:1;padding:0.65rem;background:#2d5a27;color:white;border:2px solid #2d5a27;border-radius:8px 0 0 8px;font-family:inherit;font-size:0.9rem;cursor:pointer;font-weight:600;">North Service Area</button>
-        <button id="clackamas-tab-south" onclick="showClackamasTab('south')" style="flex:1;padding:0.65rem;background:#f5f5f2;color:#2d5a27;border:2px solid #d0dcc8;border-radius:0 8px 8px 0;font-family:inherit;font-size:0.9rem;cursor:pointer;">South Service Area</button>
-      </div>
-      <div id="clackamas-panel-north">
-        <iframe src="clackamas_hydrants_north.pdf" style="width:100%;height:55vh;border:1px solid #d0dcc8;border-radius:8px;"></iframe>
-      </div>
-      <div id="clackamas-panel-south" style="display:none;">
-        <iframe src="clackamas_hydrants_south.pdf" style="width:100%;height:55vh;border:1px solid #d0dcc8;border-radius:8px;"></iframe>
-      </div>
-      <button onclick="closeFillUpsClackamas()" style="width:100%;margin-top:1rem;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Fill-Up Locations</button>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Hillsboro -->
-  <div class="p-modal" id="fillups-hillsboro-modal">
-    <div class="p-modal-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">🗺 Hillsboro Fill Location</h3>
-        <button onclick="closeFillUpsHillsboro()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="background:#f5f5f2;border-radius:10px;padding:1.25rem;margin-bottom:0.75rem;">
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.75rem;font-weight:700;">Fill Station</div>
-        <a href="https://www.google.com/maps?q=390+W+Main+St,+Hillsboro,+OR+97123" target="_blank" style="display:flex;align-items:center;gap:0.5rem;color:#1a6b8a;font-size:1rem;font-weight:600;text-decoration:none;margin-bottom:0.85rem;">
-          📍 390 W Main St, Hillsboro, OR 97123 ↗
-        </a>
-        <div style="background:#fdeaea;border:1.5px solid #c0392b;border-radius:8px;padding:0.65rem 0.85rem;margin-bottom:0.65rem;font-size:0.9rem;color:#c0392b;font-weight:700;">
-          ⚠️ Payment required at time of each refill
-        </div>
-        <div style="background:#e5eefb;border:1.5px solid #3d7fd4;border-radius:8px;padding:0.65rem 0.85rem;font-size:0.9rem;color:#0a3260;font-weight:600;">
-          🕐 Hours: 8:00 AM – 5:00 PM
-        </div>
-      </div>
-      <button onclick="closeFillUpsHillsboro()" style="width:100%;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Fill-Up Locations</button>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Kelso -->
-  <div class="p-modal" id="fillups-kelso-modal">
-    <div class="p-modal-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">📍 Kelso Fill Station</h3>
-        <button onclick="closeFillUpsKelso()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.25rem;">
-        <a href="https://www.google.com/maps?q=46.119167,-122.896306" target="_blank" style="display:block;background:#e8f5e2;border:2px solid #7ab648;border-radius:10px;padding:1.1rem 1.25rem;text-decoration:none;color:#2d5a27;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">
-          📍 Location — Open in Google Maps
-          <div style="font-family:'Source Sans 3',sans-serif;font-size:0.8rem;color:#4a7c3f;font-weight:400;margin-top:0.25rem;">Parrott Way, Kelso WA · near Blue Heron Aviation</div>
-        </a>
-        <button onclick="kelsoNotify(this)" style="width:100%;padding:1.1rem 1.25rem;background:#e8f5e2;border:2px solid #7ab648;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;cursor:pointer;text-align:left;font-weight:700;" onmouseover="this.style.background='#d0ecc0'" onmouseout="this.style.background='#e8f5e2'">
-          📧 Notify Kelso — We're Filling Up
-          <div style="font-family:'Source Sans 3',sans-serif;font-size:0.8rem;color:#4a7c3f;font-weight:400;margin-top:0.25rem;">Sends notification email to Kelso Water</div>
-        </button>
-        <div id="kelso-notify-ok" style="display:none;background:#e8f5e2;border:1.5px solid #7ab648;border-radius:8px;padding:0.65rem 1rem;font-size:0.9rem;color:#2d5a27;font-weight:600;">✅ Notification sent to Kelso.</div>
-        <button onclick="openKelsoTotal()" style="width:100%;padding:1.1rem 1.25rem;background:#2d5a27;border:2px solid #2d5a27;border-radius:10px;font-family:'Playfair Display',serif;font-size:1rem;color:white;cursor:pointer;text-align:left;font-weight:700;" onmouseover="this.style.background='#4a7c3f'" onmouseout="this.style.background='#2d5a27'">
-          📊 Submit Daily Total to Kelso
-          <div style="font-family:'Source Sans 3',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.75);font-weight:400;margin-top:0.25rem;">Submit gallons + send text reminder</div>
-        </button>
-      </div>
-      <button onclick="closeFillUpsKelso()" style="width:100%;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Fill-Up Locations</button>
-    </div>
-  </div>
-
-  <!-- FILL-UPS — Kelso Daily Total -->
-  <div class="p-modal" id="fillups-kelso-total-modal">
-    <div class="p-modal-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#2d5a27;">📊 Submit Daily Total — Kelso</h3>
-        <button onclick="closeKelsoTotal()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.25rem;">
-        <div>
-          <label style="display:block;font-weight:600;font-size:0.85rem;color:#2d5a27;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Gallons Filled Today</label>
-          <input type="number" id="kelso-gallons" min="0" placeholder="e.g. 2500" style="width:100%;padding:0.75rem 1rem;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;font-family:inherit;">
-        </div>
-        <div>
-          <label style="display:block;font-weight:600;font-size:0.85rem;color:#2d5a27;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Date</label>
-          <input type="date" id="kelso-date" style="width:100%;padding:0.75rem 1rem;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;font-family:inherit;">
-        </div>
-        <div>
-          <label style="display:block;font-weight:600;font-size:0.85rem;color:#2d5a27;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Crew Lead</label>
-          <input type="text" id="kelso-lead" readonly style="width:100%;padding:0.75rem 1rem;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;font-family:inherit;background:#f5f5f5;color:#888;">
-        </div>
-      </div>
-      <div id="kelso-total-err" style="display:none;color:#c0392b;font-size:0.875rem;margin-bottom:0.75rem;"></div>
-      <button id="kelso-total-btn" onclick="submitKelsoTotal(this)" style="width:100%;padding:0.85rem;background:#2d5a27;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">📤 Submit Daily Total</button>
-      <div id="kelso-total-ok" style="display:none;margin-top:0.75rem;background:#e8f5e2;border:1.5px solid #7ab648;border-radius:8px;padding:0.65rem 1rem;font-size:0.9rem;color:#2d5a27;font-weight:600;"></div>
-      <button onclick="closeKelsoTotal()" style="width:100%;margin-top:0.75rem;padding:0.85rem;background:#f5f5f2;border:2px solid #d0dcc8;border-radius:8px;font-size:1rem;cursor:pointer;color:#2a2a2a;font-family:inherit;">← Back to Kelso</button>
-    </div>
-  </div>
+  <!-- Fill-Ups → fillups.html (standalone page) -->
 
   <!-- BARK MODAL -->
   <div class="p-modal" id="bark-modal">
@@ -756,25 +589,7 @@ button,input,select,textarea{font-family:inherit;}
   <!-- On Our Way: Hydroseeding → hydro_omw.html (standalone page) -->
   <!-- On Our Way: Bark Blowing  → bark_omw.html  (standalone page) -->
 
-  <!-- REORDER MODAL -->
-  <div id="reorder-modal">
-    <div class="reorder-box">
-      <div class="reorder-top-bar">
-        <div><h3>🛒 Reorder Supplies</h3><p class="reorder-sub">Check items running low. Last order amounts shown for reference.</p></div>
-        <button class="reorder-closer" onclick="closeReorder()">&times;</button>
-      </div>
-      <div class="reorder-job-wrap">
-        <label>Job / Project Name</label>
-        <input type="text" id="reorder-job" value="Hydroseed Residential">
-      </div>
-      <div id="reorder-items"></div>
-      <div class="reorder-footer">
-        <button class="btn-reorder-submit" onclick="submitReorder()">📤 Send Reorder Request</button>
-        <button class="btn-reorder-cancel" onclick="closeReorder()">Cancel</button>
-      </div>
-      <div class="reorder-success" id="reorder-success"></div>
-    </div>
-  </div>
+  <!-- Reorder Supplies → reorder.html (standalone page) -->
 
   <!-- SCHEDULED JOBS PANEL -->
   <div id="panel-scheduledjobs" style="display:none;min-height:100vh;background:var(--bg);">
@@ -1019,85 +834,7 @@ button,input,select,textarea{font-family:inherit;}
     </div><!-- /tab content -->
   </div><!-- /panel-olydisco -->
 
-  <!-- LOG A CALL PANEL -->
-  <div id="panel-log-call" style="display:none;min-height:100vh;background:var(--gray-light);">
-    <div style="background:var(--green-dark);padding:1rem 1.5rem;display:flex;align-items:center;gap:0.75rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);">
-      <button onclick="showTiles()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:0.35rem 0.85rem;cursor:pointer;font-size:0.82rem;font-family:inherit;">← Portal</button>
-      <h2 style="font-family:'Playfair Display',serif;color:white;font-size:1.25rem;margin:0;">📞 Log a Call</h2>
-    </div>
-    <div style="padding:1.25rem;max-width:640px;margin:0 auto;">
-      <div class="od-card">
-        <h4>📞 Incoming Call Log</h4>
-
-        <div class="od-g2">
-          <div class="od-f">
-            <label>Caller Name</label>
-            <input type="text" id="lc-caller-name" placeholder="First Last" autocomplete="off">
-          </div>
-          <div class="od-f">
-            <label>Phone Number</label>
-            <input type="tel" id="lc-phone" placeholder="(360) 555-0000" autocomplete="off">
-          </div>
-        </div>
-
-        <div class="od-g2">
-          <div class="od-f">
-            <label>Service Type</label>
-            <select id="lc-service-type">
-              <option value="">Select service…</option>
-              <option value="Hydroseeding">Hydroseeding</option>
-              <option value="Bark Blowing">Bark Blowing</option>
-            </select>
-          </div>
-          <div class="od-f">
-            <label>Logged By</label>
-            <select id="lc-logged-by" onchange="lcToggleLoggedByOther(this)">
-              <option value="">Select…</option>
-              <option value="Rena">Rena</option>
-              <option value="Liz">Liz</option>
-              <option value="Heather">Heather</option>
-              <option value="Brydon">Brydon</option>
-              <option value="Ethan">Ethan</option>
-              <option value="Kevin">Kevin</option>
-              <option value="Emily">Emily</option>
-              <option value="Robert">Robert</option>
-              <option value="Randy">Randy</option>
-              <option value="__other__">Other — type name…</option>
-            </select>
-            <input type="text" id="lc-logged-by-other" placeholder="Type name…" style="display:none;margin-top:0.4rem;width:100%;padding:0.55rem 0.85rem;border:1.5px solid var(--border);border-radius:7px;font-size:0.9rem;font-family:inherit;">
-          </div>
-        </div>
-
-        <div class="od-f">
-          <label>Job Address</label>
-          <input type="text" id="lc-address" placeholder="123 Main St, City, State">
-        </div>
-
-        <div class="od-f">
-          <label>Lot Size / Sq Ft or CY</label>
-          <input type="text" id="lc-lot-size" placeholder="e.g. 4500">
-          <div style="font-size:0.78rem;color:var(--gray-mid);margin-top:0.35rem;">sq ft for hydroseed &nbsp;·&nbsp; CY for bark</div>
-        </div>
-
-        <div class="od-f">
-          <label>Notes</label>
-          <textarea id="lc-notes" rows="3" placeholder="Any additional details about the call…" style="resize:vertical;"></textarea>
-        </div>
-
-        <div class="od-f">
-          <label>Date &amp; Time</label>
-          <input type="datetime-local" id="lc-datetime">
-        </div>
-
-        <button class="od-submit" id="lc-submit-btn" onclick="submitLogCall()">📞 Log This Call</button>
-
-        <div id="lc-success" style="display:none;background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:0.85rem 1rem;color:var(--green-dark);font-size:0.9rem;font-weight:600;margin-top:0.85rem;">
-          ✅ Call logged successfully. Form cleared.
-        </div>
-        <div id="lc-error" style="display:none;background:#fdeaea;border:1px solid var(--red);border-radius:8px;padding:0.85rem 1rem;color:var(--red);font-size:0.9rem;font-weight:600;margin-top:0.85rem;line-height:1.5;"></div>
-      </div>
-    </div>
-  </div>
+  <!-- Log a Call → log_a_call.html (standalone page) -->
 
   <!-- EMPLOYEE RESOURCES PANEL -->
   <div id="panel-resources">
@@ -1606,55 +1343,7 @@ function closeBarkMenu(){document.getElementById('bark-modal').classList.remove(
 //   Hydroseeding → hydro_omw.html
 //   Bark Blowing → bark_omw.html
 
-// ═══════════════════════════════════════════════
-// REORDER
-// ═══════════════════════════════════════════════
-var PRODUCTS=[
-  {id:'mulch',product:'Mulch',nameOfProduct:'50/50 Mulch',supplier:'Cascade Geo',vendorEmail:'travis.riehl@cascadegeos.com',reorderAmt:5,reorderUnit:'Pallet',triggerAmt:1,triggerUnit:'Pallet'},
-  {id:'tackifier',product:'Tackifier',nameOfProduct:'Soil Binder',supplier:'Simplot',vendorEmail:'Sean.Watts@simplot.com',reorderAmt:2,reorderUnit:'Jug',triggerAmt:1,triggerUnit:'Jug'},
-  {id:'fert',product:'Fertilizer',nameOfProduct:'16-16-16 Slow Release',supplier:'Simplot',vendorEmail:'Sean.Watts@simplot.com',reorderAmt:40,reorderUnit:'Bags',triggerAmt:5,triggerUnit:'Bags Left'},
-  {id:'rye',product:'Perennial Rye Seed',nameOfProduct:'Birdie Per. Rye',supplier:'Ewing',vendorEmail:'bsteyskal@ewingos.com',reorderAmt:40,reorderUnit:'Bags',triggerAmt:5,triggerUnit:'Bags Left'},
-  {id:'fescue',product:'Turf-Type Tall Fescue',nameOfProduct:'RFT - Barenburg',supplier:'Simplot',vendorEmail:'Sean.Watts@simplot.com',reorderAmt:20,reorderUnit:'Bags',triggerAmt:3,triggerUnit:'Bags Left'}
-];
-function buildReorderItems(){
-  var wrap=document.getElementById('reorder-items');wrap.innerHTML='';
-  PRODUCTS.forEach(p=>{
-    var div=document.createElement('div');div.className='reorder-item';div.id='ri-'+p.id;
-    div.innerHTML='<div class="reorder-item-top" onclick="toggleReorderItem(\''+p.id+'\')"><input type="checkbox" id="chk-'+p.id+'" onclick="event.stopPropagation();toggleReorderItem(\''+p.id+'\')"><span class="reorder-item-name">'+p.product+' <span style="font-weight:400;color:#666;font-size:0.85rem;">('+p.nameOfProduct+')</span></span><span class="reorder-item-vendor">'+p.supplier+'</span></div><div class="reorder-item-details"><div class="last-order-badge">📦 Last order: '+p.reorderAmt+' '+p.reorderUnit+' · Reorder trigger: ≤'+p.triggerAmt+' '+p.triggerUnit+'</div><div class="reorder-detail-row"><div class="form-group"><label>Qty to Order</label><input type="number" id="qty-'+p.id+'" min="1" value="'+p.reorderAmt+'"></div><div class="form-group"><label>Unit</label><input type="text" id="unit-'+p.id+'" value="'+p.reorderUnit+'"></div></div><div class="reorder-notes"><label>Notes (optional)</label><textarea id="notes-'+p.id+'" placeholder="Special instructions…"></textarea></div></div>';
-    wrap.appendChild(div);
-  });
-}
-function toggleReorderItem(id){var item=document.getElementById('ri-'+id);var chk=document.getElementById('chk-'+id);var sel=!item.classList.contains('selected');item.classList.toggle('selected',sel);chk.checked=sel;}
-function openReorder(){closeHydroMenu();document.getElementById('reorder-success').classList.remove('show');document.getElementById('reorder-success').textContent='';document.getElementById('reorder-modal').classList.add('open');}
-function closeReorder(){document.getElementById('reorder-modal').classList.remove('open');}
-function submitReorder(){
-  var job=document.getElementById('reorder-job').value.trim()||'Hydroseed Residential';
-  var selected=PRODUCTS.filter(p=>document.getElementById('chk-'+p.id).checked);
-  if(!selected.length){alert('Please check at least one item.');return;}
-  var byVendor={};
-  selected.forEach(p=>{
-    var qty=document.getElementById('qty-'+p.id).value||p.reorderAmt;
-    var unit=document.getElementById('unit-'+p.id).value||p.reorderUnit;
-    var notes=document.getElementById('notes-'+p.id).value.trim();
-    if(!byVendor[p.vendorEmail])byVendor[p.vendorEmail]={supplier:p.supplier,email:p.vendorEmail,items:[]};
-    byVendor[p.vendorEmail].items.push({product:p.product,name:p.nameOfProduct,qty,unit,lastOrder:p.reorderAmt+' '+p.reorderUnit,notes});
-  });
-  var date=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  var vendorGroups=Object.values(byVendor);var sent=0;
-  function submitNext(){
-    if(sent>=vendorGroups.length){
-      var msg=document.getElementById('reorder-success');
-      msg.textContent='✅ Reorder sent to '+[...new Set(selected.map(p=>p.supplier))].join(', ')+'. '+selected.length+' item(s) requested.';
-      msg.classList.add('show');
-      PRODUCTS.forEach(p=>{document.getElementById('chk-'+p.id).checked=false;document.getElementById('ri-'+p.id).classList.remove('selected');});
-      return;
-    }
-    var v=vendorGroups[sent];
-    var itemLines=v.items.map(it=>{var l=it.product+' ('+it.name+') — Qty: '+it.qty+' '+it.unit+' | Last order: '+it.lastOrder;if(it.notes)l+=' | Notes: '+it.notes;return l;}).join('\n');
-    fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({vendorEmail:v.email,vendorName:v.supplier,ccEmails:CC_EMAILS.join(','),jobName:job,employee:currentEmployee,date,items:itemLines,type:'Hydroseeding Supply Reorder'})}).then(()=>{sent++;submitNext();}).catch(()=>{sent++;submitNext();});
-  }
-  submitNext();
-}
+// Reorder Supplies → reorder.html (standalone page)
 
 // ═══════════════════════════════════════════════
 // HANDBOOK / SIGNATURES
@@ -4028,260 +3717,9 @@ function checkClackamasReminder(){
     .catch(function(){});
 }
 
-// ═══════════════════════════════════════════════
-// FILL-UPS MODULE
-// ═══════════════════════════════════════════════
-var CREW_PHONES = {
-  'Brydon Bellika':      '+13605609860',
-  'Rena Bellika':        '+13606065616',
-  'Garrett Booker':      '+13605602290',
-  'Elynn Alholinna':     '+19063701837',
-  'Juan Gonzalez':       '+13602067159',
-  'Emily Greer':         '+13609072420',
-  'Heather Hooper':      '+19712607063',
-  'Joe Jumalon':         '+15038576952',
-  'Ethan Kludt-Painter': '+19075184130',
-  'Evaristo Lopez':      '+13607236463',
-  'Adriane North':       '+13609214013',
-  'Liz Prather':         '+13609802969',
-  'Randy Schmeusser':    '+13606013173',
-  'Robert Serna':        '+19712372452',
-  'Kevin Willbur':       '+13607986759'
-};
+// Fill-Ups → fillups.html (standalone page)
 
-function openFillUps(){closeHydroMenu();document.getElementById('fillups-modal').classList.add('open');}
-function closeFillUps(){document.getElementById('fillups-modal').classList.remove('open');}
-
-function openFillUpsCC(){closeFillUps();document.getElementById('fillups-cc-modal').classList.add('open');}
-function closeFillUpsCC(){document.getElementById('fillups-cc-modal').classList.remove('open');openFillUps();}
-
-function openFillUpsCorvallis(){closeFillUps();document.getElementById('fillups-corvallis-modal').classList.add('open');}
-function closeFillUpsCorvallis(){document.getElementById('fillups-corvallis-modal').classList.remove('open');openFillUps();}
-
-function openFillUpsClackamas(){closeFillUps();document.getElementById('fillups-clackamas-modal').classList.add('open');}
-function closeFillUpsClackamas(){document.getElementById('fillups-clackamas-modal').classList.remove('open');openFillUps();}
-
-function showClackamasTab(tab){
-  document.getElementById('clackamas-panel-north').style.display=tab==='north'?'block':'none';
-  document.getElementById('clackamas-panel-south').style.display=tab==='south'?'block':'none';
-  var n=document.getElementById('clackamas-tab-north');
-  var s=document.getElementById('clackamas-tab-south');
-  if(tab==='north'){
-    n.style.background='#2d5a27';n.style.color='white';n.style.borderColor='#2d5a27';
-    s.style.background='#f5f5f2';s.style.color='#2d5a27';s.style.borderColor='#d0dcc8';
-  } else {
-    s.style.background='#2d5a27';s.style.color='white';s.style.borderColor='#2d5a27';
-    n.style.background='#f5f5f2';n.style.color='#2d5a27';n.style.borderColor='#d0dcc8';
-  }
-}
-
-function openFillUpsHillsboro(){closeFillUps();document.getElementById('fillups-hillsboro-modal').classList.add('open');}
-function closeFillUpsHillsboro(){document.getElementById('fillups-hillsboro-modal').classList.remove('open');openFillUps();}
-
-function openFillUpsKelso(){
-  closeFillUps();
-  document.getElementById('kelso-notify-ok').style.display='none';
-  document.getElementById('fillups-kelso-modal').classList.add('open');
-}
-function closeFillUpsKelso(){document.getElementById('fillups-kelso-modal').classList.remove('open');openFillUps();}
-
-function kelsoNotify(btn){
-  btn.disabled=true;btn.style.opacity='0.6';
-  var payload={
-    type:'Kelso_Fill_Notification',
-    to:'egeiszler@kelso.gov,dmackin@kelso.gov',
-    cc:'Rena@1BellaTerra.com,Office@1BellaTerra.com',
-    from:'Team@1BellaTerra.com',
-    subject:'Bella Terra LLC \u2014 Hydrant Fill Notification',
-    body:'Bella Terra LLC is notifying you that we will be filling up at the designated spot shortly.',
-    employee:currentEmployee
-  };
-  fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
-    .then(function(){kelsoNotifyDone(btn);}).catch(function(){kelsoNotifyDone(btn);});
-}
-function kelsoNotifyDone(btn){
-  btn.disabled=false;btn.style.opacity='1';
-  var ok=document.getElementById('kelso-notify-ok');
-  ok.style.display='block';
-  setTimeout(function(){ok.style.display='none';},5000);
-}
-
-function openKelsoTotal(){
-  var today=new Date().toISOString().split('T')[0];
-  document.getElementById('kelso-date').value=today;
-  document.getElementById('kelso-lead').value=currentEmployee||'';
-  document.getElementById('kelso-gallons').value='';
-  document.getElementById('kelso-total-ok').style.display='none';
-  document.getElementById('kelso-total-err').style.display='none';
-  var btn=document.getElementById('kelso-total-btn');
-  btn.disabled=false;btn.textContent='📤 Submit Daily Total';
-  document.getElementById('fillups-kelso-total-modal').classList.add('open');
-}
-function closeKelsoTotal(){document.getElementById('fillups-kelso-total-modal').classList.remove('open');}
-
-function submitKelsoTotal(btn){
-  var gallons=document.getElementById('kelso-gallons').value.trim();
-  var date=document.getElementById('kelso-date').value;
-  var lead=document.getElementById('kelso-lead').value||currentEmployee||'Unknown';
-  var errEl=document.getElementById('kelso-total-err');
-  errEl.style.display='none';
-  if(!gallons||isNaN(gallons)||Number(gallons)<0){errEl.textContent='Please enter a valid gallons amount.';errEl.style.display='block';return;}
-  btn.disabled=true;btn.textContent='⏳ Submitting…';
-  var emailBody='Bella Terra LLC daily fill total for '+date+': '+gallons+' gallons. Crew Lead: '+lead+'.';
-  var payload={
-    type:'Kelso_Daily_Fill_Total',
-    to:'egeiszler@kelso.gov,dmackin@kelso.gov',
-    cc:'Rena@1BellaTerra.com,Office@1BellaTerra.com',
-    subject:'Bella Terra LLC \u2014 Daily Fill Total',
-    body:emailBody,
-    date:date,gallons:gallons,crew_lead:lead,employee:currentEmployee
-  };
-  fetch(APPS_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
-    .then(function(){kelsoTotalSendText(btn,lead);}).catch(function(){kelsoTotalSendText(btn,lead);});
-}
-function kelsoTotalSendText(btn,lead){
-  var phone=CREW_PHONES[lead]||null;
-  if(!phone){kelsoTotalDone(btn,'nophone');return;}
-  var now=new Date();
-  var sendAt=new Date(now.getFullYear(),now.getMonth(),now.getDate(),16,30,0);
-  if(now>=sendAt){
-    kelsoSendTextNow(phone);
-    kelsoTotalDone(btn,'sent');
-  } else {
-    localStorage.setItem('kelso_pending_text',JSON.stringify({phone:phone,sendAfter:sendAt.getTime()}));
-    var delay=sendAt.getTime()-now.getTime();
-    setTimeout(function(){kelsoSendTextNow(phone);localStorage.removeItem('kelso_pending_text');},delay);
-    kelsoTotalDone(btn,'scheduled');
-  }
-}
-function kelsoSendTextNow(phone){
-  var auth=btoa(CS_USER+':'+CS_KEY);
-  var msg='Reminder: Don\'t forget to submit your Kelso daily fill total in the portal.';
-  fetch('https://rest.clicksend.com/v3/sms/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:phone,body:msg}]})})
-    .catch(function(){});
-}
-function kelsoCheckPendingText(){
-  var raw=localStorage.getItem('kelso_pending_text');
-  if(!raw)return;
-  try{
-    var data=JSON.parse(raw);
-    if(Date.now()>=data.sendAfter){
-      localStorage.removeItem('kelso_pending_text');
-      kelsoSendTextNow(data.phone);
-    } else {
-      var delay=data.sendAfter-Date.now();
-      setTimeout(function(){kelsoSendTextNow(data.phone);localStorage.removeItem('kelso_pending_text');},delay);
-    }
-  }catch(e){localStorage.removeItem('kelso_pending_text');}
-}
-function kelsoTotalDone(btn,status){
-  btn.disabled=false;btn.textContent='📤 Submit Daily Total';
-  var ok=document.getElementById('kelso-total-ok');
-  if(status==='sent') ok.textContent='✅ Daily total submitted. Text reminder sent.';
-  else if(status==='scheduled') ok.textContent='✅ Daily total submitted. Text reminder scheduled for 4:30 PM.';
-  else ok.textContent='✅ Daily total submitted. Phone number not found — remind crew lead manually.';
-  ok.style.display='block';
-}
-
-// ═══════════════════════════════════════════════
-// LOG A CALL — Airtable
-// ═══════════════════════════════════════════════
-var AT_BASE  = 'appdtsnIEuASNVrn4';
-var AT_TABLE = 'tblQQcyu5tdHNhk1d';
-var AT_TOKEN = 'patTWo30QfHzcYBh2.fd64fbfa6d16009e1b49c6e7e55e2fa0a0962882b91335bde4398c8179bca89a';
-
-function showLogCall(){
-  ['main-tiles','panel-resources','panel-nursery','panel-jobs','panel-olydisco','panel-scheduledjobs']
-    .forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
-  document.getElementById('panel-log-call').style.display='block';
-  lcStampDatetime();
-}
-
-function lcToggleLoggedByOther(sel){
-  var other=document.getElementById('lc-logged-by-other');
-  other.style.display = sel.value==='__other__' ? 'block' : 'none';
-  if(sel.value!=='__other__') other.value='';
-}
-
-function lcStampDatetime(){
-  var now=new Date();
-  var iso=now.getFullYear()+'-'
-    +String(now.getMonth()+1).padStart(2,'0')+'-'
-    +String(now.getDate()).padStart(2,'0')+'T'
-    +String(now.getHours()).padStart(2,'0')+':'
-    +String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('lc-datetime').value=iso;
-}
-
-function submitLogCall(){
-  var callerName  = document.getElementById('lc-caller-name').value.trim();
-  var phone       = document.getElementById('lc-phone').value.trim();
-  var serviceType = document.getElementById('lc-service-type').value;
-  var address     = document.getElementById('lc-address').value.trim();
-  var lotSize     = document.getElementById('lc-lot-size').value.trim();
-  var notes       = document.getElementById('lc-notes').value.trim();
-  var loggedByRaw = document.getElementById('lc-logged-by').value;
-  var loggedBy    = loggedByRaw==='__other__' ? document.getElementById('lc-logged-by-other').value.trim() : loggedByRaw;
-  var datetime    = document.getElementById('lc-datetime').value;
-
-  var errEl = document.getElementById('lc-error');
-  errEl.style.display='none';
-  document.getElementById('lc-success').style.display='none';
-
-  if(!callerName || !serviceType || !loggedBy){
-    errEl.textContent='⚠ Caller Name, Service Type, and Logged By are required.';
-    errEl.style.display='block';
-    return;
-  }
-
-  var btn=document.getElementById('lc-submit-btn');
-  btn.disabled=true; btn.textContent='⏳ Logging…';
-
-  var isoDatetime = datetime ? new Date(datetime).toISOString() : new Date().toISOString();
-
-  fetch('https://api.airtable.com/v0/'+AT_BASE+'/'+AT_TABLE, {
-    method:'POST',
-    headers:{
-      'Authorization':'Bearer '+AT_TOKEN,
-      'Content-Type':'application/json'
-    },
-    body:JSON.stringify({fields:{
-      'Caller Name':  callerName,
-      'Phone': phone,
-      'Service Type': serviceType,
-      'Job Address':  address,
-      'Lot Size / Sq Ft or CY': lotSize,
-      'Notes':        notes,
-      'Logged By':    loggedBy,
-      'Date & Time':  isoDatetime,
-      'Status':       'Open'
-    }})
-  })
-  .then(function(res){
-    if(res.ok){ lcSuccess(btn); }
-    else{ return res.json().then(function(d){ lcError(btn, d.error?d.error.message:'Server error ('+res.status+'). Please retry.'); }); }
-  })
-  .catch(function(err){ lcError(btn,'Network error — check your connection and retry. ('+(err.message||err)+')'); });
-}
-
-function lcSuccess(btn){
-  btn.disabled=false; btn.textContent='📞 Log This Call';
-  document.getElementById('lc-success').style.display='block';
-  ['lc-caller-name','lc-phone','lc-address','lc-lot-size','lc-notes'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('lc-service-type').value='';
-  document.getElementById('lc-logged-by').value='';
-  document.getElementById('lc-logged-by-other').value='';
-  document.getElementById('lc-logged-by-other').style.display='none';
-  lcStampDatetime();
-  setTimeout(function(){ document.getElementById('lc-success').style.display='none'; },6000);
-}
-
-function lcError(btn, msg){
-  btn.disabled=false; btn.textContent='📞 Log This Call';
-  var errEl=document.getElementById('lc-error');
-  errEl.textContent='❌ '+msg;
-  errEl.style.display='block';
-}
+// Log a Call → log_a_call.html (standalone page)
 
 // ── PWA Service Worker ──
 if ('serviceWorker' in navigator) {
