@@ -538,6 +538,7 @@ button,input,select,textarea{font-family:inherit;}
 ════════════════════════════════════════════════ -->
 <script>
 // ── CONFIGURATION ──────────────────────────────
+const BOARD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
 const CLICKSEND_USERNAME = 'Bids@1bellaterra.com';
 const CLICKSEND_API_KEY  = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
 const EMAIL_SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxa52KhAmPtWCgP6KGt8o74igU1XZCu_Lqk8kmqPGLvuBYrSA_8yfu_p8WqVqMm9dar/exec';
@@ -604,6 +605,22 @@ const FLEET_UNITS = [
   { id:'323', num:'323', nickname:'Moffet Forklift',   year:'2003', make:'Moffet',      model:'Forklift',               plate:'N/A',     icon:'🏗', category:'equipment' },
   { id:'326', num:'326', nickname:'Gator',             year:'2018', make:'John Deere',  model:'TE 4x2 Gator',          plate:'—',       icon:'🚜', category:'equipment' }
 ];
+
+// ── FLEET DRIVE FOLDERS ────────────────────────
+var _fleetFolders = {}; // unit num → Drive folder URL
+
+function loadFleetFolders() {
+  fetch(BOARD_SCRIPT_URL + '?action=fleetFolders')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.success && data.folders) _fleetFolders = data.folders;
+    })
+    .catch(function(){});
+}
+
+function getFolderUrl(unitNum) {
+  return _fleetFolders[unitNum] || 'https://drive.google.com/drive/folders/1_jjw13GJ8sPUD-6kTcU-BrxXn9Tl7sdS';
+}
 
 // ── LOCALSTORAGE ───────────────────────────────
 const LS_REPAIRS = 'bt_repair_requests';
@@ -1010,6 +1027,12 @@ function openVehicleModal(unitId) {
     ? '<p class="v-history-empty">No repair requests for this unit.</p>'
     : repairItems.map(r => `<div class="v-history-item"><div class="v-history-date">${formatDt(r.datetime)} <span class="log-entry-badge ${urgencyBadgeClass(r.urgency)}" style="font-size:0.7rem;">${r.urgency}</span></div><div>${escHtml(r.description.substring(0,120))}${r.description.length>120?'...':''}</div></div>`).join('');
 
+  // Set document links to this unit's Drive folder
+  var folderUrl = getFolderUrl(u.num);
+  document.querySelectorAll('#vp-docs .v-doc-link').forEach(function(a){
+    a.href = folderUrl;
+  });
+
   document.querySelectorAll('.v-sub-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.v-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('vp-docs').classList.add('active');
@@ -1038,6 +1061,7 @@ function escHtml(s) {
 
 // ── INIT ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  loadFleetFolders(); // fetch per-unit Drive folder links
   initSearchSelect('acc');
   initSearchSelect('rep');
   initSearchSelect('maint');
