@@ -540,7 +540,7 @@ button,input,select,textarea{font-family:inherit;}
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">Reorder Supplies</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Flag low stock → sends vendor email</div>
         </div>
-        <div onclick="openOMW('Hydroseeding')" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
+        <div onclick="window.location.href='hydro_omw.html'" style="display:block;background:#e8f5e2;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #7ab648;">
           <div style="font-size:2rem;margin-bottom:0.5rem;">💧📱</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#2d5a27;margin-bottom:0.25rem;">On Our Way — Hydroseed</div>
           <div style="font-size:0.8rem;color:#4a7c3f;font-weight:600;">Search customer → text ETA</div>
@@ -741,7 +741,7 @@ button,input,select,textarea{font-family:inherit;}
         <button onclick="closeBarkMenu()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:#888;">&times;</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
-        <div onclick="openOMW('Bark Blowing')" style="display:block;background:#fff3e8;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #e07c30;">
+        <div onclick="window.location.href='bark_omw.html'" style="display:block;background:#fff3e8;border-radius:10px;padding:1.25rem;cursor:pointer;color:#2a2a2a;border:2px solid #e07c30;">
           <div style="font-size:2rem;margin-bottom:0.5rem;">🌬️📱</div>
           <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#b85c00;margin-bottom:0.25rem;">On Our Way — Bark Blowing</div>
           <div style="font-size:0.8rem;color:#b85c00;font-weight:600;">Search customer → text ETA</div>
@@ -753,13 +753,8 @@ button,input,select,textarea{font-family:inherit;}
     </div>
   </div>
 
-  <!-- OMW MODAL -->
-  <div class="p-modal" id="omw-modal">
-    <div class="omw-box">
-      <button class="omw-closer" onclick="closeOMW()">&times;</button>
-      <div id="omw-content"></div>
-    </div>
-  </div>
+  <!-- On Our Way: Hydroseeding → hydro_omw.html (standalone page) -->
+  <!-- On Our Way: Bark Blowing  → bark_omw.html  (standalone page) -->
 
   <!-- REORDER MODAL -->
   <div id="reorder-modal">
@@ -1607,59 +1602,9 @@ function closeBarkMenu(){document.getElementById('bark-modal').classList.remove(
 
 // ═══════════════════════════════════════════════
 // OMW
-// ═══════════════════════════════════════════════
-var ETA_OPTIONS=['15 minutes','30 minutes','45 minutes','1 hour','1.5 hours','2 hours','2.5 hours','3 hours','4 hours'];
-var omwService='',omwStep='',omwName='',omwPhone='',omwEta='',omwResults=[];
-
-function openOMW(svc){closeHydroMenu();closeBarkMenu();omwService=svc;omwStep='search';omwName='';omwPhone='';omwEta='';omwResults=[];document.getElementById('omw-modal').classList.add('open');renderOMW();}
-function closeOMW(){document.getElementById('omw-modal').classList.remove('open');}
-function omwColors(){if(omwService==='Hydroseeding')return{primary:'#2d5a27',light:'#e8f5e2',border:'#7ab648',emoji:'💧'};return{primary:'#b85c00',light:'#fff3e8',border:'#e07c30',emoji:'🌬️'};}
-
-function renderOMW(){
-  var c=omwColors();var isBark=omwService==='Bark Blowing';var html='';
-  if(omwStep==='search'){
-    html='<h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:0.25rem;margin-right:2rem;">'+c.emoji+' '+omwService+'</h3><p style="color:#888;font-size:0.9rem;margin-bottom:1.25rem;">Type the customer\'s last name.</p><div style="display:flex;gap:0.5rem;margin-bottom:1rem;"><input class="omw-field" id="omw-search" placeholder="Customer last name…" style="margin-top:0;flex:1;" onkeypress="if(event.key===\'Enter\')omwDoSearch()"><button onclick="omwDoSearch()" style="padding:0.6rem 1rem;background:'+c.primary+';color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Search</button></div><div id="omw-search-results"></div>';
-  } else if(omwStep==='review'){
-    var etaHtml='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.4rem;">';
-    ETA_OPTIONS.forEach(opt=>{var sel=omwEta===opt;etaHtml+='<button onclick="omwSetEta(\''+opt+'\')" style="padding:0.5rem 0.25rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:2px solid #d0dcc8;background:white;color:#555;'+(sel?(isBark?'border-color:#b85c00;background:#fff3e8;color:#b85c00;':'border-color:#2d5a27;background:#e8f5e2;color:#2d5a27;'):'')+'">' +opt+'</button>';});
-    etaHtml+='</div>';
-    var preview=omwEta?'<div class="omw-preview"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:0.3rem;">Message Preview</div>Your Bella Terra crew is on the way! ETA: '+omwEta+'. We look forward to seeing you. – Bella Terra LLC</div>':'';
-    html='<button class="omw-back" onclick="omwStep=\'search\';renderOMW()">← Search Again</button><h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:1rem;margin-right:2rem;">'+c.emoji+' Review &amp; Send</h3><div style="background:white;border-radius:12px;border:2px solid '+c.border+';padding:1.25rem;margin-bottom:1rem;"><div style="margin-bottom:0.75rem;"><label class="omw-label" style="color:'+c.primary+';">Customer Name</label><input class="omw-field" id="omw-name-input" value="'+omwName+'" oninput="omwName=this.value" style="margin-top:0.3rem;"></div><div><label class="omw-label" style="color:'+c.primary+';">Customer Phone</label><input class="omw-field" id="omw-phone-input" value="'+omwPhone+'" placeholder="10-digit number" oninput="omwPhone=this.value" style="margin-top:0.3rem;"></div></div><div style="background:white;border-radius:12px;border:2px solid '+c.border+';padding:1.25rem;margin-bottom:1rem;"><label class="omw-label" style="color:'+c.primary+';">Select ETA</label>'+etaHtml+'</div>'+preview+'<div id="omw-error" style="color:#c0392b;font-size:0.85rem;margin-bottom:0.5rem;display:none;"></div><button class="omw-send-btn" onclick="omwSend()" style="background:'+(omwEta&&omwPhone?c.primary:'#aaa')+';">📤 Send Text</button>';
-  } else if(omwStep==='sent'){
-    html='<div class="omw-success"><div style="font-size:2.5rem;margin-bottom:0.5rem;">✅</div><h3 style="font-family:\'Playfair Display\',serif;color:'+c.primary+';margin-bottom:0.5rem;">Text Sent!</h3><p style="color:#555;margin-bottom:0.25rem;"><strong>'+omwName+'</strong></p><p style="color:#555;font-size:0.9rem;margin-bottom:0.25rem;">'+omwPhone+'</p><p style="color:#555;font-size:0.9rem;margin-bottom:1rem;">ETA: <strong>'+omwEta+'</strong></p><button onclick="openOMW(\''+omwService+'\')" style="padding:0.75rem 1.5rem;background:'+c.primary+';color:white;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;">Send Another</button></div>';
-  }
-  document.getElementById('omw-content').innerHTML=html;
-}
-
-function omwDoSearch(){
-  var q=(document.getElementById('omw-search')||{}).value||'';
-  if(q.trim().length<2){document.getElementById('omw-search-results').innerHTML='<p style="color:#c0392b;font-size:0.85rem;">Please enter at least 2 characters.</p>';return;}
-  var c=omwColors();
-  document.getElementById('omw-search-results').innerHTML='<div style="text-align:center;padding:1rem;color:'+c.primary+';font-weight:600;">🔍 Searching…</div>';
-  var svc=omwService==='Hydroseeding'?'hydroseeding':'bark blowing';
-  fetch(LOOKUP_URL+'?name='+encodeURIComponent(q)+'&service='+encodeURIComponent(svc))
-  .then(r=>r.json()).then(data=>{
-    var results=data.results||[];
-    if(!results.length){document.getElementById('omw-search-results').innerHTML='<p style="color:#888;font-size:0.9rem;text-align:center;padding:1rem;">No jobs found for "<strong>'+q+'</strong>".</p>';return;}
-    var html='<p style="font-size:0.82rem;color:#888;margin-bottom:0.75rem;">'+results.length+' job(s) found — tap to select:</p>';
-    results.forEach((r,i)=>{html+='<div class="omw-result-card" onclick="omwSelectCustomer('+i+')"><div style="font-weight:700;font-size:1rem;color:'+c.primary+';">'+r.name+'</div><div style="font-size:0.82rem;color:#666;margin-top:0.2rem;">📅 '+r.requestedDate+' · '+r.service+'</div></div>';});
-    omwResults=results;document.getElementById('omw-search-results').innerHTML=html;
-  }).catch(()=>{document.getElementById('omw-search-results').innerHTML='<p style="color:#c0392b;font-size:0.85rem;">Search failed. Check connection.</p>';});
-}
-function omwSelectCustomer(i){var r=omwResults[i];omwName=r.name;omwPhone=r.phone;omwStep='review';renderOMW();}
-function omwSetEta(opt){omwEta=opt;renderOMW();}
-function omwSend(){
-  omwName=document.getElementById('omw-name-input')?document.getElementById('omw-name-input').value:omwName;
-  omwPhone=document.getElementById('omw-phone-input')?document.getElementById('omw-phone-input').value:omwPhone;
-  if(!omwPhone){document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Phone number is required.';return;}
-  if(!omwEta){document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Please select an ETA.';return;}
-  var digits=omwPhone.replace(/\D/g,'');var to=digits.length===10?'+1'+digits:'+'+digits;
-  var auth=btoa(CS_USER+':'+CS_KEY);
-  var msg='Your Bella Terra crew is on the way! ETA: '+omwEta+'. We look forward to seeing you. – Bella Terra LLC';
-  fetch('https://rest.clicksend.com/v3/sms/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Basic '+auth},body:JSON.stringify({messages:[{source:'sdk',from:CS_FROM,to:to,body:msg}]})})
-  .then(r=>r.json()).then(data=>{if(data.response_code==='SUCCESS'){omwStep='sent';renderOMW();}else{document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Send failed: '+(data.response_msg||'Check credentials.');}})
-  .catch(()=>{document.getElementById('omw-error').style.display='block';document.getElementById('omw-error').textContent='Network error.';});
-}
+// On Our Way features moved to standalone pages:
+//   Hydroseeding → hydro_omw.html
+//   Bark Blowing → bark_omw.html
 
 // ═══════════════════════════════════════════════
 // REORDER
