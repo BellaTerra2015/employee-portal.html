@@ -553,22 +553,45 @@ function renderPlans(){
     :'<button class="edit-btn" onclick="enterPlansEdit()">✏️ Edit Plans</button>';
 
   var emailGate=plansEditMode?
-    '<div class="email-gate"><label>Your @1BellaTerra.com Email</label><input type="email" id="plans-email" value="'+plansEmail+'" placeholder="yourname@1bellaterra.com" oninput="plansEmail=this.value"><p style="font-size:0.75rem;color:var(--gray);margin-top:0.25rem;">Required to save plan links</p></div>':'';
+    '<div class="email-gate"><label>Your @1BellaTerra.com Email</label>'+
+    '<input type="email" id="plans-email" value="'+plansEmail+'" placeholder="yourname@1bellaterra.com" oninput="plansEmail=this.value">'+
+    '<p style="font-size:0.75rem;color:var(--gray);margin-top:0.25rem;">Required to save plan links</p></div>':'';
 
-  var notice=plansEditMode?'<div class="edit-notice">✏️ Editing mode — paste Google Drive links below and click Save for each plan.</div>':'';
+  var notice=plansEditMode?'<div class="edit-notice">✏️ Editing mode — paste Google Drive links and click Save for each document.</div>':'';
 
   var slotsHtml=slots.map(function(slot){
-    var plan=(JOB.plans&&JOB.plans[slot.key])||null;
-    var hasLink=plan&&plan.link;
-    var viewBtn=hasLink?'<a href="'+plan.link+'" target="_blank" class="plan-view-btn">📄 View Plan</a>':'<span class="plan-no-link">No plan uploaded yet</span>';
-    var updatedNote=hasLink?'<span class="plan-updated">'+plan.updatedBy+' · '+fmtDate(plan.updatedDate)+'</span>':'';
-    var editArea=plansEditMode?
-      '<div class="plan-edit-area" style="display:block;">'+
-        '<input type="url" id="link-'+slot.key+'" class="plan-link-input" value="'+(hasLink?plan.link:'')+'" placeholder="Paste Google Drive link…">'+
-        '<button class="plan-save-btn" onclick="savePlan(\''+slot.key+'\',\''+slot.label+'\')">💾 Save '+slot.label+'</button>'+
-        '<span class="ok-box" id="plan-ok-'+slot.key+'" style="display:inline-block;margin-left:0.5rem;padding:0.35rem 0.65rem;font-size:0.8rem;"></span>'+
-      '</div>':'';
-    return '<div class="plan-slot"><div class="plan-slot-header"><span class="plan-slot-label">'+slot.label+'</span>'+updatedNote+'</div>'+viewBtn+editArea+'</div>';
+    var docs=(JOB.plans&&JOB.plans[slot.key])||[];
+
+    // Existing documents
+    var docsHtml=docs.map(function(doc,idx){
+      var docId=slot.key+'_'+idx;
+      var viewBtn='<a href="'+doc.link+'" target="_blank" class="plan-view-btn">📄 '+doc.label+'</a>';
+      var updatedNote='<span class="plan-updated">'+doc.updatedBy+' · '+fmtDate(doc.updatedDate)+'</span>';
+      var editArea=plansEditMode?
+        '<div class="plan-edit-area" style="display:block;">'+
+          '<input type="url" id="link-'+docId+'" class="plan-link-input" value="'+doc.link+'" placeholder="Paste Google Drive link…">'+
+          '<button class="plan-save-btn" onclick="savePlan(\''+slot.key+'\',\''+doc.label+'\',\'link-'+docId+'\',\'ok-'+docId+'\')">💾 Update</button>'+
+          '<span id="ok-'+docId+'" style="display:inline-block;margin-left:0.5rem;font-size:0.8rem;"></span>'+
+        '</div>':'';
+      return '<div class="plan-doc">'+viewBtn+updatedNote+editArea+'</div>';
+    }).join('');
+
+    // Add new document area (edit mode only)
+    var addArea=plansEditMode?
+      '<div id="add-area-'+slot.key+'" style="display:none;margin-top:0.5rem;">'+
+        '<input type="text" id="add-label-'+slot.key+'" class="plan-link-input" placeholder="Document name (e.g. Planting Schedule)" style="margin-bottom:0.4rem;">'+
+        '<input type="url" id="add-link-'+slot.key+'" class="plan-link-input" placeholder="Paste Google Drive link…">'+
+        '<button class="plan-save-btn" onclick="addPlanDoc(\''+slot.key+'\',\''+slot.label+'\')">💾 Save Document</button>'+
+        '<span id="add-ok-'+slot.key+'" style="display:inline-block;margin-left:0.5rem;font-size:0.8rem;"></span>'+
+      '</div>'+
+      '<button class="tag-add-btn" style="margin-top:0.5rem;" onclick="document.getElementById(\'add-area-'+slot.key+'\').style.display=\'block\';this.style.display=\'none\'">+ Add Document</button>':'';
+
+    var emptyMsg=(!docs.length&&!plansEditMode)?'<span class="plan-no-link">No plan uploaded yet</span>':'';
+
+    return '<div class="plan-slot">'+
+      '<div class="plan-slot-header"><span class="plan-slot-label">'+slot.label+'</span></div>'+
+      emptyMsg+docsHtml+addArea+
+    '</div>';
   }).join('');
 
   return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:2px solid var(--pale);">'+
@@ -578,20 +601,49 @@ function renderPlans(){
 function enterPlansEdit(){ plansEditMode=true; renderTab('plans'); }
 function exitPlansEdit(){ plansEditMode=false; plansEmail=''; renderTab('plans'); }
 
-async function savePlan(key,label){
-  var link=(document.getElementById('link-'+key)||{}).value||'';
+async function savePlan(planType, label, linkId, okId){
+  var link=(document.getElementById(linkId)||{}).value||'';
   var email=plansEmail.trim();
-  var okEl=document.getElementById('plan-ok-'+key);
+  var okEl=document.getElementById(okId);
   if(!link){alert('Please paste a Google Drive link first.');return;}
   if(!email.toLowerCase().endsWith('@1bellaterra.com')){alert('Please enter your @1BellaTerra.com email above.');return;}
-  if(okEl){okEl.textContent='Saving…';okEl.style.display='inline-block';okEl.style.color='var(--gray)';}
+  if(okEl){okEl.textContent='Saving…';okEl.style.color='var(--gray)';}
   try{
-    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveJobPlan',jobId:JOB_ID,planType:key,link:link,email:email})});
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveJobPlan',jobId:JOB_ID,planType:planType,label:label,link:link,updatedBy:email})});
     var d=await res.json();
     if(d.success){
       if(!JOB.plans) JOB.plans={};
-      JOB.plans[key]={link:link,updatedBy:email,updatedDate:new Date().toLocaleDateString()};
+      if(!JOB.plans[planType]) JOB.plans[planType]=[];
+      var idx=JOB.plans[planType].findIndex(function(p){return p.label===label;});
+      var entry={label:label,link:link,updatedBy:email,updatedDate:new Date().toISOString()};
+      if(idx>=0) JOB.plans[planType][idx]=entry; else JOB.plans[planType].push(entry);
       if(okEl){okEl.textContent='✅ Saved';okEl.style.color='var(--gd)';}
+    } else { if(okEl){okEl.textContent='❌ '+(d.error||'Error');okEl.style.color='var(--red)';} }
+  } catch(e){ if(okEl){okEl.textContent='❌ Network error';okEl.style.color='var(--red)';} }
+}
+
+async function addPlanDoc(planType, slotLabel){
+  var labelEl=document.getElementById('add-label-'+planType);
+  var linkEl=document.getElementById('add-link-'+planType);
+  var okEl=document.getElementById('add-ok-'+planType);
+  var label=(labelEl&&labelEl.value.trim())||slotLabel;
+  var link=linkEl&&linkEl.value.trim();
+  var email=plansEmail.trim();
+  if(!link){alert('Please paste a Google Drive link first.');return;}
+  if(!email.toLowerCase().endsWith('@1bellaterra.com')){alert('Please enter your @1BellaTerra.com email above.');return;}
+  if(okEl){okEl.textContent='Saving…';okEl.style.color='var(--gray)';}
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveJobPlan',jobId:JOB_ID,planType:planType,label:label,link:link,updatedBy:email})});
+    var d=await res.json();
+    if(d.success){
+      if(!JOB.plans) JOB.plans={};
+      if(!JOB.plans[planType]) JOB.plans[planType]=[];
+      JOB.plans[planType].push({label:label,link:link,updatedBy:email,updatedDate:new Date().toISOString()});
+      if(okEl){okEl.textContent='✅ Saved';okEl.style.color='var(--gd)';}
+      if(labelEl) labelEl.value='';
+      if(linkEl) linkEl.value='';
     } else { if(okEl){okEl.textContent='❌ '+(d.error||'Error');okEl.style.color='var(--red)';} }
   } catch(e){ if(okEl){okEl.textContent='❌ Network error';okEl.style.color='var(--red)';} }
 }
