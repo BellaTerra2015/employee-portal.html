@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Resources — Bella Terra</title>
+<meta name="theme-color" content="#2d5a27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gd:#2d5a27; --gm:#4a7c3f; --gl:#7ab648;
+  --gp:#e8f5e2; --gray:#f5f5f2; --gm2:#888;
+  --text:#2a2a2a; --bdr:#d0dcc8; --red:#c0392b;
+  --blue:#1a73e8; --shd:0 2px 12px rgba(45,90,39,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--gray);color:var(--text);min-height:100vh;}
+button,input,select,textarea{font-family:inherit;}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--gd) 0%,var(--gm) 60%,var(--gl) 100%);padding:2rem;}
+#login-screen h1{font-family:'Playfair Display',serif;color:#fff;font-size:2rem;margin-bottom:0.25rem;text-align:center;}
+#login-screen p{color:rgba(255,255,255,0.75);margin-bottom:2rem;text-align:center;}
+.login-box{background:white;border-radius:12px;padding:2rem;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.25);}
+.login-box label{display:block;font-weight:600;font-size:0.85rem;color:var(--gd);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;}
+.login-box input{width:100%;padding:0.75rem 1rem;border:2px solid var(--bdr);border-radius:8px;font-size:1rem;margin-bottom:1rem;transition:border-color 0.2s;}
+.login-box input:focus{outline:none;border-color:var(--gm);}
+.btn-login{width:100%;padding:0.85rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+.btn-login:hover{background:var(--gm);}
+.error-msg{color:var(--red);font-size:0.875rem;margin-top:0.5rem;display:none;}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.app-header{background:var(--gd);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.app-header h2{font-family:'Playfair Display',serif;color:white;font-size:1.2rem;}
+.btn-portal{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.35rem 0.85rem;border-radius:6px;cursor:pointer;font-size:0.85rem;}
+.btn-portal:hover{background:rgba(255,255,255,0.25);}
+
+/* ── TAB BAR ── */
+.tab-bar{background:white;border-bottom:2px solid var(--bdr);display:flex;overflow-x:auto;position:sticky;top:57px;z-index:19;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:0.75rem 1.1rem;background:none;border:none;font-size:0.85rem;font-weight:600;color:var(--gm2);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.15s;white-space:nowrap;}
+.tab-btn.active{color:var(--gd);border-bottom-color:var(--gd);}
+.tab-btn:hover{color:var(--gm);background:var(--gp);}
+.tab-badge{display:inline-block;background:var(--red);color:white;border-radius:10px;font-size:0.65rem;font-weight:700;padding:0 5px;margin-left:4px;vertical-align:middle;}
+
+/* ── TAB CONTENT ── */
+.tab-content{display:none;padding:1.25rem;max-width:740px;margin:0 auto;padding-bottom:3rem;}
+.tab-content.active{display:block;}
+
+/* ── OVERVIEW ── */
+.welcome-card{background:var(--gp);border-radius:10px;padding:1.25rem;margin-bottom:1rem;}
+.welcome-card h3{font-family:'Playfair Display',serif;color:var(--gd);margin-bottom:0.35rem;}
+.welcome-card p{font-size:0.88rem;color:#555;line-height:1.5;}
+.tasks-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;}
+.task-card{background:white;border-radius:10px;padding:1rem;box-shadow:var(--shd);cursor:pointer;border-top:4px solid var(--bdr);transition:box-shadow 0.15s;}
+.task-card:hover{box-shadow:0 4px 20px rgba(45,90,39,0.15);}
+.task-card.annual{border-top-color:var(--gl);}
+.task-card.required{border-top-color:var(--red);}
+.task-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;color:var(--gm2);margin-bottom:0.35rem;letter-spacing:0.04em;}
+.task-card h4{font-size:0.95rem;margin-bottom:0.25rem;color:var(--text);}
+.task-card p{font-size:0.8rem;color:var(--gm2);line-height:1.4;margin-bottom:0.5rem;}
+.task-status{font-size:0.78rem;font-weight:700;color:var(--red);}
+.task-status.done{color:var(--gl);}
+
+/* ── DIRECTORY ── */
+.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.75rem;}
+.dir-card{background:white;border-radius:10px;padding:1rem 1.1rem;box-shadow:var(--shd);}
+.dir-card.leadership{border-left:4px solid var(--gd);}
+.dir-card h4{font-size:1rem;color:var(--text);margin-bottom:0.25rem;}
+.dir-role{font-size:0.75rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.4rem;}
+.dir-card a{display:block;font-size:0.85rem;color:var(--blue);text-decoration:none;}
+.dir-notes{font-size:0.78rem;color:var(--red);font-style:italic;margin-top:0.4rem;}
+.loading-msg{text-align:center;padding:2.5rem;color:var(--gm2);font-size:0.9rem;}
+.error-state{text-align:center;padding:2rem;color:var(--red);font-size:0.88rem;}
+
+/* ── CONTACTS ── */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.75rem;}
+.res-card{background:white;border-radius:10px;padding:1rem;box-shadow:var(--shd);text-decoration:none;color:var(--text);display:block;transition:box-shadow 0.15s;}
+.res-card:hover{box-shadow:0 4px 16px rgba(45,90,39,0.15);}
+.res-icon{font-size:1.75rem;margin-bottom:0.5rem;}
+.res-card h4{font-size:0.95rem;color:var(--gd);margin-bottom:0.3rem;}
+.res-card p{font-size:0.82rem;color:#555;line-height:1.5;}
+
+/* ── SIGNATURES ── */
+.annual-info{background:#fff8e1;border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#5d4037;border:1px solid #ffe082;line-height:1.5;}
+.sig-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shd);margin-bottom:1rem;}
+.sig-card h4{font-family:'Playfair Display',serif;color:var(--gd);margin-bottom:0.5rem;}
+.sig-desc{font-size:0.85rem;color:#555;margin-bottom:1rem;line-height:1.5;}
+.doc-preview{background:var(--gray);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:0.85rem;line-height:1.6;}
+.doc-preview h5{font-size:0.9rem;margin-bottom:0.5rem;color:var(--gd);}
+.doc-preview ul{margin-left:1.25rem;margin-top:0.35rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;}
+.form-group label{display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--gd);letter-spacing:0.04em;margin-bottom:0.3rem;}
+.form-group input{width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--bdr);border-radius:7px;font-size:0.95rem;}
+.form-group input:focus{outline:none;border-color:var(--gm);}
+.sig-pad-wrap{margin-bottom:0.75rem;}
+.sig-pad-wrap label{display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--gd);letter-spacing:0.04em;margin-bottom:0.35rem;}
+.sig-pad{border:2px solid var(--bdr);border-radius:8px;width:100%;max-width:500px;cursor:crosshair;touch-action:none;display:block;}
+.sig-controls{display:flex;gap:0.75rem;margin-top:0.35rem;align-items:center;}
+.btn-clear{background:none;border:1px solid var(--bdr);border-radius:6px;padding:0.3rem 0.75rem;font-size:0.8rem;cursor:pointer;color:var(--gm2);}
+.consent-check{display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:1rem;font-size:0.82rem;color:#555;line-height:1.4;}
+.consent-check input[type=checkbox]{flex-shrink:0;margin-top:2px;width:16px;height:16px;}
+.btn-submit{width:100%;padding:0.8rem;background:var(--gd);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-submit:hover{background:var(--gm);}
+.success-msg{display:none;background:var(--gp);border:1px solid var(--gl);border-radius:8px;padding:0.75rem 1rem;color:var(--gd);font-size:0.9rem;font-weight:600;margin-top:0.75rem;}
+
+/* ── HANDBOOK ── */
+.hb-progress-wrap{background:white;border-radius:10px;padding:1rem 1.25rem;box-shadow:var(--shd);margin-bottom:1rem;display:flex;align-items:center;gap:1rem;}
+.hb-bar-wrap{flex:1;}
+.hb-bar-label{font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--gm2);margin-bottom:0.3rem;}
+.hb-bar{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;}
+.hb-fill{height:100%;background:var(--gl);border-radius:4px;transition:width 0.4s;}
+.hb-count{font-size:1.1rem;font-weight:700;color:var(--gd);white-space:nowrap;}
+.hb-complete{background:var(--gp);border:1.5px solid var(--gl);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;display:none;}
+.hb-complete h3{color:var(--gd);margin-bottom:0.25rem;}
+.hb-complete p{font-size:0.88rem;color:#555;}
+.hb-chapter{background:white;border-radius:10px;box-shadow:var(--shd);margin-bottom:0.65rem;overflow:hidden;}
+.ch-header{display:flex;align-items:center;gap:0.85rem;padding:1rem 1.1rem;cursor:pointer;user-select:none;}
+.ch-header:hover{background:var(--gp);}
+.ch-num{width:32px;height:32px;border-radius:50%;background:var(--gp);color:var(--gd);font-weight:700;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
+.ch-num.done{background:var(--gl);color:white;}
+.ch-title-wrap{flex:1;}
+.ch-title{font-weight:600;font-size:0.95rem;color:var(--text);}
+.ch-type{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-top:0.15rem;color:var(--gm2);}
+.ch-type.needs-init{color:var(--red);}
+.ch-type.initialed{color:var(--gl);}
+.ch-arrow{color:var(--gm2);font-size:0.75rem;transition:transform 0.2s;flex-shrink:0;}
+.ch-arrow.open{transform:rotate(180deg);}
+.ch-body{display:none;border-top:1px solid var(--bdr);}
+.ch-content{padding:1rem 1.1rem;font-size:0.88rem;line-height:1.7;color:#444;}
+.ch-content h4{color:var(--gd);font-size:0.9rem;margin:0.75rem 0 0.3rem;}
+.ch-content h4:first-child{margin-top:0;}
+.ch-content p+p{margin-top:0.45rem;}
+.ch-content ul{margin-left:1.25rem;}
+.ch-content li{margin-bottom:0.15rem;}
+.init-block{background:var(--gp);padding:0.85rem 1.1rem;border-top:1px solid var(--bdr);}
+.init-block p{font-size:0.85rem;color:var(--gd);margin-bottom:0.6rem;font-weight:600;}
+.init-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
+.init-row input{width:90px;padding:0.5rem 0.75rem;border:2px solid var(--bdr);border-radius:7px;font-size:1rem;font-weight:700;text-align:center;letter-spacing:0.1em;text-transform:uppercase;}
+.init-row input:focus{outline:none;border-color:var(--gd);}
+.btn-initial{padding:0.5rem 1rem;background:var(--gd);color:white;border:none;border-radius:7px;font-size:0.85rem;font-weight:600;cursor:pointer;}
+.init-done{display:none;color:var(--gl);font-weight:700;font-size:0.9rem;}
+.hb-submit-card{background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shd);margin-top:1rem;display:none;}
+.hb-submit-card h4{font-family:'Playfair Display',serif;color:var(--gd);margin-bottom:0.5rem;}
+.hb-submit-card .sig-desc{margin-bottom:1rem;}
+
+@media(max-width:540px){
+  .tasks-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <h1>👥 Employee Resources</h1>
+  <p>Bella Terra LLC</p>
+  <div class="login-box">
+    <label>Portal Password</label>
+    <input type="password" id="login-pass" placeholder="Enter password">
+    <p class="error-msg" id="login-error">Incorrect password. Please try again.</p>
+    <button class="btn-login" style="margin-top:0.5rem" onclick="doLogin()">Access</button>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="app-header">
+    <h2>👥 Employee Resources</h2>
+    <button class="btn-portal" onclick="window.location.href='bella_terra_portal_html.html'">← Portal</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tb-overview"   onclick="showTab('overview')">🏠 Overview</button>
+    <button class="tab-btn"        id="tb-directory"  onclick="showTab('directory')">👷 Team</button>
+    <button class="tab-btn"        id="tb-contacts"   onclick="showTab('contacts')">📋 Contacts</button>
+    <button class="tab-btn"        id="tb-signatures" onclick="showTab('signatures')">✍️ Signatures <span class="tab-badge" id="sig-badge">2</span></button>
+    <button class="tab-btn"        id="tb-handbook"   onclick="showTab('handbook')">📖 Handbook <span class="tab-badge" id="hb-badge">!</span></button>
+  </div>
+
+  <!-- ── OVERVIEW ── -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="welcome-card">
+      <h3>Your To-Do List</h3>
+      <p>Complete required signatures and review the handbook. All signed documents are automatically sent to payroll.</p>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card annual" onclick="showTab('signatures')">
+        <div class="task-label">📅 Annual · Due Jan 1</div>
+        <h4>4/10 Work Agreement</h4>
+        <p>Review and sign your annual 4/10 work schedule agreement.</p>
+        <div class="task-status" id="status-410">⚠ Signature required</div>
+      </div>
+      <div class="task-card required" onclick="showTab('signatures')">
+        <div class="task-label">📋 Required</div>
+        <h4>Breaks &amp; Meal Period</h4>
+        <p>Acknowledge Washington State rest and meal break policies.</p>
+        <div class="task-status" id="status-breaks">⚠ Signature required</div>
+      </div>
+      <div class="task-card required" onclick="showTab('handbook')">
+        <div class="task-label">📖 Required</div>
+        <h4>Employee Handbook</h4>
+        <p>Read all sections and initial the required chapters.</p>
+        <div class="task-status" id="status-handbook">⚠ Initials required</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TEAM DIRECTORY ── -->
+  <div class="tab-content" id="tab-directory">
+    <div id="dir-wrap"><div class="loading-msg">🔍 Loading team directory…</div></div>
+  </div>
+
+  <!-- ── CONTACTS ── -->
+  <div class="tab-content" id="tab-contacts">
+    <div class="res-grid">
+      <a class="res-card" href="https://www.lni.wa.gov/WorkplaceRights" target="_blank">
+        <div class="res-icon">⚖️</div><h4>WA Labor &amp; Industries</h4>
+        <p>Workplace rights, L&amp;I claims, safety resources.</p>
+      </a>
+      <a class="res-card" href="https://www.vitalcarewa.com" target="_blank">
+        <div class="res-icon">🏥</div><h4>Vital Care Urgent Care</h4>
+        <p>Battle Ground, WA · (360) 723-0528<br>Mon–Fri 8am–5pm</p>
+      </a>
+      <div class="res-card">
+        <div class="res-icon">📧</div><h4>HR / Office</h4>
+        <p>Liz Prather<br>office@1BellaTerra.com</p>
+      </div>
+      <a class="res-card" href="tel:3606065616">
+        <div class="res-icon">📞</div><h4>Safety — Rena Bellika</h4>
+        <p>(360) 606-5616</p>
+      </a>
+      <a class="res-card" href="tel:3605609860">
+        <div class="res-icon">🦺</div><h4>Safety — Brydon Bellika</h4>
+        <p>(360) 560-9860</p>
+      </a>
+      <div class="res-card">
+        <div class="res-icon">💵</div><h4>Payroll</h4>
+        <p>payroll@1BellaTerra.com</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIGNATURES ── -->
+  <div class="tab-content" id="tab-signatures">
+    <div class="annual-info">
+      <strong>Annual Documents:</strong> The 4/10 Work Agreement and Breaks &amp; Meal Period Acknowledgment must be signed at the start of each calendar year. Completed signatures are emailed to <strong>payroll@1BellaTerra.com</strong>.
+    </div>
+
+    <div class="sig-card">
+      <h4>📅 4/10 Work Schedule Agreement</h4>
+      <div class="sig-desc">Must be signed at the beginning of each calendar year or upon first login on a new device.</div>
+      <div class="doc-preview">
+        <h5>Bella Terra LLC — 4/10 Work Schedule Agreement</h5>
+        <p>I understand and agree to Bella Terra's 4/10 work schedule — four (4) ten (10) hour workdays per week. I understand that:</p>
+        <ul>
+          <li>My standard workday will be 10 hours, not including unpaid meal breaks</li>
+          <li>Overtime is calculated on hours in excess of 40 per workweek</li>
+          <li>My specific days and hours will be assigned by my supervisor and may vary seasonally</li>
+          <li>This agreement is reviewed and re-executed annually</li>
+        </ul>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input type="text" id="410-name" placeholder="First Last"></div>
+        <div class="form-group"><label>Position</label><input type="text" id="410-position" placeholder="e.g. Hydroseeder Operator"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Date of Hire</label><input type="date" id="410-hire"></div>
+        <div class="form-group"><label>Today's Date</label><input type="date" id="410-date"></div>
+      </div>
+      <div class="sig-pad-wrap">
+        <label>Employee Signature (draw below)</label>
+        <canvas class="sig-pad" id="canvas-410" width="500" height="120"></canvas>
+        <div class="sig-controls">
+          <button class="btn-clear" onclick="clearSig('canvas-410')">✕ Clear</button>
+          <span style="font-size:0.78rem;color:var(--gm2)">Draw with mouse or finger</span>
+        </div>
+      </div>
+      <div class="consent-check">
+        <input type="checkbox" id="consent-410">
+        <label for="consent-410">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to the 4/10 Work Schedule Agreement.</label>
+      </div>
+      <button class="btn-submit" onclick="submitSig('410')">📤 Submit Agreement</button>
+      <div class="success-msg" id="success-410">✅ 4/10 Agreement submitted to payroll</div>
+    </div>
+
+    <div class="sig-card">
+      <h4>🍽 Break &amp; Meal Period Acknowledgment</h4>
+      <div class="sig-desc">Washington State requires annual documentation that employees understand rest and meal break rights.</div>
+      <div class="doc-preview">
+        <h5>Bella Terra — Break &amp; Meal Period Acknowledgment</h5>
+        <p><strong>Rest Breaks (Paid):</strong> 10 minutes for every 4 hours worked. Cannot be waived to leave early.</p>
+        <p style="margin-top:0.5rem"><strong>Meal Breaks (Unpaid):</strong> 30 minutes when working more than 5 hours.</p>
+        <ul style="margin-top:0.5rem">
+          <li>Take your assigned breaks as scheduled</li>
+          <li>Immediately notify your supervisor if you cannot take a break</li>
+        </ul>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input type="text" id="breaks-name" placeholder="First Last"></div>
+        <div class="form-group"><label>Position</label><input type="text" id="breaks-position" placeholder="e.g. Crew Member"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Date of Hire</label><input type="date" id="breaks-hire"></div>
+        <div class="form-group"><label>Today's Date</label><input type="date" id="breaks-date"></div>
+      </div>
+      <div class="sig-pad-wrap">
+        <label>Employee Signature (draw below)</label>
+        <canvas class="sig-pad" id="canvas-breaks" width="500" height="120"></canvas>
+        <div class="sig-controls">
+          <button class="btn-clear" onclick="clearSig('canvas-breaks')">✕ Clear</button>
+          <span style="font-size:0.78rem;color:var(--gm2)">Draw with mouse or finger</span>
+        </div>
+      </div>
+      <div class="consent-check">
+        <input type="checkbox" id="consent-breaks">
+        <label for="consent-breaks">By checking this box and signing above, I acknowledge this constitutes my electronic signature and I agree to Bella Terra's Break &amp; Meal Period policies.</label>
+      </div>
+      <button class="btn-submit" onclick="submitSig('breaks')">📤 Submit Acknowledgment</button>
+      <div class="success-msg" id="success-breaks">✅ Acknowledgment submitted to payroll</div>
+    </div>
+  </div>
+
+  <!-- ── HANDBOOK ── -->
+  <div class="tab-content" id="tab-handbook">
+    <div class="hb-progress-wrap">
+      <div class="hb-bar-wrap">
+        <div class="hb-bar-label">Handbook Completion</div>
+        <div class="hb-bar"><div class="hb-fill" id="hb-fill" style="width:0%"></div></div>
+      </div>
+      <div class="hb-count"><span id="hb-num">0</span> / <span id="hb-total">0</span></div>
+    </div>
+    <div class="hb-complete" id="hb-complete">
+      <h3>✅ Handbook Complete!</h3>
+      <p>All required sections initialed. Submit your acknowledgment below.</p>
+    </div>
+    <div id="hb-wrap"><div class="loading-msg">📖 Loading handbook…</div></div>
+    <div class="hb-submit-card" id="hb-submit-card">
+      <h4>Submit Handbook Acknowledgment</h4>
+      <div class="sig-desc">All required sections initialed. Submit to send your acknowledgment to payroll.</div>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input type="text" id="hb-name" placeholder="First Last"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="hb-date"></div>
+      </div>
+      <button class="btn-submit" onclick="submitHandbook()">📤 Submit Acknowledgment</button>
+      <div class="success-msg" id="hb-success">✅ Acknowledgment sent to payroll</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CREDENTIALS — update here only, nowhere else
+// ═══════════════════════════════════════════════
+var PORTAL_PW   = 'bellaterra';
+var ER_SCRIPT   = 'YOUR_EMPLOYEE_RESOURCES_SCRIPT_URL';   // ← paste your new Apps Script URL here
+var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbw1YubodZ0g9RUVSI36cW3JjP6NJdjmZlwMCR8hZMc7zdjnNfp4JKcV1Ka3tBBec68H1g/exec';
+var CC_EMAILS   = ['Rena@1BellaTerra.com','payroll@1BellaTerra.com','Office@1BellaTerra.com'];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+var hbInitialed = {};  // { order: 'initials' }
+var hbRequired  = [];  // order numbers that require initials
+var sigDone     = { '410': false, 'breaks': false };
+
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+function doLogin(){
+  var pass = document.getElementById('login-pass').value;
+  var err  = document.getElementById('login-error');
+  if(pass !== PORTAL_PW){ err.style.display='block'; return; }
+  err.style.display='none';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  var today = new Date().toISOString().slice(0,10);
+  ['410-date','breaks-date','hb-date'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value=today;
+  });
+  initCanvas('canvas-410');
+  initCanvas('canvas-breaks');
+  fetchResources();
+}
+document.getElementById('login-pass').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
+  var tb=document.getElementById('tb-'+id); if(tb) tb.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// FETCH FROM GOOGLE APPS SCRIPT
+// ═══════════════════════════════════════════════
+function fetchResources(){
+  if(!ER_SCRIPT || ER_SCRIPT==='YOUR_EMPLOYEE_RESOURCES_SCRIPT_URL'){
+    setDirectoryError('Apps Script URL not configured yet — see setup instructions.');
+    setHandbookError('Apps Script URL not configured yet — see setup instructions.');
+    return;
+  }
+  fetch(ER_SCRIPT+'?action=all')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      renderDirectory(data.directory||[]);
+      renderHandbook(data.handbook||[]);
+    })
+    .catch(function(){
+      setDirectoryError('Could not load directory. Check your connection and try again.');
+      setHandbookError('Could not load handbook. Check your connection and try again.');
+    });
+}
+
+// ═══════════════════════════════════════════════
+// TEAM DIRECTORY
+// ═══════════════════════════════════════════════
+function renderDirectory(employees){
+  var wrap=document.getElementById('dir-wrap');
+  if(!employees.length){
+    wrap.innerHTML='<div class="loading-msg">No active employees found in the Team Directory sheet.</div>';
+    return;
+  }
+  var html='<p style="font-size:0.85rem;color:var(--gm2);margin-bottom:1rem;">Tap a phone number to call. Listed alphabetically.</p><div class="dir-grid">';
+  employees.forEach(function(emp){
+    var digits=(emp.phone||'').toString().replace(/\D/g,'');
+    var display=fmtPhone(digits);
+    html+='<div class="dir-card'+(emp.leadership?' leadership':'')+'">'+
+          '<h4>'+esc(emp.name)+'</h4>'+
+          '<div class="dir-role">'+esc(emp.role)+'</div>'+
+          (digits?'<a href="tel:'+digits+'">📱 '+display+'</a>':'')+
+          (emp.notes?'<div class="dir-notes">'+esc(emp.notes)+'</div>':'')+
+          '</div>';
+  });
+  html+='</div>';
+  wrap.innerHTML=html;
+}
+function setDirectoryError(msg){
+  document.getElementById('dir-wrap').innerHTML='<div class="error-state">⚠ '+esc(msg)+'</div>';
+}
+function fmtPhone(d){
+  if(d.length===10) return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);
+  if(d.length===11&&d[0]==='1') return '('+d.slice(1,4)+') '+d.slice(4,7)+'-'+d.slice(7);
+  return d;
+}
+
+// ═══════════════════════════════════════════════
+// HANDBOOK
+// ═══════════════════════════════════════════════
+function renderHandbook(chapters){
+  var wrap=document.getElementById('hb-wrap');
+  if(!chapters.length){
+    wrap.innerHTML='<div class="loading-msg">No handbook chapters found in the Handbook sheet.</div>';
+    return;
+  }
+  hbRequired=chapters.filter(function(c){ return c.requiresInitials; }).map(function(c){ return c.order; });
+  document.getElementById('hb-total').textContent=hbRequired.length;
+  wrap.innerHTML=chapters.map(buildChapter).join('');
+  updateHbProgress();
+}
+
+function buildChapter(ch){
+  var needsInit=ch.requiresInitials;
+  var typeLabel=needsInit?'✍ Initial required after reading':'📘 Read — No initials required';
+  var typeCls  =needsInit?'needs-init':'';
+  return '<div class="hb-chapter" id="hb-ch-'+ch.order+'">'+
+    '<div class="ch-header" onclick="toggleCh(this)">'+
+    '<div class="ch-num" id="ch-num-'+ch.order+'">'+ch.order+'</div>'+
+    '<div class="ch-title-wrap">'+
+    '<div class="ch-title">'+esc(ch.title)+'</div>'+
+    '<div class="ch-type '+typeCls+'" id="ch-type-'+ch.order+'">'+typeLabel+'</div>'+
+    '</div><span class="ch-arrow">▼</span></div>'+
+    '<div class="ch-body">'+
+    '<div class="ch-content">'+parseContent(ch.content||'')+'</div>'+
+    (needsInit?
+      '<div class="init-block">'+
+      '<p>Initial to confirm you have read and understood this section.</p>'+
+      '<div class="init-row">'+
+      '<input type="text" placeholder="Initials" id="init-'+ch.order+'" maxlength="4">'+
+      '<button class="btn-initial" onclick="saveInitial('+ch.order+')">Confirm Initials</button>'+
+      '<div class="init-done" id="done-'+ch.order+'">✅ Initialed</div>'+
+      '</div></div>':'')+
+    '</div></div>';
+}
+
+function parseContent(text){
+  // Simple format: ## Heading, - bullet, blank line = new paragraph
+  var lines=text.split('\n'), html='', inList=false;
+  lines.forEach(function(line){
+    line=line.trim();
+    if(!line){ if(inList){html+='</ul>';inList=false;} return; }
+    if(line.startsWith('## ')){
+      if(inList){html+='</ul>';inList=false;}
+      html+='<h4>'+esc(line.slice(3))+'</h4>';
+    } else if(line.startsWith('- ')||line.startsWith('• ')){
+      if(!inList){html+='<ul>';inList=true;}
+      html+='<li>'+esc(line.slice(2))+'</li>';
+    } else {
+      if(inList){html+='</ul>';inList=false;}
+      html+='<p>'+esc(line)+'</p>';
+    }
+  });
+  if(inList) html+='</ul>';
+  return html;
+}
+
+function toggleCh(header){
+  var body=header.nextElementSibling;
+  var arrow=header.querySelector('.ch-arrow');
+  var open=body.style.display==='block';
+  body.style.display=open?'none':'block';
+  arrow.classList.toggle('open',!open);
+}
+
+function saveInitial(order){
+  var input=document.getElementById('init-'+order);
+  if(!input||!input.value.trim()){ input.style.borderColor='var(--red)'; setTimeout(function(){input.style.borderColor='';},1500); return; }
+  hbInitialed[order]=input.value.trim().toUpperCase();
+  document.getElementById('done-'+order).style.display='inline';
+  input.disabled=true;
+  var btn=document.querySelector('#hb-ch-'+order+' .btn-initial'); if(btn) btn.disabled=true;
+  var numEl=document.getElementById('ch-num-'+order); if(numEl) numEl.classList.add('done');
+  var typeEl=document.getElementById('ch-type-'+order);
+  if(typeEl){typeEl.textContent='✅ Initialed';typeEl.className='ch-type initialed';}
+  updateHbProgress();
+}
+
+function updateHbProgress(){
+  var done=Object.keys(hbInitialed).length, total=hbRequired.length;
+  var pct=total?Math.round(done/total*100):0;
+  document.getElementById('hb-fill').style.width=pct+'%';
+  document.getElementById('hb-num').textContent=done;
+  if(done>=total&&total>0){
+    document.getElementById('hb-complete').style.display='block';
+    document.getElementById('hb-submit-card').style.display='block';
+    document.getElementById('hb-badge').style.display='none';
+    var sth=document.getElementById('status-handbook');
+    if(sth){sth.textContent='✅ Complete';sth.className='task-status done';}
+  }
+}
+
+function submitHandbook(){
+  var name=document.getElementById('hb-name').value.trim();
+  var date=document.getElementById('hb-date').value;
+  if(!name){alert('Please enter your full name.');return;}
+  var initList=hbRequired.map(function(o){ return 'Ch.'+o+': '+(hbInitialed[o]||'?'); }).join(' | ');
+  var subject='Employee Handbook Acknowledgment — '+name;
+  var body='Handbook fully acknowledged.\n\nName: '+name+'\nDate: '+date+'\n\nInitials by chapter: '+initList;
+  fetch(APPS_SCRIPT+'?type=email&to='+encodeURIComponent(CC_EMAILS.join(','))+'&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body))
+    .finally(function(){ document.getElementById('hb-success').style.display='block'; });
+}
+
+function setHandbookError(msg){
+  document.getElementById('hb-wrap').innerHTML='<div class="error-state">⚠ '+esc(msg)+'</div>';
+}
+
+// ═══════════════════════════════════════════════
+// SIGNATURES
+// ═══════════════════════════════════════════════
+function submitSig(type){
+  var name    =document.getElementById(type+'-name').value.trim();
+  var position=document.getElementById(type+'-position').value.trim();
+  var hireDate=document.getElementById(type+'-hire').value;
+  var date    =document.getElementById(type+'-date').value;
+  var consent =document.getElementById('consent-'+type).checked;
+  if(!name||!consent){alert('Please enter your name and check the consent box.');return;}
+  var titles={'410':'4/10 Work Schedule Agreement','breaks':'Break & Meal Period Acknowledgment'};
+  var subject=titles[type]+' — '+name;
+  var body   =titles[type]+' submitted electronically.\n\nName: '+name+'\nPosition: '+position+'\nHire Date: '+hireDate+'\nDate Signed: '+date;
+  fetch(APPS_SCRIPT+'?type=email&to='+encodeURIComponent(CC_EMAILS.join(','))+'&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body))
+    .finally(function(){
+      document.getElementById('success-'+type).style.display='block';
+      sigDone[type]=true; updateSigBadge();
+      var st=document.getElementById('status-'+type);
+      if(st){st.textContent='✅ Signed';st.className='task-status done';}
+    });
+}
+
+function updateSigBadge(){
+  var pending=Object.values(sigDone).filter(function(v){return!v;}).length;
+  var badge=document.getElementById('sig-badge');
+  badge.style.display=pending?'inline':'none';
+  if(pending) badge.textContent=pending;
+}
+
+// ═══════════════════════════════════════════════
+// CANVAS SIGNATURE PADS
+// ═══════════════════════════════════════════════
+function initCanvas(id){
+  var canvas=document.getElementById(id);
+  var ctx=canvas.getContext('2d');
+  var drawing=false;
+  ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  function pos(e){
+    var rect=canvas.getBoundingClientRect();
+    var sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    var src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-rect.left)*sx, y:(src.clientY-rect.top)*sy};
+  }
+  canvas.addEventListener('mousedown', function(e){drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+  canvas.addEventListener('mousemove', function(e){if(!drawing)return;var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);});
+  canvas.addEventListener('mouseup',   function(){drawing=false;});
+  canvas.addEventListener('mouseleave',function(){drawing=false;});
+  canvas.addEventListener('touchstart',function(e){e.preventDefault();drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+  canvas.addEventListener('touchmove', function(e){e.preventDefault();if(!drawing)return;var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+  canvas.addEventListener('touchend',  function(){drawing=false;});
+}
+function clearSig(id){var c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);}
+
+// ═══════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
