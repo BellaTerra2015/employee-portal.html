@@ -225,15 +225,42 @@ const ALL_SPECIES = [...BT_PLANTS, ...CN_PLANTS];
 
 let state = { loaded:{}, stagingAreas:[], countyCount:{} };
 
-window.onload = () => {
+window.onload = async () => {
   const saved = localStorage.getItem('odt_state');
   if (saved) { try { state = {...state, ...JSON.parse(saved)}; } catch(e){} }
+  await loadFromSheet();
   renderBTTable(); renderCNTable(); renderStagingAreas(); renderReport();
 };
 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsm6p9b-UeNkxE-1DAo16ayZ2uQ-dCdDuwjieIxt-Js8og6C10g3HBBcAUf_s6mJng/exec';
+
 function save() {
   localStorage.setItem('odt_state', JSON.stringify(state));
-  document.getElementById('syncBadge').textContent = '● Saved';
+  syncToSheet();
+}
+
+async function syncToSheet() {
+  const badge = document.getElementById('syncBadge');
+  badge.textContent = '● Syncing…';
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveState', state: state })
+    });
+    badge.textContent = '● Synced';
+  } catch(e) {
+    badge.textContent = '● Local only';
+  }
+}
+
+async function loadFromSheet() {
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    if (data.success && data.state) {
+      state = {...state, ...data.state};
+    }
+  } catch(e) {}
 }
 
 /* ── MANIFEST ── */
