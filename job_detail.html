@@ -174,6 +174,7 @@ var SCOPE_TABS = {
   'Blowing':            { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
   'CAD':                { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
   'Dump Truck':         { icon:'🚚', label:'Delivery Log',     panel:'delivery' },
+  'Plant Ship/Stage':   { icon:'🌿', label:'Plant Ship/Stage', panel:'shipstage' },
   'Maintenance':        { icon:'🌿', label:'Maintenance',      panel:'maintenance'},
   'Herbicide':          { icon:'🧪', label:'Herbicide Log',    panel:'herbicide'},
   'Herbicide Application':{ icon:'🧪', label:'Herbicide Log',  panel:'herbicide'},
@@ -319,6 +320,7 @@ function buildPanelContent(panelId, scopeName) {
     case 'hydro':        return buildHydroPanel();
     case 'planting':     return buildPlantingPanel();
     case 'bark':         return buildBarkPanel();
+    case 'shipstage':    return buildShipStagePanel();
     case 'delivery':     return buildDeliveryPanel();
     case 'maintenance':  return buildMaintenancePanel();
     case 'safety':       return buildSafetyPanel();
@@ -383,8 +385,19 @@ function buildBarkPanel() {
     '<button class="btn-submit" onclick="submitReport(\'bark\',this)">📤 Submit Bark Report</button>' +
     '<div class="ok-msg" id="bark-ok">✅ Report submitted successfully.</div></div>';
 }
-
-// ── DELIVERY LOG ──────────────────────────────────────────────
+// ── PLANT SHIP / STAGE ────────────────────────────────────────
+function buildShipStagePanel() {
+  var id = _project ? encodeURIComponent(_project.podioItemId) : '';
+  return '<div class="card" style="padding:0;overflow:hidden;">' +
+    '<div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">' +
+    '<h4 style="margin:0;">🌿 Plant Ship / Stage</h4>' +
+    '<span style="font-size:.78rem;color:var(--gray-mid);">Pull tickets · Staging counts · Inspection report</span>' +
+    '</div>' +
+    '<iframe src="odt_staging.html?projectId=' + id + '" ' +
+    'style="width:100%;height:calc(100vh - 180px);border:none;display:block;"></iframe>' +
+    '</div>';
+}
+  // ── DELIVERY LOG ──────────────────────────────────────────────
 function buildDeliveryPanel() {
   return '<div class="card"><h4>🚚 Plant Shipment / Delivery Log</h4>' +
     '<div class="g2"><div class="f"><label>Delivery Date</label><input type="date" id="ship-date"></div>' +
