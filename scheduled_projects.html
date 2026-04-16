@@ -33,6 +33,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .user-badge{background:rgba(255,255,255,.15);color:#fff;padding:.3rem .75rem;border-radius:20px;font-size:.85rem;}
 .btn-back{background:transparent;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.3);padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-size:.85rem;text-decoration:none;}
 .btn-sync{background:var(--green-mid);color:#fff;border:none;padding:.4rem .9rem;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;}
+.btn-install{display:none;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;align-items:center;gap:.35rem;}
 
 /* ── BOARD ── */
 .board-wrap{padding:1.5rem;overflow-x:auto;}
@@ -144,6 +145,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 <div class="page-header">
   <h1>📋 Project Board</h1>
   <div class="header-right">
+    <button class="btn-install" id="btn-install" onclick="triggerInstall()">📲 Add to Home Screen</button>
     <span class="user-badge" id="user-badge" onclick="promptSignIn()">Loading…</span>
     <button class="btn-sync" onclick="syncFromPodio()">↻ Sync Podio</button>
     <a class="btn-back" href="bella_terra_portal_html.html">← Portal</a>
@@ -887,11 +889,80 @@ function esc(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── SERVICE WORKER (PWA install) ─────────────────────────────
+// ── SERVICE WORKER ────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./sw.js');
   });
+}
+
+// ── PWA INSTALL PROMPT ────────────────────────────────────────
+var _installPrompt = null;
+var _isIos        = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+var _isMobile     = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+var _isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                    window.navigator.standalone === true;
+
+function _showInstallBtn(label) {
+  var btn = document.getElementById('btn-install');
+  btn.textContent = label;
+  btn.style.display = 'flex';
+}
+
+// Desktop Chrome / Edge / Android Chrome — browser fires this when app is installable
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _installPrompt = e;
+  _showInstallBtn(_isMobile ? '📲 Add to Home Screen' : '💻 Install App');
+});
+
+// Hide button once installed
+window.addEventListener('appinstalled', function() {
+  document.getElementById('btn-install').style.display = 'none';
+  _installPrompt = null;
+});
+
+// iOS Safari — browser never fires beforeinstallprompt, so show button manually
+if (_isIos && !_isStandalone) {
+  window.addEventListener('load', function() {
+    _showInstallBtn('📲 Add to Home Screen');
+  });
+}
+
+function triggerInstall() {
+  if (_isStandalone) {
+    alert('Bella Terra Portal is already installed!');
+    return;
+  }
+
+  if (_installPrompt) {
+    // Desktop Chrome / Edge / Android Chrome — native install dialog
+    _installPrompt.prompt();
+    _installPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') {
+        document.getElementById('btn-install').style.display = 'none';
+      }
+      _installPrompt = null;
+    });
+
+  } else if (_isIos) {
+    // iPhone / iPad — manual steps (Safari doesn't support the prompt API)
+    alert(
+      'To add Bella Terra Portal to your Home Screen:\n\n' +
+      '1. Tap the Share button (\u29c8\u2191) at the bottom of Safari\n' +
+      '2. Scroll down and tap \u201cAdd to Home Screen\u201d\n' +
+      '3. Tap \u201cAdd\u201d in the top right corner\n\n' +
+      'The Bella Terra logo will appear on your home screen.'
+    );
+
+  } else {
+    // Firefox, Samsung Internet, other browsers
+    alert(
+      'To install Bella Terra Portal:\n\n' +
+      'In Chrome \u2014 click the \u22ee menu \u2192 \u201cInstall Bella Terra Portal\u201d\n' +
+      'In Edge \u2014 click the \u2026 menu \u2192 \u201cApps\u201d \u2192 \u201cInstall this site as an app\u201d'
+    );
+  }
 }
 </script>
 </body>
