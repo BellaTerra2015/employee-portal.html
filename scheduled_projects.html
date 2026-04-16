@@ -238,12 +238,22 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
       <textarea id="sp-notes" placeholder="Any other site-specific information…"></textarea></div>
 
     <div class="modal-section">Chemical Safety Data Sheets (SDS)</div>
-    <div id="sds-modal-list" style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;line-height:2;">
-      <span style="color:#888;font-size:.82rem;">Loading SDS documents…</span>
+    <!-- Authorized users: checklist to approve chemicals for this site -->
+    <div id="sds-checklist-auth" style="display:none;">
+      <p style="font-size:.8rem;color:#555;margin-bottom:.5rem;">Check every chemical approved for use on this site. Crew will only see the ones you select.</p>
+      <div id="sds-checkbox-list" style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;">
+        <span style="color:#888;font-size:.82rem;">Loading…</span>
+      </div>
+    </div>
+    <!-- Non-authorized users: read-only links for approved chemicals only -->
+    <div id="sds-checklist-readonly" style="display:none;">
+      <div id="sds-link-list" style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;line-height:2;">
+        <span style="color:#888;font-size:.82rem;">Loading approved chemicals…</span>
+      </div>
     </div>
 
     <div id="safety-auth-warn" style="display:none;background:#fff3e8;border:1px solid #e07c30;border-radius:6px;padding:.6rem .8rem;font-size:.82rem;color:#b85c00;margin-bottom:.75rem;">
-      ⚠ Only Rena, Heather, Brydon, or Liz can save safety plans.
+      ⚠ Sign in with your @1BellaTerra.com email to edit safety plans.
     </div>
     <button class="btn-save" id="sp-save-btn" onclick="saveSafetyPlan()">Save Safety Plan</button>
     <p class="modal-note">Visible to all employees on the portal.</p>
@@ -303,14 +313,13 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbW5McYt3rJySawuk6nV4Mi22lu1psbz1EfDpd_po9gymTVlhm2o93dnNtGbSJquO1/exec';
 var STAGES     = ['Awarded','Scheduled','Underway','Maintenance','Complete'];
-var AUTHORIZED = ['rena@1bellaterra.com','admin@1bellaterra.com','office@1bellaterra.com','brydon@1bellaterra.com'];
-
 var _projects          = [];
 var _currentUser       = '';
 var _currentUserEmail  = '';
 var _activeSafetyId    = null;
 var _activeFinancialId = null;
 var _activeHoldId      = null;
+var _sdsAllProducts    = null;  // cached after first fetch
 
 // ── INIT ─────────────────────────────────────────────────────
 
@@ -319,38 +328,73 @@ window.onload = function() {
   _currentUserEmail = localStorage.getItem('bt_employee_email') || '';
   updateUserBadge();
   loadProjects();
-  loadSdsList();
 };
 
-function loadSdsList() {
-  fetch(SCRIPT_URL + '?action=sdsProducts')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var el = document.getElementById('sds-modal-list');
-      if (!el) return;
-      var products = data.products || [];
-      if (!products.length) {
-        el.innerHTML = '<span style="color:#888;font-size:.82rem;">No SDS documents on file.</span>';
-        return;
-      }
-      var html = '';
-      products.forEach(function(p) {
-        if (p.drivePdfUrl) {
-          html += '<a href="' + p.drivePdfUrl + '" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">📄 ' + p.name;
-          if (p.epaReg) html += ' — EPA Reg #' + p.epaReg;
-          html += '</a>';
-        }
-        if (p.emergencyPhone) {
-          html += '<div style="color:#888;font-size:.78rem;">☎ ' + p.emergencyPhone + '</div>';
-        }
+// Fetches all SDS products (cached), then builds the checklist for the open safety modal
+function renderSdsChecklist(savedChemicals) {
+  var savedSet = {};
+  (savedChemicals || []).forEach(function(id) { savedSet[id] = true; });
+
+  if (_sdsAllProducts) {
+    buildSdsChecklist(_sdsAllProducts, savedSet);
+  } else {
+    document.getElementById('sds-checkbox-list').innerHTML = '<span style="color:#888;font-size:.82rem;">Loading…</span>';
+    document.getElementById('sds-link-list').innerHTML     = '<span style="color:#888;font-size:.82rem;">Loading…</span>';
+    fetch(SCRIPT_URL + '?action=sdsProducts')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        _sdsAllProducts = data.products || [];
+        buildSdsChecklist(_sdsAllProducts, savedSet);
+      })
+      .catch(function() {
+        document.getElementById('sds-checkbox-list').innerHTML = '<span style="color:#c00;">Could not load SDS list.</span>';
+        document.getElementById('sds-link-list').innerHTML     = '<span style="color:#c00;">Could not load SDS list.</span>';
       });
-      html += '<div style="margin-top:.4rem;color:#888;font-size:.78rem;">☎ Chemical emergency (24hrs): CHEMTREC 1-800-424-9300</div>';
-      el.innerHTML = html;
-    })
-    .catch(function() {
-      var el = document.getElementById('sds-modal-list');
-      if (el) el.innerHTML = '<span style="color:#888;font-size:.82rem;">Could not load SDS documents.</span>';
+  }
+}
+
+// Renders checkboxes (for authorized editors) and read-only links (for crew)
+function buildSdsChecklist(products, savedSet) {
+  // ── Authorized: checkbox list of all products ──────────────
+  var checkHtml = '';
+  products.forEach(function(p) {
+    var checked = savedSet[p.id] ? ' checked' : '';
+    checkHtml +=
+      '<label style="display:flex;align-items:flex-start;gap:.55rem;padding:.4rem 0;cursor:pointer;border-bottom:1px solid #e8eef8;">' +
+        '<input type="checkbox" name="sds-chem" value="' + p.id + '"' + checked +
+          ' style="margin-top:3px;flex-shrink:0;width:16px;height:16px;">' +
+        '<span>' +
+          '<strong style="color:#2a2a2a;">' + p.name + '</strong>';
+    if (p.epaReg) checkHtml += ' <span style="color:#666;font-size:.78rem;">EPA #' + p.epaReg + '</span>';
+    if (p.manufacturer) checkHtml += '<br><span style="color:#888;font-size:.76rem;">' + p.manufacturer + '</span>';
+    checkHtml += '</span></label>';
+  });
+  if (!checkHtml) checkHtml = '<span style="color:#888;font-size:.82rem;">No products in SDS Database yet.</span>';
+  document.getElementById('sds-checkbox-list').innerHTML = checkHtml;
+
+  // ── Non-authorized: links for approved products only ───────
+  var approved = products.filter(function(p) { return savedSet[p.id]; });
+  var linkHtml = '';
+  if (approved.length) {
+    approved.forEach(function(p) {
+      if (p.drivePdfUrl) {
+        linkHtml += '<a href="' + p.drivePdfUrl + '" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">📄 ' + p.name;
+        if (p.epaReg) linkHtml += ' — EPA #' + p.epaReg;
+        linkHtml += '</a>';
+      } else {
+        linkHtml += '<div style="color:#555;font-weight:600;">📄 ' + p.name;
+        if (p.epaReg) linkHtml += ' — EPA #' + p.epaReg;
+        linkHtml += '</div>';
+      }
+      if (p.emergencyPhone) {
+        linkHtml += '<div style="color:#888;font-size:.78rem;">☎ ' + p.emergencyPhone + '</div>';
+      }
     });
+    linkHtml += '<div style="margin-top:.4rem;color:#888;font-size:.78rem;">☎ Chemical emergency (24hrs): CHEMTREC 1-800-424-9300</div>';
+  } else {
+    linkHtml = '<span style="color:#888;font-size:.82rem;">No chemicals have been approved for this site yet.</span>';
+  }
+  document.getElementById('sds-link-list').innerHTML = linkHtml;
 }
 
 function updateUserBadge() {
@@ -380,7 +424,7 @@ function promptSignIn() {
 }
 
 function isAuthorized() {
-  return AUTHORIZED.indexOf(_currentUserEmail.toLowerCase()) !== -1;
+  return _currentUserEmail.toLowerCase().endsWith('@1bellaterra.com');
 }
 
 // ── LOAD PROJECTS ─────────────────────────────────────────────
@@ -623,10 +667,18 @@ function openSafety(podioItemId) {
   document.getElementById('sp-pretalk').value        = sp.preSiteTalk             || '';
   document.getElementById('sp-notes').value          = sp.notes                   || '';
 
+  var auth = isAuthorized();
   var warn = document.getElementById('safety-auth-warn');
   var btn  = document.getElementById('sp-save-btn');
-  if (isAuthorized()) { warn.style.display='none'; btn.style.display='block'; }
-  else                { warn.style.display='block'; btn.style.display='none'; }
+  if (auth) { warn.style.display='none'; btn.style.display='block'; }
+  else       { warn.style.display='block'; btn.style.display='none'; }
+
+  // Show checklist (edit) or read-only links depending on auth
+  document.getElementById('sds-checklist-auth').style.display     = auth ? 'block' : 'none';
+  document.getElementById('sds-checklist-readonly').style.display = auth ? 'none'  : 'block';
+
+  var savedChemicals = (sp.chemicals || []);
+  renderSdsChecklist(savedChemicals);
 
   document.getElementById('safety-modal').classList.add('open');
 }
@@ -700,6 +752,12 @@ function loadSafetyTemplate() {
 
 function saveSafetyPlan() {
   if (!isAuthorized() || !_activeSafetyId) return;
+  // Collect which chemicals are checked for this site
+  var chemicals = [];
+  document.querySelectorAll('input[name="sds-chem"]:checked').forEach(function(cb) {
+    chemicals.push(cb.value);
+  });
+
   var plan = {
     er:                       document.getElementById('sp-er').value,
     urgentCare:               document.getElementById('sp-urgent').value,
@@ -716,7 +774,8 @@ function saveSafetyPlan() {
     ppe:                      document.getElementById('sp-ppe').value,
     hazards:                  document.getElementById('sp-hazards').value,
     preSiteTalk:              document.getElementById('sp-pretalk').value,
-    notes:                    document.getElementById('sp-notes').value
+    notes:                    document.getElementById('sp-notes').value,
+    chemicals:                chemicals
   };
   var btn = document.getElementById('sp-save-btn');
   btn.textContent = 'Saving…'; btn.disabled = true;
