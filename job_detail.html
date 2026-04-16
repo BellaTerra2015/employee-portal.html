@@ -174,7 +174,6 @@ var SCOPE_TABS = {
   'Blowing':            { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
   'CAD':                { icon:'🌬️', label:'CAD Bark',         panel:'bark'     },
   'Dump Truck':         { icon:'🚚', label:'Delivery Log',     panel:'delivery' },
-  'Plant Ship/Stage':   { icon:'🌿', label:'Plant Ship/Stage', panel:'shipstage' },
   'Maintenance':        { icon:'🌿', label:'Maintenance',      panel:'maintenance'},
   'Herbicide':          { icon:'🧪', label:'Herbicide Log',    panel:'herbicide'},
   'Herbicide Application':{ icon:'🧪', label:'Herbicide Log',  panel:'herbicide'},
@@ -320,7 +319,6 @@ function buildPanelContent(panelId, scopeName) {
     case 'hydro':        return buildHydroPanel();
     case 'planting':     return buildPlantingPanel();
     case 'bark':         return buildBarkPanel();
-    case 'shipstage':    return buildShipStagePanel();
     case 'delivery':     return buildDeliveryPanel();
     case 'maintenance':  return buildMaintenancePanel();
     case 'safety':       return buildSafetyPanel();
@@ -385,14 +383,8 @@ function buildBarkPanel() {
     '<button class="btn-submit" onclick="submitReport(\'bark\',this)">📤 Submit Bark Report</button>' +
     '<div class="ok-msg" id="bark-ok">✅ Report submitted successfully.</div></div>';
 }
-// ── PLANT SHIP / STAGE ────────────────────────────────────────
-function buildShipStagePanel() {
-  var id = _project ? encodeURIComponent(_project.podioItemId) : '';
-  var url = 'odt_staging.html?projectId=' + id;
-  window.location.href = url;
-  return '<div class="card" style="padding:1rem 1.25rem;text-align:center;color:#888;">Opening Plant Staging…</div>';
-}
-  // ── DELIVERY LOG ──────────────────────────────────────────────
+
+// ── DELIVERY LOG ──────────────────────────────────────────────
 function buildDeliveryPanel() {
   return '<div class="card"><h4>🚚 Plant Shipment / Delivery Log</h4>' +
     '<div class="g2"><div class="f"><label>Delivery Date</label><input type="date" id="ship-date"></div>' +
@@ -449,6 +441,9 @@ function buildSafetyPanel() {
     safetyRow('Required PPE', sp.ppe) +
     safetyRow('Site Hazards / Traffic Control', sp.hazards) +
     safetyRow('Additional Notes', sp.notes) +
+    '<div style="margin-top:1.25rem;border-top:1px solid var(--border);padding-top:1rem;">' +
+    '<button class="btn-submit" style="background:#1a4b8c;" onclick="printSafetyPDF()">📄 Generate Site Safety PDF</button>' +
+    '</div>' +
     '</div>';
 }
 
@@ -457,6 +452,101 @@ function safetyRow(label, value) {
     '<div style="padding:.4rem .75rem;background:#f5f5f2;border-radius:6px;font-size:.88rem;color:#aaa;font-style:italic;">Not set</div></div>';
   return '<div class="f"><label>' + label + '</label>' +
     '<div style="padding:.4rem .75rem;background:#f0f4ee;border-radius:6px;font-size:.88rem;">' + esc(value) + '</div></div>';
+}
+
+function printSafetyPDF() {
+  var j = _project || {};
+  var sp = (j.safetyPlan) ? j.safetyPlan : {};
+  var jobName = esc(j.name || '—');
+  var jobNum  = esc(j.jobNumber || j.podioItemId || '—');
+  var today   = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+  function sRow(label, val) {
+    return '<tr><td class="lbl">' + label + '</td><td class="val">' +
+      (val ? esc(val) : '<span class="empty">Not set</span>') + '</td></tr>';
+  }
+
+  var w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><title>Site Safety Plan \u2014 ' + jobName + '</title>' +
+  '<style>' +
+  'body{font-family:Arial,sans-serif;font-size:10.5px;padding:24px;max-width:780px;margin:0 auto;color:#1a1a1a;}' +
+  '.hdr{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid #2d5a27;padding-bottom:10px;margin-bottom:16px;}' +
+  '.co-name{font-size:20px;font-weight:900;color:#2d5a27;letter-spacing:.02em;}' +
+  '.co-sub{font-size:9px;color:#4a7c3f;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}' +
+  '.doc-title{text-align:right;}' +
+  '.doc-title h1{font-size:15px;font-weight:700;margin:0;}' +
+  '.doc-title .sub{font-size:9px;color:#666;margin-top:2px;}' +
+  '.job-bar{background:#f0f4ee;border:1px solid #b8d4a0;border-radius:4px;padding:8px 12px;margin-bottom:16px;display:flex;gap:36px;}' +
+  '.job-bar .lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a7c3f;}' +
+  '.job-bar .val{font-size:12px;font-weight:700;color:#1a1a1a;margin-top:2px;}' +
+  '.sec{background:#2d5a27;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:4px 8px;margin-top:14px;}' +
+  'table{width:100%;border-collapse:collapse;}' +
+  'td{border:1px solid #ccc;padding:5px 8px;vertical-align:top;}' +
+  'td.lbl{width:38%;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#4a7c3f;background:#f8faf5;}' +
+  'td.val{font-size:10.5px;}' +
+  '.empty{color:#aaa;font-style:italic;}' +
+  '.sig-section{margin-top:28px;border-top:2px solid #2d5a27;padding-top:14px;}' +
+  '.sig-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2d5a27;margin-bottom:16px;}' +
+  '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}' +
+  '.sig-line{border-bottom:1px solid #333;height:30px;margin-bottom:4px;}' +
+  '.sig-label{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.05em;}' +
+  '.footer{margin-top:20px;font-size:8px;color:#888;text-align:center;border-top:1px solid #ddd;padding-top:6px;}' +
+  '@media print{body{padding:8px;}}' +
+  '</style></head><body>' +
+
+  '<div class="hdr">' +
+  '<div><div class="co-name">Bella Terra</div><div class="co-sub">Ecological Restoration &amp; Landscaping</div></div>' +
+  '<div class="doc-title"><h1>Site Safety Plan</h1><div class="sub">Generated ' + today + '</div></div>' +
+  '</div>' +
+
+  '<div class="job-bar">' +
+  '<div><div class="lbl">Job Name</div><div class="val">' + jobName + '</div></div>' +
+  '<div><div class="lbl">Job / Item #</div><div class="val">' + jobNum + '</div></div>' +
+  '</div>' +
+
+  '<div class="sec">Emergency Services</div>' +
+  '<table>' +
+  sRow('Nearest Emergency Room', sp.er) +
+  sRow('Nearest Urgent Care', sp.urgentCare) +
+  sRow('Emergency Services / 911', sp.emergency911 || '911') +
+  '</table>' +
+
+  '<div class="sec">Site Information</div>' +
+  '<table>' +
+  sRow('Site Address', sp.siteAddress) +
+  sRow('Gate Code / Site Access', sp.gateCode) +
+  sRow('Prime Contractor Foreman', sp.foreman) +
+  sRow('Safety Foreman', sp.safetyForeman) +
+  sRow('Utilities (Call Before Digging)', sp.utilities || '811') +
+  '</table>' +
+
+  '<div class="sec">Bella Terra Contacts</div>' +
+  '<table>' +
+  sRow('Emergency Contact', sp.emergency) +
+  sRow('First Aid Kit Location', sp.firstAid) +
+  sRow('Muster Point', sp.muster) +
+  '</table>' +
+
+  '<div class="sec">PPE &amp; Hazards</div>' +
+  '<table>' +
+  sRow('Required PPE', sp.ppe) +
+  sRow('Site Hazards / Traffic Control', sp.hazards) +
+  sRow('Additional Notes', sp.notes) +
+  '</table>' +
+
+  '<div class="sig-section">' +
+  '<div class="sig-title">Acknowledgment &amp; Sign-Off</div>' +
+  '<div class="sig-grid">' +
+  '<div><div class="sig-line"></div><div class="sig-label">Site Foreman Signature</div></div>' +
+  '<div><div class="sig-line"></div><div class="sig-label">Date</div></div>' +
+  '<div><div class="sig-line"></div><div class="sig-label">Safety Foreman Signature</div></div>' +
+  '<div><div class="sig-line"></div><div class="sig-label">Date</div></div>' +
+  '</div></div>' +
+
+  '<div class="footer">Bella Terra Ecological Restoration &amp; Landscaping &nbsp;&bull;&nbsp; Site Safety Plan &nbsp;&bull;&nbsp; ' + jobName + ' &nbsp;&bull;&nbsp; ' + today + '</div>' +
+
+  '<scr' + 'ipt>window.print();<\/scr' + 'ipt></body></html>');
+  w.document.close();
 }
 
 // ── HERBICIDE LOG ─────────────────────────────────────────────
