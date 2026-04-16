@@ -212,20 +212,21 @@ var plansEmail   = '';
 // ═══════════════════════════════════════════════
 // TAB DEFINITIONS
 // ═══════════════════════════════════════════════
-var TAB_ORDER_STD  = ['plans','staging','soils','compost','irrigation','shipment','planting','bark','hydroseeding','stormwater','complete'];
-var TAB_ORDER_WSDOT= ['plans','staging','soils','bark','shipment','planting','hydroseeding','stormwater','complete'];
+var TAB_ORDER_STD  = ['plans','shipstage','soils','compost','irrigation','planting','bark','hydroseeding','stormwater','safety','herbicide','complete'];
+var TAB_ORDER_WSDOT= ['plans','shipstage','soils','bark','planting','hydroseeding','stormwater','safety','herbicide','complete'];
 
 var TAB_META = {
   plans:        {label:'📋 Plans'},
-  staging:      {label:'📦 Plant Staging'},
+  shipstage:    {label:'🌿 Plant Ship/Stage'},
   soils:        {label:'🏔️ Soils'},
   compost:      {label:'🌿 Compost'},
   irrigation:   {label:'💦 Irrigation'},
-  shipment:     {label:'🚚 Shipment'},
   planting:     {label:'🌱 Planting'},
   bark:         {label:'🌬️ CAD Bark'},
   hydroseeding: {label:'💧 Hydroseeding'},
   stormwater:   {label:'🌊 Stormwater'},
+  safety:       {label:'🦺 Site Safety'},
+  herbicide:    {label:'🧪 Herbicide Log'},
   complete:     {label:'✅ Complete'}
 };
 
@@ -304,8 +305,7 @@ function renderJob(){
 
   var order = (JOB.phaseOrder==='wsdot') ? TAB_ORDER_WSDOT : TAB_ORDER_STD;
   var tabs  = order.filter(function(t){
-    if(t==='plans'||t==='complete') return true;
-    if(t==='staging') return JOB.phases.indexOf('planting')>=0||JOB.phases.indexOf('shipment')>=0;
+    if(t==='plans'||t==='complete'||t==='safety'||t==='herbicide') return true;
     return JOB.phases.indexOf(t)>=0;
   });
 
@@ -327,7 +327,7 @@ function switchTab(id){
 
 function renderTab(id){
   var panel=document.getElementById('tab-panel');
-  var fn={plans:renderPlans,staging:renderStaging,bark:renderBark,planting:renderPlanting,shipment:renderShipment,hydroseeding:renderHydro,soils:renderSoils,compost:renderCompost,irrigation:renderIrrigation,stormwater:renderStormwater,complete:renderComplete}[id];
+  var fn={plans:renderPlans,shipstage:renderShipStage,bark:renderBark,planting:renderPlanting,hydroseeding:renderHydro,soils:renderSoils,compost:renderCompost,irrigation:renderIrrigation,stormwater:renderStormwater,safety:renderSafety,herbicide:renderHerbicide,complete:renderComplete}[id];
   if(!fn){panel.innerHTML='<div class="card"><p>Tab coming soon.</p></div>';return;}
   panel.innerHTML=fn();
   // Auto-fill dates + employee fields
@@ -641,9 +641,7 @@ async function addPlanDoc(planType, slotLabel){
       if(!JOB.plans) JOB.plans={};
       if(!JOB.plans[planType]) JOB.plans[planType]=[];
       JOB.plans[planType].push({label:label,link:link,updatedBy:email,updatedDate:new Date().toISOString()});
-      if(okEl){okEl.textContent='✅ Saved';okEl.style.color='var(--gd)';}
-      if(labelEl) labelEl.value='';
-      if(linkEl) linkEl.value='';
+      renderTab('plans');
     } else { if(okEl){okEl.textContent='❌ '+(d.error||'Error');okEl.style.color='var(--red)';} }
   } catch(e){ if(okEl){okEl.textContent='❌ Network error';okEl.style.color='var(--red)';} }
 }
@@ -841,6 +839,87 @@ async function submitSimple(tabId,type,dateId,crewId,hoursId,notesId,btn){
     document.getElementById(notesId).value='';
   }catch(e){showErr(tabId+'-err','❌ '+e.message);}
   btn.disabled=false; btn.textContent='📤 Submit Report';
+}
+
+// ── PLANT SHIP / STAGE ──
+function renderShipStage(){
+  var projectId='BT-'+JOB.jobNum;
+  return '<div class="card">'+
+    '<h4>🌿 Plant Ship / Stage</h4>'+
+    '<p style="font-size:.88rem;color:var(--gray);margin:.5rem 0 1.25rem;">Track plant deliveries from Bella Terra and vendors, staging counts by area, and daily loaded tallies.</p>'+
+    '<a href="odt_staging.html?projectId='+projectId+'" target="_blank" style="display:block;text-align:center;background:var(--gd);color:#fff;padding:.95rem;border-radius:8px;font-weight:700;font-size:1rem;text-decoration:none;margin-bottom:.75rem;">🌿 Open Plant Ship/Stage</a>'+
+  '</div>';
+}
+
+// ── SITE SAFETY ──
+function renderSafety(){
+  var sp=JOB.safetyPlan||{};
+  var isOffice=plansEditMode;
+  var editBtn=isOffice
+    ?'<button class="edit-btn" onclick="exitPlansEdit()">✕ Done Editing</button>'
+    :'<button class="edit-btn" onclick="enterPlansEdit()">✏️ Edit Safety Plan</button>';
+
+  function safetyRow(label,field){
+    var val=sp[field]||'';
+    if(isOffice) return '<div class="f"><label>'+label+'</label><input type="text" id="sp-'+field+'" value="'+val+'" placeholder="Not set"></div>';
+    return '<div class="f"><label>'+label+'</label><div style="padding:.4rem .75rem;background:'+(val?'#f0f4ee':'#f5f5f2')+';border-radius:6px;font-size:.88rem;color:'+(val?'var(--text)':'#aaa')+';font-style:'+(val?'normal':'italic')+';">'+(val||'Not set')+'</div></div>';
+  }
+
+  var emailGate=isOffice?'<div class="email-gate" style="margin-bottom:1rem;"><label>Your @1BellaTerra.com Email</label><input type="email" id="safety-email" value="'+plansEmail+'" placeholder="yourname@1bellaterra.com" oninput="plansEmail=this.value"><p style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Required to save changes</p></div>':'';
+  var saveBtn=isOffice?'<button class="submit-btn" onclick="saveSafetyPlan(this)" style="margin-top:1rem;">💾 Save Safety Plan</button><div class="ok-box" id="safety-ok" style="margin-top:.5rem;"></div>':'';
+
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--pale);">'+
+    '<h4 style="margin:0;padding:0;border:none;">🦺 Site Safety Plan</h4>'+editBtn+'</div>'+
+    emailGate+
+    '<div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:.75rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);">Emergency Services</div>'+
+    safetyRow('Nearest Emergency Room','er')+
+    safetyRow('Nearest Urgent Care','urgentCare')+
+    '<div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:.75rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);">Site Information</div>'+
+    safetyRow('Site Address','siteAddress')+
+    safetyRow('Gate Code / Site Access','gateCode')+
+    safetyRow('Prime Contractor Foreman','foreman')+
+    safetyRow('Safety Foreman','safetyForeman')+
+    '<div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:.75rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);">Bella Terra Contacts</div>'+
+    safetyRow('Emergency Contact','emergencyContact')+
+    safetyRow('First Aid Kit Location','firstAid')+
+    safetyRow('Muster Point','muster')+
+    '<div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin:.75rem 0 .4rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);">PPE & Hazards</div>'+
+    safetyRow('Required PPE','ppe')+
+    safetyRow('Site Hazards / Traffic Control','hazards')+
+    safetyRow('Additional Notes','notes')+
+    saveBtn+
+  '</div>';
+}
+
+async function saveSafetyPlan(btn){
+  var email=plansEmail.trim();
+  if(!email.toLowerCase().endsWith('@1bellaterra.com')){alert('Please enter your @1BellaTerra.com email above.');return;}
+  var fields=['er','urgentCare','siteAddress','gateCode','foreman','safetyForeman','emergencyContact','firstAid','muster','ppe','hazards','notes'];
+  var plan={};
+  fields.forEach(function(f){var el=document.getElementById('sp-'+f);if(el)plan[f]=el.value.trim();});
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    var res=await fetch(APPS_SCRIPT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveSafetyPlan',jobId:JOB_ID,plan:plan,updatedBy:email})});
+    var d=await res.json();
+    var okEl=document.getElementById('safety-ok');
+    if(d.success){
+      JOB.safetyPlan=plan;
+      if(okEl){okEl.textContent='✅ Saved';okEl.style.color='var(--gd)';}
+    } else { if(okEl){okEl.textContent='❌ '+(d.error||'Error');okEl.style.color='var(--red)';} }
+  }catch(e){var okEl=document.getElementById('safety-ok');if(okEl){okEl.textContent='❌ Network error';okEl.style.color='var(--red)';}}
+  btn.disabled=false;btn.textContent='💾 Save Safety Plan';
+}
+
+// ── HERBICIDE LOG ──
+function renderHerbicide(){
+  var jobRef=encodeURIComponent(JOB_ID);
+  return '<div class="card">'+
+    '<h4>🧪 Herbicide Application — WSDOT DOT 540-509</h4>'+
+    '<div style="background:#fffbea;border:1px solid var(--gold-border);border-radius:8px;padding:.75rem 1rem;font-size:.85rem;color:var(--gold);margin:.75rem 0;">⚠️ Each application requires a separate form per RCW 17.21. Records must be retained 7 years.</div>'+
+    '<p style="font-size:.88rem;margin:.75rem 0 1.25rem;">The Herbicide Report auto-fills weather, project info, and chemical details. You only fill in quantities, times, and lot number.</p>'+
+    '<a href="herbicide_report.html?jobId='+jobRef+'" target="_blank" style="display:block;text-align:center;background:var(--gd);color:#fff;padding:.95rem;border-radius:8px;font-weight:700;font-size:1rem;text-decoration:none;">📋 Open Herbicide Report Form</a>'+
+  '</div>';
 }
 
 // ── JOB COMPLETE ──
