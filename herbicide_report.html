@@ -209,10 +209,8 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--tex
   <!-- SDS LINKS -->
   <div class="sds-box">
     <strong style="font-size:.82rem;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.05em;">Chemical Safety Data Sheets</strong>
-    <a href="SDS-Roundup-Custom-Aquatic.pdf" target="_blank">📄 Roundup Custom® Aquatic &amp; Terrestrial — EPA #524-343</a>
-    <a href="SDS-Preference.pdf" target="_blank">📄 Preference® Adjuvant — WinField Solutions</a>
-    <a href="SDS-Dynamark-UV-Blue.pdf" target="_blank">📄 Dynamark® UV Blue Spray Marker — WinField Solutions</a>
-    <div class="sds-note">Chemical emergency (24 hrs): CHEMTREC 1-800-424-9300 &nbsp;|&nbsp; Bayer: 1-800-334-7577</div>
+    <div id="sds-herb-list"><span style="color:#888;font-size:.82rem;">Loading SDS documents…</span></div>
+    <div class="sds-note">Chemical emergency (24 hrs): CHEMTREC 1-800-424-9300</div>
   </div>
 
   <!-- ACTIONS -->
@@ -226,7 +224,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--tex
 </div><!-- /page-content -->
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbW5McYt3rJySawuk6nV4Mi22lu1psbz1EfDpd_po9gymTVlhm2o93dnNtGbSJquO1/exec';
 
 var _project = null;
 var _weather  = null;
@@ -248,6 +246,9 @@ window.onload = function() {
 
   // Load licensee list
   fetchLicensees();
+
+  // Load SDS product links from database
+  loadSdsHerb();
 
   // Get browser location first, then fetch weather + project in parallel
   if (navigator.geolocation) {
@@ -276,6 +277,35 @@ window.onload = function() {
     showPage();
   }
 };
+
+// ── FETCH SDS PRODUCTS ───────────────────────────────────────
+function loadSdsHerb() {
+  fetch(SCRIPT_URL + '?action=sdsProducts')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('sds-herb-list');
+      if (!el) return;
+      var products = data.products || [];
+      if (!products.length) {
+        el.innerHTML = '<span style="color:#888;font-size:.82rem;">No SDS documents on file.</span>';
+        return;
+      }
+      var html = '';
+      products.forEach(function(p) {
+        if (p.drivePdfUrl) {
+          html += '<a href="' + p.drivePdfUrl + '" target="_blank">📄 ' + p.name;
+          if (p.manufacturer) html += ' — ' + p.manufacturer;
+          if (p.epaReg) html += ' — EPA #' + p.epaReg;
+          html += '</a>';
+        }
+      });
+      el.innerHTML = html || '<span style="color:#888;font-size:.82rem;">No SDS links available yet.</span>';
+    })
+    .catch(function() {
+      var el = document.getElementById('sds-herb-list');
+      if (el) el.innerHTML = '<span style="color:#888;font-size:.82rem;">Could not load SDS documents.</span>';
+    });
+}
 
 // ── FETCH LICENSEES ───────────────────────────────────────────
 function fetchLicensees() {

@@ -238,19 +238,8 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
       <textarea id="sp-notes" placeholder="Any other site-specific information…"></textarea></div>
 
     <div class="modal-section">Chemical Safety Data Sheets (SDS)</div>
-    <div style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;line-height:2;">
-      <a href="SDS-Roundup-Custom-Aquatic.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
-        📄 Roundup Custom® for Aquatic &amp; Terrestrial Use — EPA Reg #524-343
-      </a>
-      <a href="SDS-Preference.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
-        📄 Preference® Adjuvant / Surfactant — WinField Solutions
-      </a>
-      <a href="SDS-Dynamark-UV-Blue.pdf" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">
-        📄 Dynamark® UV Blue Spray Marker — WinField Solutions
-      </a>
-      <div style="margin-top:.4rem;color:#888;font-size:.78rem;">
-        ☎ Chemical emergency (24hrs): CHEMTREC 1-800-424-9300 &nbsp;|&nbsp; Bayer: 1-800-334-7577
-      </div>
+    <div id="sds-modal-list" style="background:#f8f9ff;border:1px solid #c5d5f0;border-radius:8px;padding:.85rem;font-size:.84rem;line-height:2;">
+      <span style="color:#888;font-size:.82rem;">Loading SDS documents…</span>
     </div>
 
     <div id="safety-auth-warn" style="display:none;background:#fff3e8;border:1px solid #e07c30;border-radius:6px;padding:.6rem .8rem;font-size:.82rem;color:#b85c00;margin-bottom:.75rem;">
@@ -312,7 +301,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 </div>
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbW5McYt3rJySawuk6nV4Mi22lu1psbz1EfDpd_po9gymTVlhm2o93dnNtGbSJquO1/exec';
 var STAGES     = ['Awarded','Scheduled','Underway','Maintenance','Complete'];
 var AUTHORIZED = ['rena@1bellaterra.com','admin@1bellaterra.com','office@1bellaterra.com','brydon@1bellaterra.com'];
 
@@ -330,7 +319,39 @@ window.onload = function() {
   _currentUserEmail = localStorage.getItem('bt_employee_email') || '';
   updateUserBadge();
   loadProjects();
+  loadSdsList();
 };
+
+function loadSdsList() {
+  fetch(SCRIPT_URL + '?action=sdsProducts')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var el = document.getElementById('sds-modal-list');
+      if (!el) return;
+      var products = data.products || [];
+      if (!products.length) {
+        el.innerHTML = '<span style="color:#888;font-size:.82rem;">No SDS documents on file.</span>';
+        return;
+      }
+      var html = '';
+      products.forEach(function(p) {
+        if (p.drivePdfUrl) {
+          html += '<a href="' + p.drivePdfUrl + '" target="_blank" style="display:block;color:#1a4b8c;font-weight:600;text-decoration:none;">📄 ' + p.name;
+          if (p.epaReg) html += ' — EPA Reg #' + p.epaReg;
+          html += '</a>';
+        }
+        if (p.emergencyPhone) {
+          html += '<div style="color:#888;font-size:.78rem;">☎ ' + p.emergencyPhone + '</div>';
+        }
+      });
+      html += '<div style="margin-top:.4rem;color:#888;font-size:.78rem;">☎ Chemical emergency (24hrs): CHEMTREC 1-800-424-9300</div>';
+      el.innerHTML = html;
+    })
+    .catch(function() {
+      var el = document.getElementById('sds-modal-list');
+      if (el) el.innerHTML = '<span style="color:#888;font-size:.82rem;">Could not load SDS documents.</span>';
+    });
+}
 
 function updateUserBadge() {
   var badge = document.getElementById('user-badge');
