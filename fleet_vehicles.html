@@ -541,7 +541,7 @@ button,input,select,textarea{font-family:inherit;}
 const BOARD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqp23RVisQQodIBwU7nwcca-tAIsIlkfqqIa2mXBds0CHk9ngVBvn8HGL9neA8rRk1/exec';
 const CLICKSEND_USERNAME = 'Bids@1bellaterra.com';
 const CLICKSEND_API_KEY  = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
-const EMAIL_SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxa52KhAmPtWCgP6KGt8o74igU1XZCu_Lqk8kmqPGLvuBYrSA_8yfu_p8WqVqMm9dar/exec';
+const EMAIL_SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyWP1YCqezkswgeKZUBOa66nVfy7tTeOaOGAAvTv8C4Qv_k1A_s8_nNKbpb3tRsbRNt/exec';
 
 const SMS_RECIPIENTS = [
   { name: 'Kent',   number: '+13605184248' },
@@ -796,6 +796,30 @@ function removePhoto(previewId, idx) {
   renderPhotoPreviews(previewId);
 }
 
+// Resizes a photo to max 1200px and encodes as base64 JPEG
+// Reduces phone photos from 3–8 MB down to ~200–400 KB each
+function compressPhoto(file) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var MAX = 1200, w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else        { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.78).split(',')[1]);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // ── URGENCY ────────────────────────────────────
 let selectedUrgency = '';
 const urgencyClass  = { 'Routine':'sel-routine','Semi-Urgent':'sel-semi','Urgent':'sel-urgent','Down-Not Running':'sel-down' };
@@ -807,7 +831,7 @@ function selectUrgency(btn) {
 }
 
 // ── ACCIDENT REPORT ────────────────────────────
-function submitAccidentReport() {
+async function submitAccidentReport() {
   const name   = document.getElementById('acc-name').value.trim();
   const email  = document.getElementById('acc-email').value.trim();
   const unit   = document.getElementById('acc-unit').value;
@@ -819,6 +843,23 @@ function submitAccidentReport() {
   if (!name || !email || !unit || !dt || !loc || !desc) { alert('Please fill in all required fields.'); return; }
   if (photos.length < 3) { alert(`Please attach at least 3 photos. Currently ${photos.length} attached.`); return; }
 
+  // Disable button and show progress while photos compress
+  const btn = document.querySelector('button[onclick="submitAccidentReport()"]');
+  btn.disabled = true;
+  btn.textContent = `Compressing ${photos.length} photos…`;
+
+  let photos_base64 = [];
+  try {
+    photos_base64 = await Promise.all(photos.map(compressPhoto));
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Accident Report';
+    alert('Photo processing failed. Please try again.');
+    return;
+  }
+
+  btn.textContent = 'Sending report…';
+
   const payload = {
     type: 'accident_report', employee_name: name, employee_email: email,
     unit: unitLabel(unit), datetime: dt, location: loc, description: desc,
@@ -827,9 +868,12 @@ function submitAccidentReport() {
     other_insurance: document.getElementById('acc-other-ins').value,
     police_report: document.getElementById('acc-police').value,
     other_vehicle: document.getElementById('acc-other-vehicle').value,
-    photo_count: photos.length, email_to: [...ACCIDENT_EMAIL_TO, email],
+    photo_count: photos_base64.length,
+    photos_base64: photos_base64,
+    email_to: [...ACCIDENT_EMAIL_TO, email],
     submitted_at: new Date().toISOString()
   };
+
   fetch(EMAIL_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) }).catch(()=>{});
 
   document.getElementById('accident-success').classList.add('show');
@@ -839,6 +883,8 @@ function submitAccidentReport() {
   photoFiles['acc-previews'] = [];
   document.getElementById('acc-previews').innerHTML = '';
   document.getElementById('acc-photo-msg').textContent = '';
+  btn.disabled = false;
+  btn.textContent = 'Submit Accident Report';
   window.scrollTo(0,0);
 }
 
