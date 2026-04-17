@@ -903,17 +903,20 @@ var _isMobile     = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 var _isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                     window.navigator.standalone === true;
 
-function _showInstallBtn(label) {
+// Always show the button (except when already installed as an app)
+// Chrome's beforeinstallprompt is unreliable until the user has visited enough times
+window.addEventListener('load', function() {
+  if (_isStandalone) return; // already installed — hide it
+  var label = _isMobile ? '📲 Add to Home Screen' : '💻 Install App';
   var btn = document.getElementById('btn-install');
   btn.textContent = label;
   btn.style.display = 'flex';
-}
+});
 
-// Desktop Chrome / Edge / Android Chrome — browser fires this when app is installable
+// If Chrome fires the native prompt, capture it for a smoother one-tap install
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   _installPrompt = e;
-  _showInstallBtn(_isMobile ? '📲 Add to Home Screen' : '💻 Install App');
 });
 
 // Hide button once installed
@@ -921,13 +924,6 @@ window.addEventListener('appinstalled', function() {
   document.getElementById('btn-install').style.display = 'none';
   _installPrompt = null;
 });
-
-// iOS Safari — browser never fires beforeinstallprompt, so show button manually
-if (_isIos && !_isStandalone) {
-  window.addEventListener('load', function() {
-    _showInstallBtn('📲 Add to Home Screen');
-  });
-}
 
 function triggerInstall() {
   if (_isStandalone) {
