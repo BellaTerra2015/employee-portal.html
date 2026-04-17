@@ -2,7 +2,7 @@
   "name": "Bella Terra Portal",
   "short_name": "Bella Terra",
   "description": "Bella Terra Ecological Restoration field crew portal",
-  "start_url": "./scheduled_projects.html",
+  "start_url": "./bella_terra_portal_html.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -13,13 +13,13 @@
       "src": "Logo 192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "Logo 192x192.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
