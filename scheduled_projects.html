@@ -927,7 +927,7 @@ var SPECIES_LOOKUP = [
   {spId:'vine_maple',       names:['vine maple','acer circinatum']},
   {spId:'red_alder',        names:['red alder','alnus rubra']},
   {spId:'serviceberry',     names:['serviceberry','saskatoon','amelanchier alnifolia']},
-  {spId:'cascara',          names:['cascara','cascara buckthorn','frangula purshiana','rhamnus purshiana']},
+  {spId:'cascara',          names:['cascara','cascara buckthorn','frangula purshiana','rhamnus purshiana','prangula purshiana']},
   {spId:'oregon_ash',       names:['oregon ash','fraxinus latifolia']},
   {spId:'black_cottonwood', names:['black cottonwood','cottonwood','populus balsamifera','populus trichocarpa']},
   {spId:'oregon_white_oak', names:['oregon white oak','garry oak','quercus garryana']},
@@ -935,7 +935,7 @@ var SPECIES_LOOKUP = [
   {spId:'douglas_fir',      names:['douglas fir','douglas-fir','pseudotsuga menziesii']},
   {spId:'western_red_cedar',names:['western red cedar','western redcedar','thuja plicata']},
   {spId:'ponderosa_pine',   names:['ponderosa pine','pinus ponderosa']},
-  {spId:'pacific_willow',   names:['pacific willow','salix lucida','salix lasiandra']},
+  {spId:'pacific_willow',   names:['pacific willow','salix lucida','salix lasiandra','commons willow','common willow','willow stakes','commons willow stakes','common willow stakes']},
   {spId:'scouler_willow',   names:["scouler's willow",'scouler willow','salix scouleriana']},
   {spId:'red_twig_dogwood', names:['red twig dogwood','red-twig dogwood','red osier dogwood','cornus sericea','cornus stolonifera']},
   {spId:'red_elderberry',   names:['red elderberry','sambucus racemosa']},
@@ -970,15 +970,32 @@ function cleanPlantName(name) {
     .trim();
 }
 
-function matchSpecies(name) {
-  var n = cleanPlantName(name).toLowerCase();
-  for (var i = 0; i < SPECIES_LOOKUP.length; i++) {
-    var entry = SPECIES_LOOKUP[i];
-    for (var j = 0; j < entry.names.length; j++) {
-      if (n === entry.names[j] ||
-          n.indexOf(entry.names[j]) !== -1 ||
-          entry.names[j].indexOf(n) !== -1) {
-        return entry.spId;
+function matchSpecies(name, botanical) {
+  // Try common name first
+  var n = cleanPlantName(name || '').toLowerCase();
+  if (n) {
+    for (var i = 0; i < SPECIES_LOOKUP.length; i++) {
+      var entry = SPECIES_LOOKUP[i];
+      for (var j = 0; j < entry.names.length; j++) {
+        if (n === entry.names[j] ||
+            n.indexOf(entry.names[j]) !== -1 ||
+            entry.names[j].indexOf(n) !== -1) {
+          return entry.spId;
+        }
+      }
+    }
+  }
+  // Fallback: try botanical / scientific name
+  if (botanical) {
+    var b = botanical.toString().toLowerCase().trim();
+    for (var i = 0; i < SPECIES_LOOKUP.length; i++) {
+      var entry = SPECIES_LOOKUP[i];
+      for (var j = 0; j < entry.names.length; j++) {
+        if (b === entry.names[j] ||
+            b.indexOf(entry.names[j]) !== -1 ||
+            entry.names[j].indexOf(b) !== -1) {
+          return entry.spId;
+        }
       }
     }
   }
@@ -1078,7 +1095,7 @@ function createNurseryJobFromBoard() {
       var targets   = [];
       var unmatched = [];
       data.plants.forEach(function(plant) {
-        var spId = matchSpecies(plant.name);
+        var spId = matchSpecies(plant.name, plant.botanical);
         if (spId) {
           targets.push({ spId:spId, qty:plant.qty, container:'#1', heightSpec:'' });
         } else {
