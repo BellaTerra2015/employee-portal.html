@@ -756,8 +756,12 @@ button,input,select,textarea{font-family:inherit;}
       <button class="unlock-btn" onclick="promptUnlock()">🔓 Unlock to Edit</button>
     </div>
     <!-- Back button row -->
-    <div style="background:var(--green-dark);padding:6px 14px;">
+    <div style="background:var(--green-dark);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;">
       <button class="btn-back nrs-back-btn" onclick="showTiles()" style="font-size:0.82rem;">← Back to Portal</button>
+      <div style="display:flex;gap:6px;">
+        <button onclick="loadNurseryFromSheet()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);padding:3px 10px;border-radius:6px;font-size:.76rem;cursor:pointer;">☁ Load from Cloud</button>
+        <button onclick="syncAllToSheet()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);padding:3px 10px;border-radius:6px;font-size:.76rem;cursor:pointer;">↑ Sync to Cloud</button>
+      </div>
     </div>
     <!-- Nursery bottom nav -->
     <nav class="bnav">
@@ -1041,6 +1045,8 @@ var CS_USER    = 'Bids@1bellaterra.com';
 var CS_KEY     = 'F056C597-29B2-0CBF-EFC6-39EFD8EA0628';
 var CS_FROM    = '+13602251125';
 var LOOKUP_URL = 'https://script.google.com/macros/s/AKfycbztvESvljI8jPfZQXUyaBj1AbsjwAlV4JBTlVq_PJrruLz4gMPBc_GU71326_MOpV8/exec';
+// Bella Terra Portal Apps Script — nursery inventory sync
+var NURSERY_URL = 'https://script.google.com/macros/s/AKfycbxShQauowbQUa9nxH-zdKnmqllb5rwQtYvwcaFMRpJ_ez1FWDFcbMHCtpe6lczAaez1/exec';
 // Anthropic API — proxy via cors-anywhere or direct (works on desktop; on mobile Chrome use fetch with correct headers)
 var ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 
@@ -1139,6 +1145,8 @@ function showNursery(){
   document.getElementById('as-sp').innerHTML='<option value="">— Select species —</option>'+[...masterSpecies].sort((a,b)=>a.common.localeCompare(b.common)).map(s=>`<option value="${s.id}">${s.common}</option>`).join('');
   document.getElementById('as-date').value=nToday();
   buildJobSpRows();
+  // Load from Google Sheet on first open each session
+  if(!_nurseryLoaded){_nurseryLoaded=true;loadNurseryFromSheet();}
 }
 
 function showTiles(){
@@ -2254,7 +2262,50 @@ const DEFAULT_SPECIES=[
 const SK={plants:'bt4_plants',jobs:'bt4_jobs',stock:'bt4_stock',logs:'bt4_logs',fertRes:'bt4_fr',fertDone:'bt4_fd',redFlags:'bt4_rf',countHistory:'bt4_ch'};
 const SK_POT='bt4_pq';
 function ld(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}}
-function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function sv(k,v){
+  try{localStorage.setItem(k,JSON.stringify(v))}catch{}
+  // Auto-sync nursery keys to Google Sheets on every save
+  if(k===SK.stock||k===SK.jobs||k===SK_POT){
+    var keyName=k===SK.stock?'stock':k===SK.jobs?'jobs':'pottingQueue';
+    syncNurseryKeyToSheet(keyName,v);
+  }
+}
+function syncNurseryKeyToSheet(keyName,data){
+  try{
+    fetch(NURSERY_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'saveNurseryData',key:keyName,data:data})});
+  }catch(e){}
+}
+function syncAllToSheet(){
+  syncNurseryKeyToSheet('stock',stock);
+  syncNurseryKeyToSheet('jobs',jobs);
+  syncNurseryKeyToSheet('pottingQueue',pottingQueue);
+  nToast('☁ All data synced to Google Sheet',3000);
+}
+var _nurseryLoaded=false;
+function loadNurseryFromSheet(){
+  nToast('☁ Loading inventory from cloud…',3500);
+  fetch(NURSERY_URL+'?action=nurseryData')
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.success&&res.data){
+        if(Array.isArray(res.data.stock)&&res.data.stock.length){
+          stock=res.data.stock;localStorage.setItem(SK.stock,JSON.stringify(stock));
+        }
+        if(Array.isArray(res.data.jobs)&&res.data.jobs.length){
+          jobs=res.data.jobs;localStorage.setItem(SK.jobs,JSON.stringify(jobs));
+        }
+        if(Array.isArray(res.data.pottingQueue)&&res.data.pottingQueue.length){
+          pottingQueue=res.data.pottingQueue;localStorage.setItem(SK_POT,JSON.stringify(pottingQueue));
+        }
+        buildDash();buildPottingQueue();
+        nToast('✅ Inventory loaded from cloud');
+      } else {
+        nToast('☁ No cloud data yet — add inventory to get started');
+      }
+    })
+    .catch(function(){nToast('⚠️ Could not reach cloud — using local data');});
+}
 function nToday(){return new Date().toISOString().split('T')[0];}
 
 let masterSpecies=(()=>{const saved=ld(SK.plants)||[];const ids=new Set(DEFAULT_SPECIES.map(s=>s.id));const custom=saved.filter(s=>!ids.has(s.id)&&s.custom);return[...DEFAULT_SPECIES,...custom];})();
