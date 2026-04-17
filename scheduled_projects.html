@@ -960,8 +960,18 @@ var SPECIES_LOOKUP = [
   {spId:'lady_fern',        names:['lady fern','athyrium filix-femina']}
 ];
 
+function cleanPlantName(name) {
+  // Strip container size info so "Serviceberry #5" → "Serviceberry"
+  // and "Western Crabapple .5 in Cal" → "Western Crabapple"
+  return name
+    .replace(/\s*#\d.*$/i, '')                                    // remove #5, #1, etc.
+    .replace(/\s+\d+(\.\d+)?\s*(in\b|"\s*cal|cal|gal).*$/i, '') // remove "3 in Cal", "2 gal"
+    .replace(/\s+\.\d+.*$/i, '')                                  // remove ".5 in Cal"
+    .trim();
+}
+
 function matchSpecies(name) {
-  var n = name.toLowerCase().trim();
+  var n = cleanPlantName(name).toLowerCase();
   for (var i = 0; i < SPECIES_LOOKUP.length; i++) {
     var entry = SPECIES_LOOKUP[i];
     for (var j = 0; j < entry.names.length; j++) {
