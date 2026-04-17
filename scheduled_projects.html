@@ -121,6 +121,8 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .btn-save:hover{background:var(--blue-mid);}
 .btn-save-orange{background:var(--orange);}
 .btn-save-orange:hover{background:#c0621e;}
+.btn-cancel{background:#f5f5f2;color:#555;border:1px solid #ddd;padding:.85rem;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:.5rem;}
+.btn-cancel:hover{background:#e8e8e4;}
 .modal-note{font-size:.78rem;color:var(--gray-mid);margin-top:.5rem;text-align:center;}
 .modal-section{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-mid);margin:.75rem 0 .5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border);}
 
@@ -291,6 +293,37 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 </div>
 
 <!-- FINANCIAL DATA MODAL -->
+<!-- ═══ PROJECT SETUP MODAL ═══ -->
+<div class="modal" id="setup-modal">
+  <div class="modal-box" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>⚙ Project Setup</h3>
+      <button class="modal-close" onclick="closeSetup()">&times;</button>
+    </div>
+    <p id="setup-project-name" style="font-size:.85rem;color:#666;margin-bottom:1rem;font-weight:600;"></p>
+
+    <label style="display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
+      <input type="checkbox" id="setup-nursery-chk" onchange="toggleNurserySetup()" style="width:18px;height:18px;accent-color:#2d5a27;">
+      Nursery plants required for this project
+    </label>
+
+    <div id="setup-nursery-section" style="display:none;background:#f0f7ff;border:1px solid #c5d5f0;border-radius:8px;padding:12px;margin-bottom:1rem;">
+      <div style="font-size:.8rem;color:#555;margin-bottom:8px;">Paste your bid spreadsheet URL — reads qty (col C) and plant name (col D) starting at row 12.</div>
+      <input type="text" id="setup-bid-url" placeholder="Paste Google Sheet URL here…"
+        style="width:100%;box-sizing:border-box;padding:.45rem .65rem;border:1px solid #c5d5f0;border-radius:6px;font-size:.83rem;margin-bottom:8px;">
+      <button class="btn-save" id="setup-create-btn" onclick="createNurseryJobFromBoard()" style="width:100%;">
+        🌱 Create Nursery Job
+      </button>
+      <div id="setup-job-status" style="font-size:.8rem;margin-top:8px;display:none;line-height:1.5;"></div>
+    </div>
+
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+      <button class="btn-save" onclick="saveSetupData()">💾 Save</button>
+      <button class="btn-cancel" onclick="closeSetup()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="financial-modal">
   <div class="modal-box pw-modal-box">
     <div class="modal-header">
@@ -321,6 +354,7 @@ var _currentUserEmail  = '';
 var _activeSafetyId    = null;
 var _activeFinancialId = null;
 var _activeHoldId      = null;
+var _activeSetupId     = null;
 var _sdsAllProducts    = null;  // cached after first fetch
 
 // ── INIT ─────────────────────────────────────────────────────
@@ -550,6 +584,10 @@ function buildCard(p, stage) {
         '">' + (holdActive ? '▶ Resume' : '⏸ Hold') + '</button>'
     : '';
 
+  var setupBtn = canMove
+    ? '<button class="btn-safety" onclick="openSetup(\'' + p.podioItemId + '\')">⚙ Setup</button>'
+    : '';
+
   card.innerHTML =
     holdBanner +
     '<div class="card-name">' + esc(p.name) + '</div>' +
@@ -561,6 +599,7 @@ function buildCard(p, stage) {
       '<button class="btn-safety" onclick="openSafety(\'' + p.podioItemId + '\')">🦺 Safety</button>' +
       reportBtn +
       holdBtn +
+      setupBtn +
       '<button class="btn-financial" onclick="openFinancial(\'' + p.podioItemId + '\')">💰</button>' +
     '</div>' +
     moveHtml;
@@ -878,6 +917,219 @@ function syncFromPodio() {
     setTimeout(function(){ loadProjects(); btn.textContent = '↻ Sync Podio'; btn.disabled = false; }, 3000);
   })
   .catch(function(e){ alert('Sync error: ' + e.message); btn.textContent = '↻ Sync Podio'; btn.disabled = false; });
+}
+
+// ── PROJECT SETUP ─────────────────────────────────────────────
+
+// Maps common bid-sheet plant names → nursery spId values
+var SPECIES_LOOKUP = [
+  {spId:'bigleaf_maple',    names:['big leaf maple','bigleaf maple','big-leaf maple','acer macrophyllum']},
+  {spId:'vine_maple',       names:['vine maple','acer circinatum']},
+  {spId:'red_alder',        names:['red alder','alnus rubra']},
+  {spId:'serviceberry',     names:['serviceberry','saskatoon','amelanchier alnifolia']},
+  {spId:'cascara',          names:['cascara','cascara buckthorn','frangula purshiana','rhamnus purshiana']},
+  {spId:'oregon_ash',       names:['oregon ash','fraxinus latifolia']},
+  {spId:'black_cottonwood', names:['black cottonwood','cottonwood','populus balsamifera','populus trichocarpa']},
+  {spId:'oregon_white_oak', names:['oregon white oak','garry oak','quercus garryana']},
+  {spId:'western_crabapple',names:['western crabapple','pacific crabapple','malus fusca']},
+  {spId:'douglas_fir',      names:['douglas fir','douglas-fir','pseudotsuga menziesii']},
+  {spId:'western_red_cedar',names:['western red cedar','western redcedar','thuja plicata']},
+  {spId:'ponderosa_pine',   names:['ponderosa pine','pinus ponderosa']},
+  {spId:'pacific_willow',   names:['pacific willow','salix lucida','salix lasiandra']},
+  {spId:'scouler_willow',   names:["scouler's willow",'scouler willow','salix scouleriana']},
+  {spId:'red_twig_dogwood', names:['red twig dogwood','red-twig dogwood','red osier dogwood','cornus sericea','cornus stolonifera']},
+  {spId:'red_elderberry',   names:['red elderberry','sambucus racemosa']},
+  {spId:'twinberry',        names:['twinberry','black twinberry','lonicera involucrata']},
+  {spId:'oregon_grape',     names:['oregon grape','tall oregon grape','mahonia aquifolium']},
+  {spId:'oceanspray',       names:['oceanspray','ocean spray','holodiscus discolor']},
+  {spId:'mock_orange',      names:['mock orange','philadelphus lewisii']},
+  {spId:'pacific_ninebark', names:['pacific ninebark','ninebark','physocarpus capitatus']},
+  {spId:'nootka_rose',      names:['nootka rose','rosa nutkana']},
+  {spId:'snowberry',        names:['snowberry','common snowberry','symphoricarpos albus']},
+  {spId:'flowering_currant',names:['red flowering currant','flowering currant','ribes sanguineum']},
+  {spId:'salmonberry',      names:['salmonberry','rubus spectabilis']},
+  {spId:'thimbleberry',     names:['thimbleberry','rubus parviflorus']},
+  {spId:'osoberry',         names:['osoberry','indian plum','oemleria cerasiformis']},
+  {spId:'beaked_hazelnut',  names:['beaked hazelnut','corylus cornuta']},
+  {spId:'douglas_spirea',   names:['douglas spirea','spiraea douglasii']},
+  {spId:'salal',            names:['salal','gaultheria shallon']},
+  {spId:'tufted_hairgrass', names:['tufted hairgrass','deschampsia cespitosa']},
+  {spId:'slough_sedge',     names:['slough sedge','carex obnupta']},
+  {spId:'soft_rush',        names:['soft rush','juncus effusus']},
+  {spId:'sword_fern',       names:['sword fern','polystichum munitum']},
+  {spId:'lady_fern',        names:['lady fern','athyrium filix-femina']}
+];
+
+function matchSpecies(name) {
+  var n = name.toLowerCase().trim();
+  for (var i = 0; i < SPECIES_LOOKUP.length; i++) {
+    var entry = SPECIES_LOOKUP[i];
+    for (var j = 0; j < entry.names.length; j++) {
+      if (n === entry.names[j] ||
+          n.indexOf(entry.names[j]) !== -1 ||
+          entry.names[j].indexOf(n) !== -1) {
+        return entry.spId;
+      }
+    }
+  }
+  return null;
+}
+
+function extractSheetId(url) {
+  var m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+function openSetup(podioItemId) {
+  var p = _projects.find(function(x){ return x.podioItemId === podioItemId; });
+  if (!p) return;
+  _activeSetupId = podioItemId;
+  document.getElementById('setup-project-name').textContent = p.name;
+  var sp = p.safetyPlan || {};
+  document.getElementById('setup-nursery-chk').checked = !!sp.nurseryRequired;
+  document.getElementById('setup-bid-url').value = sp.bidSheetUrl || '';
+  toggleNurserySetup();
+  var statusEl = document.getElementById('setup-job-status');
+  statusEl.style.display = 'none';
+  statusEl.innerHTML = '';
+  document.getElementById('setup-create-btn').textContent = '🌱 Create Nursery Job';
+  document.getElementById('setup-create-btn').disabled = false;
+  document.getElementById('setup-modal').classList.add('open');
+}
+
+function closeSetup() {
+  document.getElementById('setup-modal').classList.remove('open');
+  _activeSetupId = null;
+}
+
+function toggleNurserySetup() {
+  var show = document.getElementById('setup-nursery-chk').checked;
+  document.getElementById('setup-nursery-section').style.display = show ? 'block' : 'none';
+}
+
+function saveSetupData() {
+  if (!_activeSetupId) return;
+  var proj = _projects.find(function(x){ return x.podioItemId === _activeSetupId; });
+  if (!proj) { closeSetup(); return; }
+
+  var nurseryRequired = document.getElementById('setup-nursery-chk').checked;
+  var bidSheetUrl     = document.getElementById('setup-bid-url').value.trim();
+
+  // Merge into existing safety plan — don't overwrite other fields
+  var plan = {};
+  var keys = Object.keys(proj.safetyPlan || {});
+  for (var k = 0; k < keys.length; k++) { plan[keys[k]] = proj.safetyPlan[keys[k]]; }
+  plan.nurseryRequired = nurseryRequired;
+  plan.bidSheetUrl     = bidSheetUrl;
+  proj.safetyPlan = plan;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'text/plain'},
+    body: JSON.stringify({ action:'saveSafetyPlan', podioItemId:_activeSetupId, safetyPlan:plan, email:_currentUserEmail })
+  }).catch(function(){});
+
+  closeSetup();
+}
+
+function createNurseryJobFromBoard() {
+  var bidUrl = document.getElementById('setup-bid-url').value.trim();
+  if (!bidUrl) { alert('Paste a Google Sheet URL first.'); return; }
+  var sheetId = extractSheetId(bidUrl);
+  if (!sheetId) {
+    alert('Could not find a Sheet ID in that URL.\nMake sure you paste the full address bar URL from the bid spreadsheet.');
+    return;
+  }
+
+  var proj = _projects.find(function(x){ return x.podioItemId === _activeSetupId; });
+  if (!proj) return;
+
+  var btn    = document.getElementById('setup-create-btn');
+  var status = document.getElementById('setup-job-status');
+  btn.textContent = '⏳ Reading sheet…';
+  btn.disabled    = true;
+  status.style.display = 'block';
+  status.innerHTML = '⏳ Reading plant list from bid sheet…';
+
+  fetch(SCRIPT_URL + '?action=readBidSheet&sheetId=' + encodeURIComponent(sheetId))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data.success || !data.plants || !data.plants.length) {
+        status.innerHTML = '⚠️ No plants found. Make sure qty is in column C and plant name is in column D, starting at row 12.';
+        btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
+        return;
+      }
+
+      var targets   = [];
+      var unmatched = [];
+      data.plants.forEach(function(plant) {
+        var spId = matchSpecies(plant.name);
+        if (spId) {
+          targets.push({ spId:spId, qty:plant.qty, container:'#1', heightSpec:'' });
+        } else {
+          unmatched.push(plant.name + ' (' + plant.qty + ')');
+        }
+      });
+
+      if (!targets.length) {
+        status.innerHTML = '⚠️ None of the plant names could be matched to the nursery species list.<br>Unmatched: ' + unmatched.join(', ');
+        btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
+        return;
+      }
+
+      var jobId = 'job_' + Date.now();
+      var jobData = {
+        id:           jobId,
+        name:         proj.name + ' — Nursery',
+        podioItemId:  proj.podioItemId,
+        location:     '',
+        outplantDate: '',
+        color:        '#2d5a27',
+        state:        'growing',
+        complete:     false,
+        targets:      targets
+      };
+
+      status.innerHTML = '✅ Matched ' + targets.length + ' species. Creating nursery job…';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type':'text/plain'},
+        body: JSON.stringify({ action:'createNurseryJob', jobData:jobData, email:_currentUserEmail })
+      }).then(function() {
+        var unmatchedNote = unmatched.length
+          ? '<br>⚠️ ' + unmatched.length + ' plant(s) not matched: ' + unmatched.join(', ')
+          : '';
+        status.innerHTML =
+          '🌱 <strong>Nursery job created!</strong> It will appear in the nursery app next time it loads from cloud.' +
+          unmatchedNote +
+          '<br><br><a href="../bella_terra_portal_html.html" style="color:#1a4b8c;font-weight:700;">Open Portal → Nursery →</a>';
+
+        // Save setup fields to safety plan
+        var plan = {};
+        var keys = Object.keys(proj.safetyPlan || {});
+        for (var k = 0; k < keys.length; k++) { plan[keys[k]] = proj.safetyPlan[keys[k]]; }
+        plan.nurseryRequired  = true;
+        plan.bidSheetUrl      = document.getElementById('setup-bid-url').value.trim();
+        plan.nurseryJobCreated = jobId;
+        proj.safetyPlan = plan;
+        fetch(SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: {'Content-Type':'text/plain'},
+          body: JSON.stringify({ action:'saveSafetyPlan', podioItemId:_activeSetupId, safetyPlan:plan, email:_currentUserEmail })
+        }).catch(function(){});
+
+        btn.textContent = '✅ Job Created';
+        btn.disabled = false;
+      }).catch(function(e) {
+        status.innerHTML = '⚠️ Error saving nursery job: ' + e.message;
+        btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
+      });
+    })
+    .catch(function(e) {
+      status.innerHTML = '⚠️ Error reading sheet: ' + e.message;
+      btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
+    });
 }
 
 // ── UTILITIES ────────────────────────────────────────────────
