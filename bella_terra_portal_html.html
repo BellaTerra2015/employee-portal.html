@@ -421,6 +421,32 @@ button,input,select,textarea{font-family:inherit;}
 .sq-expl.show{display:block;}
 .sq-expl.good{background:#d4edda;color:#1a5c2a;}
 .sq-expl.bad{background:#fdeaea;color:#8b1a1a;}
+
+/* ⚠️ TEAM DIRECTORY — DO NOT OVERWRITE. See TEAM_DIRECTORY_NOTES.md for structure. */
+#panel-team{display:none;min-height:100vh;background:var(--gray-light);}
+.td-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:2rem;}
+.td-card{background:white;border-radius:14px;padding:1.5rem;box-shadow:var(--shadow);border:2px solid transparent;transition:all 0.2s;position:relative;}
+.td-card.is-leader{border-color:var(--gold);}
+.td-card-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--green-dark);margin-bottom:0.2rem;}
+.td-card-role{font-size:0.85rem;color:var(--gray-mid);margin-bottom:0.75rem;line-height:1.4;}
+.td-card-row{display:flex;align-items:center;gap:0.5rem;font-size:0.88rem;margin-bottom:0.35rem;color:var(--text);}
+.td-leader-badge{position:absolute;top:1rem;right:1rem;background:var(--gold);color:white;font-size:0.68rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:10px;letter-spacing:0.05em;text-transform:uppercase;}
+.td-ec-row{background:var(--green-pale);border-radius:7px;padding:0.5rem 0.65rem;margin-top:0.5rem;font-size:0.83rem;color:var(--green-dark);}
+.td-ec-row.td-ec-empty{background:#fff8e6;color:#7a5c00;}
+.td-edit-btn{margin-top:0.85rem;width:100%;padding:0.55rem;background:transparent;border:2px solid var(--border);border-radius:8px;font-size:0.85rem;font-weight:600;color:var(--green-dark);cursor:pointer;transition:all 0.15s;}
+.td-edit-btn:hover{border-color:var(--green-mid);background:var(--green-pale);}
+.td-edit-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:1200;align-items:center;justify-content:center;}
+.td-edit-modal.open{display:flex;}
+.td-edit-box{background:white;border-radius:16px;padding:2rem;width:90%;max-width:500px;max-height:88vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.3);}
+.td-edit-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--green-dark);margin-bottom:1.25rem;}
+.td-field{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.9rem;}
+.td-field label{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);}
+.td-field input{padding:0.65rem 0.85rem;border:2px solid var(--border);border-radius:7px;font-size:0.95rem;transition:border-color 0.2s;}
+.td-field input:focus{outline:none;border-color:var(--green-mid);}
+.td-save-btn{width:100%;padding:0.85rem;background:var(--green-dark);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:0.5rem;}
+.td-cancel-link{display:block;text-align:center;margin-top:0.75rem;color:var(--gray-mid);font-size:0.88rem;cursor:pointer;}
+.td-save-ok{display:none;background:#eaf7ea;border:1px solid var(--green-light);border-radius:8px;padding:0.85rem 1rem;color:var(--green-dark);font-weight:600;font-size:0.9rem;margin-top:0.75rem;text-align:center;}
+.td-save-ok.show{display:block;}
 </style>
 </head>
 <body>
@@ -470,6 +496,12 @@ button,input,select,textarea{font-family:inherit;}
       </div>
     </div>
     <button onclick="openSafetyModal()" style="background:var(--orange-dark);color:white;border:none;border-radius:8px;padding:0.55rem 1.25rem;font-size:0.9rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Open Topic →</button>
+  </div>
+
+  <!-- Profile Update Banner — shown on first login if no emergency contact on file -->
+  <div id="td-profile-banner" style="display:none;background:#fff3e8;border-bottom:2px solid var(--orange-border);padding:0.85rem 1.5rem;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <div style="font-size:0.93rem;color:var(--orange-dark);font-weight:600;">📋 Please update your profile — <span onclick="showTeamDir(true)" style="text-decoration:underline;cursor:pointer;">add your emergency contact number</span></div>
+    <button onclick="dismissProfileBanner()" style="background:transparent;border:none;font-size:1.25rem;cursor:pointer;color:var(--orange-dark);">&times;</button>
   </div>
 
   <!-- MAIN TILES -->
@@ -526,6 +558,11 @@ button,input,select,textarea{font-family:inherit;}
           <div class="tile-icon">💵</div>
           <h3>Sales</h3>
           <p>Submit a sale to the office for billing — customer info, items, and photos.</p>
+        </div>
+        <div class="tile" onclick="showTeamDir(false)">
+          <div class="tile-icon">📛</div>
+          <h3>Team Directory</h3>
+          <p>Crew contacts, roles, emergency info, and profile updates.</p>
         </div>
       </div>
     </div>
@@ -1170,6 +1207,45 @@ button,input,select,textarea{font-family:inherit;}
     </div>
 
   </div><!-- end panel-nursery -->
+
+  <!-- ⚠️ TEAM DIRECTORY — DO NOT OVERWRITE. See TEAM_DIRECTORY_NOTES.md for structure. -->
+  <div id="panel-team" style="display:none;min-height:100vh;background:var(--gray-light);">
+    <div class="panel-header">
+      <button class="btn-back" onclick="hideTeamDir()">← Back</button>
+      <h3>📛 Team Directory</h3>
+    </div>
+    <div class="panel-content" style="max-width:960px;">
+      <p style="font-size:0.85rem;color:var(--gray-mid);margin-bottom:1.25rem;">Active crew members only. Tap your own card to update your contact info.</p>
+      <div id="td-cards" class="td-cards-grid"></div>
+    </div>
+  </div>
+
+  <!-- Team Directory Edit Modal -->
+  <div class="td-edit-modal" id="td-edit-modal">
+    <div class="td-edit-box">
+      <h3>✏️ Update My Profile</h3>
+      <div class="td-field">
+        <label>My Phone Number</label>
+        <input type="tel" id="td-edit-phone" placeholder="360-555-0100">
+      </div>
+      <div class="td-field">
+        <label>My Email Address</label>
+        <input type="email" id="td-edit-email" placeholder="name@email.com">
+      </div>
+      <div class="td-field">
+        <label>Emergency Contact Name</label>
+        <input type="text" id="td-edit-ec-name" placeholder="e.g. Jane Smith">
+      </div>
+      <div class="td-field">
+        <label>Emergency Contact Phone</label>
+        <input type="tel" id="td-edit-ec-phone" placeholder="360-555-0100">
+      </div>
+      <button class="td-save-btn" onclick="saveMyProfile()">💾 Save Profile</button>
+      <div class="td-save-ok" id="td-save-ok">✅ Profile saved! Payroll has been notified.</div>
+      <span class="td-cancel-link" onclick="closeTdEdit()">Cancel</span>
+    </div>
+  </div>
+
 </div><!-- end portal -->
 
 <script>
@@ -1274,6 +1350,7 @@ function doLogin(){
     kelsoCheckPendingText();
   } catch(e) { console.warn('doLogin init:', e); }
   checkSafetyTopic();
+  checkTdProfileBanner();
 }
 function doLogout(){location.reload();}
 
@@ -1297,6 +1374,7 @@ function showTiles(){
   document.getElementById('panel-jobs').style.display='none';
   document.getElementById('panel-olydisco').style.display='none';
   document.getElementById('panel-log-call').style.display='none';
+  document.getElementById('panel-team').style.display='none';
   document.getElementById('main-tiles').style.display='block';
 }
 // Employee Resources → employee_resources.html (standalone page)
@@ -4156,6 +4234,182 @@ window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   _installPrompt = e;
 });
+
+// ⚠️ TEAM DIRECTORY — DO NOT OVERWRITE. See TEAM_DIRECTORY_NOTES.md for structure.
+// ═══════════════════════════════════════════════
+// TEAM DIRECTORY
+// ═══════════════════════════════════════════════
+// Base roster — phone numbers here are defaults only.
+// Google Sheet ("Emergency Contacts" tab) is the live source of truth.
+var TEAM_DATA = [
+  {name:'Brydon Bellika',      role:'VP · Co-Owner · Class A CDL',                      phone:'3605609860', notes:'Call Brydon before Rena for field issues', leader:true,  active:true},
+  {name:'Rena Bellika',        role:'Owner · Class B CDL',                               phone:'3606065616', notes:'Call Rena only if no one else can help',   leader:true,  active:true},
+  {name:'Garrett Booker',      role:'Superintendent · Class A CDL',                     phone:'3605602290', notes:'',                                          leader:true,  active:true},
+  {name:'Robert Serna',        role:'Head Bark Blower · Class A CDL · Bilingual EN/ES', phone:'9712372452', notes:'',                                          leader:true,  active:true},
+  {name:'Elynn Alholinna',     role:'Nursery Lead · Field Crew',                        phone:'9063701837', notes:'',                                          leader:false, active:true},
+  {name:'Juan Gonzalez',       role:'Field Crew · Bilingual EN/ES',                     phone:'3602067159', notes:'',                                          leader:false, active:true},
+  {name:'Emily Greer',         role:'Payroll · Onboarding',                             phone:'3609072420', notes:'',                                          leader:false, active:true},
+  {name:'Heather Hooper',      role:'Office/Admin · Wed–Fri',                           phone:'9712607063', notes:'',                                          leader:false, active:true},
+  {name:'Joe Jumalon',         role:'Head Laborer · Bark Blowing',                      phone:'5038576952', notes:'',                                          leader:false, active:true},
+  {name:'Ethan Kludt-Painter', role:'Sales & Logistics',                                phone:'9075184130', notes:'',                                          leader:false, active:true},
+  {name:'Evaristo Lopez',      role:'Field Crew · Operator in Training',                phone:'3607236463', notes:'',                                          leader:false, active:true},
+  {name:'Adriane North',       role:'Class A CDL · Wednesdays Only',                    phone:'3609214013', notes:'',                                          leader:false, active:true},
+  {name:'Elizabeth (Liz) P.',  role:'Accounting & HR',                                  phone:'3609802969', notes:'',                                          leader:false, active:true},
+  {name:'Randy Schmeus',       role:'Class A CDL · Field Crew',                         phone:'3606013173', notes:'',                                          leader:false, active:true},
+  {name:'Kevin Willbur',       role:'Lead Estimator',                                   phone:'3607986759', notes:'',                                          leader:false, active:true}
+];
+
+// Live profiles loaded from Google Sheet — keyed by employee name
+var tdSheetProfiles = {};
+
+function fmtPhone(p){
+  var d=(p||'').replace(/\D/g,'');
+  if(d.length===10) return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);
+  return p;
+}
+
+function tdKey(name){ return 'bt4_td_'+name.replace(/[\s().]/g,'_').toLowerCase(); }
+
+// localStorage is a fast offline cache only — Google Sheet is the source of truth
+function getTdCache(name){
+  try{ var raw=localStorage.getItem(tdKey(name)); return raw?JSON.parse(raw):{}; }catch(e){return {};}
+}
+function setTdCache(name,profile){
+  try{ localStorage.setItem(tdKey(name),JSON.stringify(profile)); }catch(e){}
+}
+
+// Merged profile: sheet > localStorage cache > TEAM_DATA default
+function getMergedProfile(emp){
+  var sheet = tdSheetProfiles[emp.name] || {};
+  var cache = getTdCache(emp.name);
+  return {
+    phone:   sheet.phone   || cache.phone   || emp.phone,
+    email:   sheet.email   || cache.email   || '',
+    ecName:  sheet.ecName  || cache.ecName  || '',
+    ecPhone: sheet.ecPhone || cache.ecPhone || ''
+  };
+}
+
+// Load all profiles from Google Sheet, then run callback
+function loadTeamProfiles(cb){
+  fetch(NURSERY_URL+'?action=employeeProfiles')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.profiles) tdSheetProfiles = data.profiles;
+      if(cb) cb();
+    })
+    .catch(function(){ if(cb) cb(); }); // fail gracefully — show cached/default data
+}
+
+function showTeamDir(scrollToSelf){
+  document.getElementById('main-tiles').style.display='none';
+  document.getElementById('panel-team').style.display='block';
+  // Show loading state while fetching from sheet
+  var grid=document.getElementById('td-cards');
+  if(grid) grid.innerHTML='<div style="text-align:center;padding:3rem;color:var(--gray-mid);font-size:0.95rem;">Loading team contacts…</div>';
+  loadTeamProfiles(function(){
+    buildTeamDir();
+    if(scrollToSelf && currentEmployee){
+      setTimeout(function(){
+        var emp=TEAM_DATA.find(function(e){ return e.name.toLowerCase()===currentEmployee.trim().toLowerCase(); });
+        if(!emp) return;
+        var card=document.getElementById('td-card-'+tdKey(emp.name));
+        if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+      },200);
+    }
+  });
+}
+
+function hideTeamDir(){
+  document.getElementById('panel-team').style.display='none';
+  document.getElementById('main-tiles').style.display='block';
+}
+
+function buildTeamDir(){
+  var grid=document.getElementById('td-cards');
+  if(!grid) return;
+  grid.innerHTML=TEAM_DATA.filter(function(e){return e.active;}).map(function(emp){
+    var p=getMergedProfile(emp);
+    var isMe=currentEmployee&&currentEmployee.trim().toLowerCase()===emp.name.toLowerCase();
+    var cardId='td-card-'+tdKey(emp.name);
+    var leaderBadge=emp.leader?'<span class="td-leader-badge">Leadership</span>':'';
+    var ecHtml=(p.ecName||p.ecPhone)
+      ?'<div class="td-ec-row">🆘 EC: '+(p.ecName||'')+(p.ecPhone?' · <a href="tel:'+p.ecPhone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(p.ecPhone)+'</a>':'')+'</div>'
+      :'<div class="td-ec-row td-ec-empty">⚠️ Emergency contact not yet added</div>';
+    var notesHtml=emp.notes?'<div class="td-card-row" style="color:#7a5c00;font-size:0.82rem;margin-top:0.2rem;">📝 '+emp.notes+'</div>':'';
+    var emailHtml=p.email?'<div class="td-card-row">✉️ '+p.email+'</div>':'';
+    var editBtn=isMe?'<button class="td-edit-btn" onclick="openTdEdit()">✏️ Update My Info</button>':'';
+    return '<div class="td-card'+(emp.leader?' is-leader':'')+'" id="'+cardId+'">'
+      +leaderBadge
+      +'<div class="td-card-name">'+emp.name+'</div>'
+      +'<div class="td-card-role">'+emp.role+'</div>'
+      +'<div class="td-card-row">📞 <a href="tel:'+p.phone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(p.phone)+'</a></div>'
+      +emailHtml+notesHtml+ecHtml+editBtn
+      +'</div>';
+  }).join('');
+}
+
+function openTdEdit(){
+  var emp=TEAM_DATA.find(function(e){return e.name.toLowerCase()===currentEmployee.trim().toLowerCase();});
+  var p=getMergedProfile(emp||{name:currentEmployee,phone:''});
+  document.getElementById('td-edit-phone').value=p.phone;
+  document.getElementById('td-edit-email').value=p.email;
+  document.getElementById('td-edit-ec-name').value=p.ecName;
+  document.getElementById('td-edit-ec-phone').value=p.ecPhone;
+  document.getElementById('td-save-ok').classList.remove('show');
+  document.getElementById('td-edit-modal').classList.add('open');
+}
+
+function closeTdEdit(){
+  document.getElementById('td-edit-modal').classList.remove('open');
+}
+
+function saveMyProfile(){
+  var btn=document.querySelector('.td-save-btn');
+  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  var phone=document.getElementById('td-edit-phone').value.trim();
+  var email=document.getElementById('td-edit-email').value.trim();
+  var ecName=document.getElementById('td-edit-ec-name').value.trim();
+  var ecPhone=document.getElementById('td-edit-ec-phone').value.trim();
+  var profile={phone:phone,email:email,ecName:ecName,ecPhone:ecPhone};
+  // Update localStorage cache immediately so UI feels instant
+  setTdCache(currentEmployee,profile);
+  // Update in-memory sheet cache so cards refresh correctly
+  tdSheetProfiles[currentEmployee]=Object.assign({name:currentEmployee},profile);
+  buildTeamDir();
+  // Suppress banner if EC is now filled in
+  if(ecPhone||ecName){
+    localStorage.setItem('bt4_profile_banner_dismissed','true');
+    document.getElementById('td-profile-banner').style.display='none';
+  }
+  // Save to Google Sheet + notify Payroll (uses NURSERY_URL — main portal script)
+  fetch(NURSERY_URL,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({type:'profile_update',employee:currentEmployee,phone:phone,email:email,ecName:ecName,ecPhone:ecPhone})
+  }).catch(function(){});
+  // Show confirmation
+  var ok=document.getElementById('td-save-ok');
+  ok.classList.add('show');
+  if(btn){btn.disabled=false;btn.textContent='💾 Save Profile';}
+  setTimeout(function(){ok.classList.remove('show');closeTdEdit();},2500);
+}
+
+function checkTdProfileBanner(){
+  if(localStorage.getItem('bt4_profile_banner_dismissed')) return;
+  // Check merged profile — if EC already in sheet, no banner needed
+  var emp=TEAM_DATA.find(function(e){return e.name.toLowerCase()===(currentEmployee||'').trim().toLowerCase();});
+  var p=emp?getMergedProfile(emp):getTdCache(currentEmployee);
+  if(p.ecPhone||p.ecName) return;
+  var banner=document.getElementById('td-profile-banner');
+  if(banner) banner.style.display='flex';
+}
+
+function dismissProfileBanner(){
+  localStorage.setItem('bt4_profile_banner_dismissed','true');
+  document.getElementById('td-profile-banner').style.display='none';
+}
+// ── END TEAM DIRECTORY ──
 
 window.addEventListener('appinstalled', function() {
   document.getElementById('btn-install').style.display = 'none';
