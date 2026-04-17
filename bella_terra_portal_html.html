@@ -356,6 +356,8 @@ button,input,select,textarea{font-family:inherit;}
   opacity:0.45;pointer-events:none;cursor:not-allowed;
 }
 .view-only-mode .nb{opacity:1;pointer-events:auto;cursor:pointer;}
+/* Unlock modal must always be interactive regardless of view-only state */
+#m-unlock input,#m-unlock button{opacity:1!important;pointer-events:auto!important;cursor:pointer!important;}
 
 @media(max-width:580px){.fc3{grid-template-columns:1fr 1fr;}.sg{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:600px){.form-row,.reorder-detail-row{grid-template-columns:1fr;}.tasks-grid,.tiles-grid{grid-template-columns:1fr;}.portal-header h2{display:none;}}
