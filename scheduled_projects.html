@@ -1064,8 +1064,13 @@ function createNurseryJobFromBoard() {
   fetch(SCRIPT_URL + '?action=readBidSheet&sheetId=' + encodeURIComponent(sheetId))
     .then(function(r){ return r.json(); })
     .then(function(data) {
-      if (!data.success || !data.plants || !data.plants.length) {
-        status.innerHTML = '⚠️ No plants found. Make sure qty is in column C and plant name is in column D, starting at row 12.';
+      if (!data.success) {
+        status.innerHTML = '⚠️ Sheet error: ' + (data.error || 'Unknown error');
+        btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
+        return;
+      }
+      if (!data.plants || !data.plants.length) {
+        status.innerHTML = '⚠️ No plants found. Sheet returned 0 rows. Check that qty is in column B and plant name is in column D, starting at row 12.';
         btn.textContent = '🌱 Create Nursery Job'; btn.disabled = false;
         return;
       }
