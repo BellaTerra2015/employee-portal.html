@@ -833,7 +833,7 @@ button,input,select,textarea{font-family:inherit;}
         <div class="stag" style="margin:0">Jobs &amp; Contracts</div>
         <button class="nbtn nbg nbsm" onclick="openM('m-addjob')">+ Add Job</button>
       </div>
-      <div id="jobs-list"></div>
+      <div id="n-jobs-list"></div>
     </div>
 
     <div id="nsc-care" class="nscreen ncontent" style="display:none">
@@ -995,7 +995,17 @@ button,input,select,textarea{font-family:inherit;}
           <div class="nf" style="margin-bottom:10px"><label>Location / Site</label><input type="text" id="j-loc"></div>
           <div class="nf" style="margin-bottom:10px"><label>Notes</label><textarea id="j-notes"></textarea></div>
           <div style="font-weight:600;font-size:13px;margin-bottom:6px">Species Targets</div>
-          <div class="search-wrap"><input type="text" id="j-sp-search" placeholder="Search species to add..." oninput="filterJobSp(this.value)"></div>
+          <!-- Import from bid sheet -->
+          <div style="margin-bottom:10px;padding:10px;background:#f0f7ff;border:1px solid #c5d5f0;border-radius:8px;">
+            <div style="font-size:12px;font-weight:600;color:#1a4b8c;margin-bottom:4px">📋 Import from Bid Sheet</div>
+            <div style="font-size:11px;color:#555;margin-bottom:7px">Paste your bid spreadsheet URL — reads qty and plant name from columns C &amp; D starting at row 12.</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" id="j-sheet-url" placeholder="Paste Google Sheet URL here..." style="flex:1;font-size:12px;padding:6px 8px;border:1px solid #c5d5f0;border-radius:6px;">
+              <button class="nbtn nbg nbsm" onclick="importBidSheet()">Import</button>
+            </div>
+            <div id="j-import-status" style="font-size:11px;margin-top:6px;display:none;line-height:1.5;"></div>
+          </div>
+          <div class="search-wrap"><input type="text" id="j-sp-search" placeholder="Or search species to add manually..." oninput="filterJobSp(this.value)"></div>
           <div id="j-sp-rows" style="max-height:300px;overflow-y:auto;border:1px solid var(--brd2);border-radius:var(--r6)"></div>
           <div class="brow2">
             <button class="nbtn nbg" onclick="saveJob()">💾 Save Job</button>
@@ -2300,7 +2310,7 @@ function loadNurseryFromSheet(){
         if(Array.isArray(res.data.pottingQueue)&&res.data.pottingQueue.length){
           pottingQueue=res.data.pottingQueue;localStorage.setItem(SK_POT,JSON.stringify(pottingQueue));
         }
-        buildDash();buildPottingQueue();
+        buildDash();buildPottingQueue();buildJobs();
         nToast('✅ Inventory loaded from cloud');
       } else {
         nToast('☁ No cloud data yet — add inventory to get started');
@@ -2523,6 +2533,48 @@ function filterJobSp(q){buildJobSpRows(q);}
 function toggleJF(id){const f=document.getElementById('jf-'+id);if(f)f.style.display=document.getElementById('jck-'+id).checked?'grid':'none';}
 function checkORFlag(){document.getElementById('j-or-flag').style.display=document.getElementById('j-state').value==='OR'?'block':'none';}
 
+function importBidSheet(){
+  var urlInput=document.getElementById('j-sheet-url').value.trim();
+  if(!urlInput){nToast('Paste a Google Sheet URL first');return;}
+  var match=urlInput.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if(!match){nToast('Could not find sheet ID in that URL');return;}
+  var sheetId=match[1];
+  var statusEl=document.getElementById('j-import-status');
+  statusEl.style.display='block';
+  statusEl.style.color='#555';
+  statusEl.textContent='⏳ Reading bid sheet…';
+  fetch(NURSERY_URL+'?action=readBidSheet&sheetId='+sheetId)
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(!res.success){statusEl.textContent='❌ '+res.error;statusEl.style.color='var(--red2)';return;}
+      var plants=res.plants||[];
+      var matched=0;var unmatched=[];
+      plants.forEach(function(p){
+        var nameLower=p.name.toLowerCase();
+        var sp=masterSpecies.find(function(s){
+          return s.common.toLowerCase()===nameLower||
+                 s.common.toLowerCase().includes(nameLower)||
+                 nameLower.includes(s.common.toLowerCase());
+        });
+        if(sp){
+          var ck=document.getElementById('jck-'+sp.id);
+          var qtyEl=document.getElementById('jq-'+sp.id);
+          if(ck){ck.checked=true;matched++;}
+          if(qtyEl)qtyEl.value=p.qty;
+          var f=document.getElementById('jf-'+sp.id);
+          if(f)f.style.display='grid';
+        }else{
+          unmatched.push(p.name+' ('+p.qty+')');
+        }
+      });
+      var msg='✅ '+matched+' species imported.';
+      if(unmatched.length){msg+=' ⚠️ Not matched: '+unmatched.join(', ');statusEl.style.color='#b45309';}
+      else{statusEl.style.color='#2d5a27';}
+      statusEl.textContent=msg;
+    })
+    .catch(function(){statusEl.textContent='❌ Could not read sheet. Make sure it is shared with your Google account.';statusEl.style.color='var(--red2)';});
+}
+
 function saveJob(){
   if(!nurseryEditMode){nToast('🔒 Unlock edit mode first');return;}
   const name=document.getElementById('j-name').value.trim();if(!name){nToast('Enter job name');return;}
@@ -2532,18 +2584,28 @@ function saveJob(){
   jobs.push(job);sv(SK.jobs,jobs);closeM('m-addjob');nToast('✅ Job saved: '+name);buildDash();buildJobs();
 }
 
+function deleteJob(id){
+  if(!nurseryEditMode){nToast('🔒 Unlock edit mode first');return;}
+  if(!confirm('Delete this job? This cannot be undone.'))return;
+  jobs=jobs.filter(j=>j.id!==id);
+  sv(SK.jobs,jobs);buildJobs();buildDash();
+  nToast('Job deleted');
+}
+
 function buildJobs(){
-  const el=document.getElementById('jobs-list');
-  if(!jobs.length){el.innerHTML='<div class="card"><div class="cb3" style="color:var(--ink3)">No jobs yet.</div></div>';return;}
+  const el=document.getElementById('n-jobs-list');
+  if(!el)return;
+  if(!jobs.length){el.innerHTML='<div class="card"><div class="cb3" style="color:var(--ink3)">No jobs yet — click "+ Add Job".</div></div>';return;}
   el.innerHTML=jobs.map(j=>{
     return`<div class="card">
       <div class="ch2"><div class="chl"><span style="background:${j.color};width:16px;height:16px;border-radius:3px;border:1px solid rgba(0,0,0,.2);flex-shrink:0"></span>
         <div><div class="ctitle">${j.name}</div><div class="csub">${j.client||''} ${j.location?'· '+j.location:''}</div></div>
       </div>
-      <div style="display:flex;gap:5px;">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
         ${j.state==='OR'?'<span class="chip ca">OR ⚠️</span>':''}
         <button class="nbtn nbo nbsm" onclick="openJobDetail('${j.id}')">Detail</button>
         <button class="nbtn nbo nbsm" onclick="toggleJobDone('${j.id}')">${j.complete?'Reopen':'✓ Done'}</button>
+        <button class="nbtn nbsm" style="color:var(--red2);border-color:var(--red2)" onclick="deleteJob('${j.id}')">Delete</button>
       </div></div>
       <div class="cb3" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Species</th><th>Qty</th><th>Container</th><th>In Stock</th><th>Status</th></tr></thead>
       <tbody>${(j.targets||[]).map(t=>{const sp=spById(t.spId);const have=invTotal(t.spId,t.container);const need=parseInt(t.qty)||0;const ok=have>=need;
