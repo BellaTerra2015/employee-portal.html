@@ -415,6 +415,7 @@ button,input,select,textarea{font-family:inherit;}
   <div class="portal-header">
     <h2>🌿 Bella Terra LLC</h2>
     <div class="header-right">
+      <button id="btn-install" onclick="triggerInstall()" style="display:none;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);padding:.3rem .75rem;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;align-items:center;gap:.35rem;"></button>
       <span class="employee-badge" id="employee-badge">👤 Employee</span>
       <button class="btn-logout" onclick="doLogout()">Sign Out</button>
     </div>
@@ -3279,6 +3280,55 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js').catch(function() {});
   });
+}
+
+// ── PWA Install Button ──────────────────────────────────────
+var _installPrompt = null;
+var _isIos        = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+var _isMobile     = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+var _isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                    window.navigator.standalone === true;
+
+window.addEventListener('load', function() {
+  if (_isStandalone) return;
+  var btn = document.getElementById('btn-install');
+  btn.textContent = _isMobile ? '📲 Add to Home Screen' : '💻 Install App';
+  btn.style.display = 'flex';
+});
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _installPrompt = e;
+});
+
+window.addEventListener('appinstalled', function() {
+  document.getElementById('btn-install').style.display = 'none';
+  _installPrompt = null;
+});
+
+function triggerInstall() {
+  if (_isStandalone) { alert('Bella Terra Portal is already installed!'); return; }
+  if (_installPrompt) {
+    _installPrompt.prompt();
+    _installPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') document.getElementById('btn-install').style.display = 'none';
+      _installPrompt = null;
+    });
+  } else if (_isIos) {
+    alert(
+      'To add Bella Terra Portal to your Home Screen:\n\n' +
+      '1. Tap the Share button (\u29c8\u2191) at the bottom of Safari\n' +
+      '2. Scroll down and tap \u201cAdd to Home Screen\u201d\n' +
+      '3. Tap \u201cAdd\u201d in the top right\n\n' +
+      'The Bella Terra logo will appear on your home screen.'
+    );
+  } else {
+    alert(
+      'To install:\n\n' +
+      'In Chrome \u2014 click the \u22ee menu \u2192 \u201cInstall Bella Terra Portal\u201d\n' +
+      'In Edge \u2014 click \u2026 \u2192 Apps \u2192 \u201cInstall this site as an app\u201d'
+    );
+  }
 }
 </script>
 </body>
