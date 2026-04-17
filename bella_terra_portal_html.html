@@ -390,6 +390,37 @@ button,input,select,textarea{font-family:inherit;}
 .od-row-rm{position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;cursor:pointer;color:#aaa;font-size:1.1rem;line-height:1;}
 .od-row-rm:hover{color:var(--red);}
 @media(max-width:600px){.od-g2,.od-g3{grid-template-columns:1fr;}.od-tab{font-size:0.65rem;padding:0.5rem 0.3rem;min-width:60px;}}
+
+/* ── SAFETY TOPIC BANNER & MODAL ── */
+#safety-topic-banner{display:none;background:#fff3e0;border-bottom:3px solid var(--orange-border);padding:0.9rem 1.5rem;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+#safety-topic-banner.show{display:flex;}
+#safety-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1200;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;}
+#safety-modal-overlay.open{display:flex;}
+.saf-box{background:white;border-radius:16px;width:100%;max-width:660px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 56px rgba(0,0,0,0.35);}
+.saf-header{background:var(--green-dark);padding:1.25rem 1.5rem;border-radius:16px 16px 0 0;color:white;display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;}
+.saf-header h3{font-family:'Playfair Display',serif;font-size:1.15rem;line-height:1.35;flex:1;}
+.saf-body{padding:1.5rem;}
+.saf-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:0.75rem;justify-content:flex-end;background:#fafaf8;border-radius:0 0 16px 16px;flex-wrap:wrap;}
+.saf-steps{display:flex;margin-bottom:1.25rem;border-bottom:2px solid var(--border);}
+.saf-step{flex:1;text-align:center;padding:0.55rem 0.25rem;font-size:0.76rem;font-weight:700;color:var(--gray-mid);border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:-2px;}
+.saf-step.active{color:var(--green-dark);border-bottom-color:var(--green-dark);}
+.saf-step.done{color:var(--green-mid);border-bottom-color:var(--green-mid);}
+.saf-body h3{font-family:'Playfair Display',serif;color:var(--green-dark);font-size:1.05rem;margin:1.1rem 0 0.45rem;}
+.saf-body p{font-size:0.9rem;line-height:1.7;margin-bottom:0.75rem;color:var(--text);}
+.saf-body ul,.saf-body ol{padding-left:1.3rem;font-size:0.9rem;line-height:1.7;margin-bottom:0.75rem;color:var(--text);}
+.saf-body li{margin-bottom:0.3rem;}
+.saf-body strong{color:var(--green-dark);}
+.sq-item{margin-bottom:1.25rem;padding:1rem;background:#f7f7f5;border-radius:10px;border:2px solid var(--border);transition:border-color 0.2s;}
+.sq-item.correct{border-color:var(--green-mid);background:#eaf7ea;}
+.sq-item.wrong{border-color:var(--red);background:#fdeaea;}
+.sq-q{font-weight:600;font-size:0.9rem;margin-bottom:0.7rem;line-height:1.45;}
+.sq-opt{display:flex;align-items:flex-start;gap:0.55rem;padding:0.45rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.88rem;margin-bottom:0.2rem;line-height:1.4;}
+.sq-opt:hover{background:rgba(0,0,0,0.04);}
+.sq-opt input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:var(--green-dark);}
+.sq-expl{font-size:0.81rem;margin-top:0.55rem;padding:0.5rem 0.7rem;border-radius:6px;display:none;line-height:1.5;}
+.sq-expl.show{display:block;}
+.sq-expl.good{background:#d4edda;color:#1a5c2a;}
+.sq-expl.bad{background:#fdeaea;color:#8b1a1a;}
 </style>
 </head>
 <body>
@@ -427,6 +458,18 @@ button,input,select,textarea{font-family:inherit;}
   <div id="clackamas-reminder-banner" style="display:none;background:#fdeaea;border-bottom:2px solid #c0392b;padding:0.85rem 1.5rem;display:none;align-items:center;justify-content:space-between;gap:1rem;">
     <div style="font-size:0.95rem;color:#c0392b;font-weight:600;">📸 Reminder: It's the 1st — submit Clackamas Water hydrant photos to the office today.</div>
     <button onclick="document.getElementById('clackamas-reminder-banner').style.display='none';" style="background:transparent;border:none;font-size:1.25rem;cursor:pointer;color:#c0392b;flex-shrink:0;">&times;</button>
+  </div>
+
+  <!-- SAFETY TOPIC BANNER -->
+  <div id="safety-topic-banner">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <span style="font-size:1.5rem;">⚠️</span>
+      <div>
+        <div style="font-weight:700;color:var(--orange-dark);font-size:0.95rem;">New Safety Topic: <span id="safety-banner-title"></span></div>
+        <div style="font-size:0.82rem;color:#7a4500;margin-top:0.15rem;">Complete before your shift — tap to open.</div>
+      </div>
+    </div>
+    <button onclick="openSafetyModal()" style="background:var(--orange-dark);color:white;border:none;border-radius:8px;padding:0.55rem 1.25rem;font-size:0.9rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Open Topic →</button>
   </div>
 
   <!-- MAIN TILES -->
@@ -534,6 +577,39 @@ button,input,select,textarea{font-family:inherit;}
           style="background:#2d5a27;color:#fff;border:none;padding:0.6rem 1.4rem;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">Send to Office</button>
       </div>
       <div id="sl-status" style="margin-top:0.75rem;font-size:0.85rem;text-align:center;min-height:1.2rem;"></div>
+    </div>
+  </div>
+
+  <!-- SAFETY TOPIC MODAL -->
+  <div id="safety-modal-overlay">
+    <div class="saf-box">
+      <div class="saf-header">
+        <h3 id="saf-modal-title">Safety Topic</h3>
+        <button onclick="closeSafetyModal()" style="background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5rem;cursor:pointer;line-height:1;border-radius:5px;padding:0 0.3rem;flex-shrink:0;">&times;</button>
+      </div>
+      <div class="saf-body">
+        <div class="saf-steps">
+          <div class="saf-step active" id="saf-step-1">1 · Read</div>
+          <div class="saf-step" id="saf-step-2">2 · Quiz</div>
+          <div class="saf-step" id="saf-step-3">3 · Sign</div>
+        </div>
+        <div id="saf-content-read"></div>
+        <div id="saf-content-quiz" style="display:none;"></div>
+        <div id="saf-content-sign" style="display:none;">
+          <p style="font-size:0.9rem;line-height:1.65;color:#555;margin-bottom:1.25rem;">By signing below, you confirm that you have read and understood the safety topic and passed the quiz.</p>
+          <div style="margin-bottom:1rem;">
+            <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green-dark);display:block;margin-bottom:0.35rem;">Your Full Name (typed signature)</label>
+            <input type="text" id="saf-sig-input" placeholder="Type your full name" style="width:100%;padding:0.65rem 0.85rem;border:2px solid var(--border);border-radius:7px;font-size:1rem;font-family:'Playfair Display',serif;">
+          </div>
+          <div id="saf-sign-error" style="color:var(--red);font-size:0.85rem;display:none;margin-bottom:0.75rem;"></div>
+          <div id="saf-submit-success" style="display:none;background:#eaf7ea;border:1px solid var(--green-light);border-radius:8px;padding:1rem 1.25rem;color:var(--green-dark);font-size:0.9rem;line-height:1.6;margin-top:0.5rem;"></div>
+        </div>
+      </div>
+      <div class="saf-footer">
+        <button id="saf-btn-back" onclick="safBack()" style="display:none;background:transparent;color:var(--gray-mid);border:2px solid var(--border);border-radius:8px;padding:0.65rem 1.25rem;font-size:0.9rem;cursor:pointer;">← Back</button>
+        <button id="saf-btn-next" onclick="safNext()" style="background:var(--green-dark);color:white;border:none;border-radius:8px;padding:0.65rem 1.5rem;font-size:0.95rem;font-weight:600;cursor:pointer;">I've Read This — Take Quiz →</button>
+        <button id="saf-btn-submit" onclick="safSubmit()" style="display:none;background:var(--green-dark);color:white;border:none;border-radius:8px;padding:0.65rem 1.5rem;font-size:0.95rem;font-weight:600;cursor:pointer;">✓ Submit &amp; Complete</button>
+      </div>
     </div>
   </div>
 
@@ -1189,12 +1265,15 @@ function doLogin(){
   ['410-name','breaks-name','hb-name'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=name;});
   var td=new Date().toISOString().split('T')[0];
   ['410-date','breaks-date','hb-date'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=td;});
-  buildReorderItems();
-  initCanvases();
-  updateHandbookProgress();
-  loadSchollsValley();
-  checkClackamasReminder();
-  kelsoCheckPendingText();
+  try {
+    if (typeof buildReorderItems === 'function') buildReorderItems();
+    initCanvases();
+    updateHandbookProgress();
+    loadSchollsValley();
+    checkClackamasReminder();
+    kelsoCheckPendingText();
+  } catch(e) { console.warn('doLogin init:', e); }
+  checkSafetyTopic();
 }
 function doLogout(){location.reload();}
 
@@ -3588,6 +3667,475 @@ function submitSales() {
     document.getElementById('sl-status').style.color = '#c00';
     document.getElementById('sl-status').textContent = 'Error sending. Please try again.';
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAFETY TOPICS
+// To push a new topic: change SAFETY_TOPICS[0] at the bottom
+// to whichever index you want, save, and push. That's it.
+// ═══════════════════════════════════════════════════════════
+
+const SAFETY_TOPICS = [
+
+  // ─────────────────────────────────────────────
+  // TOPIC 1 — DISTRACTED DRIVING
+  // ─────────────────────────────────────────────
+  {
+    id: "topic-1",
+    title: "Distracted Driving: Bella Terra Policy & Driver Safety",
+    body: `
+      <h3>The Reality: Equal to Drunk Driving</h3>
+      <p>Texting while driving isn't just a "distraction" — it is an impairment. Research shows that texting while driving is statistically identical to driving with a .08% BAC (the legal limit for intoxication).</p>
+      <p><strong>What does .08% BAC actually mean?</strong> For most people, that's roughly 1–2 beers. That's enough to fail a roadside sobriety test and get a DUI. Even if you've never had a drink in your life, understand this: one text behind the wheel puts your reaction time in the same category as someone who just failed a breathalyzer.</p>
+      <ul>
+        <li><strong>23x</strong> increased risk of collision</li>
+        <li><strong>5 seconds</strong> eyes off the road — at highway speed, that's a full football field</li>
+        <li><strong>.08% BAC</strong> equivalent impairment</li>
+      </ul>
+      <h3>Official Bella Terra Policy — The "On My Way" Protocol</h3>
+      <p>Communication is the responsibility of the <strong>passenger</strong>.</p>
+      <ul>
+        <li>THE PASSENGER sends all "on the way" texts to clients or the office</li>
+        <li>THE DRIVER keeps both hands on the wheel and eyes on the road</li>
+        <li>Drivers are never to handle a phone while the vehicle is in motion or at a stoplight</li>
+      </ul>
+      <h3>Passenger Power</h3>
+      <ul>
+        <li>Handle the GPS, music, and all incoming calls/texts</li>
+        <li>If the driver reaches for a phone, offer to handle it immediately</li>
+        <li>Zero tolerance — we work in a high-risk environment</li>
+      </ul>
+      <h3>On-the-Road Tips</h3>
+      <ul>
+        <li>Turn on "Do Not Disturb While Driving" before you leave the shop</li>
+        <li>Enter your destination in GPS before putting the truck in gear</li>
+        <li>If driving alone, you MUST pull over to a safe location to text</li>
+      </ul>
+    `,
+    quiz: [
+      {
+        question: "Texting while driving is statistically equal to driving at what BAC level?",
+        options: ["A) .02%", "B) .08%", "C) .15%", "D) .04%"],
+        correct: 1,
+        explanation: "Texting while driving equals .08% BAC — the legal limit for intoxication in most states."
+      },
+      {
+        question: "About how many beers does .08% BAC equal for most people?",
+        options: ["A) 5–6 beers", "B) 3–4 beers", "C) 1–2 beers", "D) Half a beer"],
+        correct: 2,
+        explanation: "For most people, .08% BAC is reached at around 1–2 beers — enough to fail a sobriety test."
+      },
+      {
+        question: "How many seconds are your eyes off the road when sending one text at highway speed?",
+        options: ["A) 1 second", "B) 3 seconds", "C) 5 seconds", "D) 10 seconds"],
+        correct: 2,
+        explanation: "5 seconds — at highway speed, that's the length of a full football field driven blind."
+      },
+      {
+        question: "Who is the best person to handle texts while the truck is moving?",
+        options: ["A) The driver at a stoplight", "B) The passenger", "C) Pull over every time", "D) Use voice-to-text while driving"],
+        correct: 1,
+        explanation: "The passenger is the Safety Navigator. They handle all communication so the driver stays focused."
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // TOPIC 2 — ACCIDENT REPORTING
+  // ─────────────────────────────────────────────
+  {
+    id: "topic-2",
+    title: "Accident Reporting: What to Do When Something Goes Wrong",
+    body: `
+      <p>Every accident, injury, or qualifying near-miss must be reported — no exceptions. Unreported incidents can create legal liability for you and Bella Terra. Here's exactly what to do:</p>
+      <ol>
+        <li><strong>Stop and secure the scene.</strong> If someone is hurt, call 911 first.</li>
+        <li><strong>Open the Bella Terra Employee Portal</strong> and navigate to the job in question.</li>
+        <li><strong>Click the job</strong> to open the Job Detail page.</li>
+        <li>Document in the appropriate log tab what happened, when, and who was involved.</li>
+        <li><strong>Call or text Rena at 360-606-5616</strong> immediately — do not wait until end of day.</li>
+        <li>Do not admit fault, speculate, or discuss the incident with anyone outside Bella Terra until Rena has been notified.</li>
+        <li>If there is a vehicle accident, photograph all damage before moving the vehicles if it is safe to do so.</li>
+      </ol>
+      <h3>Near-Misses</h3>
+      <p>Not every near-miss needs to be called in. <strong>If a near-miss happened on the job and the whole crew could learn something from it</strong> — report it so it can be turned into a safety topic. That information helps prevent a real injury next time.</p>
+    `,
+    quiz: [
+      {
+        question: "What is the FIRST thing you do if someone is injured on the job?",
+        options: ["A) Call Rena", "B) Call 911", "C) Document it in the portal", "D) Drive them to urgent care yourself"],
+        correct: 1,
+        explanation: "Always call 911 first if someone is hurt. Get emergency help on the way before anything else."
+      },
+      {
+        question: "After securing the scene, where do you document the incident?",
+        options: ["A) Text the crew group chat", "B) Write it in a notebook and turn it in later", "C) The Bella Terra Employee Portal on the job detail page", "D) Email Office@"],
+        correct: 2,
+        explanation: "Document in the Employee Portal on the Job Detail page — this creates a timestamped record."
+      },
+      {
+        question: "Who must be notified immediately after any accident?",
+        options: ["A) Your crew lead", "B) The prime contractor foreman", "C) Rena at 360-606-5616", "D) No one — just document it"],
+        correct: 2,
+        explanation: "Rena must be called or texted immediately — do not wait until end of day."
+      },
+      {
+        question: "When should a near-miss be reported to the whole crew?",
+        options: ["A) Never — if nobody got hurt, move on", "B) Only if it was your fault", "C) When it happened on the job and the whole crew could learn from it", "D) Every single near-miss no matter what"],
+        correct: 2,
+        explanation: "Report near-misses that the crew can learn from — those become safety topics that prevent real injuries."
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // TOPIC 3 — HYDROSEEDER PLATFORM SAFETY
+  // ─────────────────────────────────────────────
+  {
+    id: "topic-3",
+    title: "Hydroseeder Platform Safety & Bella Terra Policy",
+    body: `
+      <h3>When the Platform Form Is Used</h3>
+      <p>The platform form is used when a site safety officer or foreman has determined it is not safe to ride on the hydroseeder while the truck is moving.</p>
+      <h3>This Is Bella Terra Policy — And It Protects You</h3>
+      <p>If a site safety officer or foreman prohibits riding on the hydroseeder and requires use of the platform form instead — and you are injured because of the ladder — <strong>liability falls on them, not Bella Terra.</strong> This policy is documented and your acknowledgment today is part of that record.</p>
+      <h3>How to Use the Platform Form in the Portal</h3>
+      <ol>
+        <li>Open the job in the Employee Portal</li>
+        <li>Navigate to the <strong>Hydroseeding</strong> tab</li>
+        <li>Fill out the platform form if the site safety foreman stops work and states you cannot be on the platform while the truck is moving</li>
+        <li>Complete the form together with the safety foreman</li>
+        <li>Email a copy to both <strong>Payroll@1BellaTerra.com</strong> and the safety foreman upon completion</li>
+      </ol>
+      <h3>Platform Safety Rules</h3>
+      <ul>
+        <li>Always maintain <strong>3–4 points of contact</strong> when traveling on or around the machine — two hands and one foot, or two feet and one hand, at all times</li>
+        <li>Never step onto the platform without non-slip boots</li>
+        <li>Always let someone on the ground know you're going up</li>
+        <li>If conditions feel unsafe, stop and reassess — no load is worth a fall</li>
+      </ul>
+    `,
+    quiz: [
+      {
+        question: "When is the platform form used?",
+        options: ["A) On every hydroseeding job", "B) Only when the tank is full", "C) When a site safety officer or foreman says you cannot be on the platform while the truck is moving", "D) Whenever you feel like it's safer"],
+        correct: 2,
+        explanation: "The platform form is only used when a site safety officer or foreman specifically prohibits riding on the hydroseeder."
+      },
+      {
+        question: "If the safety foreman requires the platform form and you are later injured on the ladder, who is liable?",
+        options: ["A) Bella Terra", "B) You", "C) The site safety officer or foreman who made the call", "D) No one — it's an accident"],
+        correct: 2,
+        explanation: "Liability falls on the party who made the restriction. Bella Terra's policy and your acknowledgment document this."
+      },
+      {
+        question: "What does '3–4 points of contact' mean when on the machine?",
+        options: ["A) Always use both hands only", "B) Two hands and one foot, or two feet and one hand, at all times", "C) Keep one hand free to hold equipment", "D) Stay seated at all times"],
+        correct: 1,
+        explanation: "3–4 points of contact means two hands + one foot, or two feet + one hand — always braced against the machine."
+      },
+      {
+        question: "Who receives a copy of the completed platform form?",
+        options: ["A) Office@1BellaTerra.com only", "B) The crew lead", "C) Both Payroll@1BellaTerra.com and the site safety foreman", "D) No one — it stays in the portal"],
+        correct: 2,
+        explanation: "Both Payroll@ and the safety foreman receive a copy — this creates a documented record on both sides."
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // TOPIC 4 — TOURNIQUET USE (TIME BRAND)
+  // ─────────────────────────────────────────────
+  {
+    id: "topic-4",
+    title: "Tourniquet Training: How to Use the TIME Tourniquet in Your Rig",
+    body: `
+      <p>Every Bella Terra rig carries a <strong>TIME brand tourniquet</strong>. A tourniquet stops life-threatening bleeding from a limb — an arm or leg. You may never need it, but if you do, seconds matter.</p>
+      <h3>When to Use It</h3>
+      <ul>
+        <li>Severe bleeding from an arm or leg that cannot be controlled with direct pressure</li>
+        <li>A cut from equipment, a chainsaw, or debris that is pumping or spurting blood</li>
+        <li>After calling 911 — this buys time until EMS arrives</li>
+      </ul>
+      <h3>How to Use the TIME Tourniquet</h3>
+      <ol>
+        <li><strong>Expose the wound</strong> — cut clothing away if needed</li>
+        <li><strong>Place the tourniquet</strong> 2–3 inches above the wound (toward the heart), never over a joint</li>
+        <li><strong>Thread the strap</strong> through the buckle and pull tight</li>
+        <li><strong>Twist the rod</strong> (the black bar) until bleeding stops — this will be tight and painful. That is correct.</li>
+        <li><strong>Lock the rod</strong> into the clip to hold tension</li>
+        <li><strong>Note the time</strong> — write the application time on the person's skin or the tourniquet strap with a marker. EMS must know how long it's been on.</li>
+        <li><strong>Do not remove it.</strong> Only EMS removes a tourniquet.</li>
+      </ol>
+      <p>The TIME tourniquet is stored in your rig's first aid kit. <strong>Know where it is before you need it.</strong></p>
+    `,
+    quiz: [
+      {
+        question: "Where on the limb should you place the tourniquet?",
+        options: ["A) Directly over the wound", "B) Below the wound", "C) 2–3 inches above the wound, toward the heart", "D) As close to the hand or foot as possible"],
+        correct: 2,
+        explanation: "Always place 2–3 inches above the wound, toward the heart — never directly over the wound or below it."
+      },
+      {
+        question: "How do you know the tourniquet is tight enough?",
+        options: ["A) It feels snug", "B) The bleeding stops", "C) The person says it feels okay", "D) The strap is fully extended"],
+        correct: 1,
+        explanation: "The tourniquet is tight enough when the bleeding stops. It will be painful — that is expected and correct."
+      },
+      {
+        question: "Why is it critical to note the time the tourniquet was applied?",
+        options: ["A) So you can bill the time", "B) EMS needs to know how long it's been on", "C) It's required by OSHA", "D) So you can remove it after 30 minutes"],
+        correct: 1,
+        explanation: "EMS needs the application time to make medical decisions. Write it on the person's skin or the strap."
+      },
+      {
+        question: "When should you remove the tourniquet?",
+        options: ["A) After 20 minutes", "B) When the bleeding slows down", "C) Never — only EMS removes it", "D) Once the person feels better"],
+        correct: 2,
+        explanation: "Never remove the tourniquet yourself. Only trained EMS personnel remove it — removing it early can cause life-threatening blood loss."
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────
+  // TOPIC 5 — WORKING IN TRAFFIC (SR 203 / HIGHWAY SITES)
+  // ─────────────────────────────────────────────
+  {
+    id: "topic-5",
+    title: "Shadow Vehicle, Traffic Control & Working on the Shoulder: SR 203 and Similar Sites",
+    body: `
+      <p>Jobs like SR 203 put our crew in one of the most dangerous work environments possible — active highway traffic at speed. WSDOT requires specific protocols and so does Bella Terra.</p>
+      <h3>Shadow Vehicle</h3>
+      <p>The shadow vehicle is the truck parked behind the crew with its flashers and arrow board running. It exists to absorb a potential impact so our crew doesn't. Never park it closer than posted spacing requires, and never turn off the flashers while crew is working.</p>
+      <h3>Required PPE on Highway Sites</h3>
+      <ul>
+        <li><strong>Class 2 Hi-Vis vest</strong> — This means a vest or jacket with a solid fluorescent yellow-green or orange background AND reflective silver stripes across the chest and around the shoulders. A plain yellow vest with no reflective strips does NOT qualify. If you're unsure, ask your foreman before the job starts.</li>
+        <li><strong>Hard hat</strong></li>
+        <li><strong>Boots</strong> (steel toe recommended on WSDOT sites)</li>
+        <li>If herbicide is being applied — full PPE per label requirements</li>
+      </ul>
+      <h3>Working on the Shoulder</h3>
+      <ul>
+        <li>Face traffic when possible so you can see what's coming</li>
+        <li>Know your escape route before you start — where will you go if a vehicle drifts toward you?</li>
+        <li>Never assume a driver sees you</li>
+        <li>If a vehicle drifts toward the work zone, move away from traffic immediately — do not freeze</li>
+        <li><strong>If your back is turned toward traffic while walking along the route, stay as far from the road and fog line as possible</strong></li>
+      </ul>
+      <h3>Traffic Control</h3>
+      <ul>
+        <li>Never move or adjust cones, signs, or the shadow vehicle without authorization from the foreman</li>
+        <li>If you see a hazard — a cone knocked over, a sign down — tell the foreman immediately; do not fix it yourself while traffic is moving</li>
+      </ul>
+    `,
+    quiz: [
+      {
+        question: "What is the purpose of the shadow vehicle?",
+        options: ["A) To store equipment", "B) To block traffic completely", "C) To absorb a potential impact and protect the crew", "D) To mark the start of the work zone"],
+        correct: 2,
+        explanation: "The shadow vehicle is positioned to take the impact of a drifting vehicle so the crew doesn't."
+      },
+      {
+        question: "Which of the following qualifies as a Class 2 Hi-Vis vest?",
+        options: ["A) Any bright yellow vest", "B) A fluorescent orange vest with no reflective strips", "C) A fluorescent yellow-green or orange vest WITH reflective silver stripes across the chest and shoulders", "D) A dark vest with a small reflective patch"],
+        correct: 2,
+        explanation: "Class 2 requires both fluorescent background material AND reflective silver stripes. A plain bright vest alone does not qualify."
+      },
+      {
+        question: "If a vehicle drifts toward the work zone, what should you do?",
+        options: ["A) Wave your arms to alert the driver", "B) Stand your ground and keep working", "C) Move away from traffic immediately", "D) Run toward the shadow vehicle"],
+        correct: 2,
+        explanation: "Move away from traffic immediately — do not freeze. Your escape route should be planned before you start working."
+      },
+      {
+        question: "If your back is turned toward traffic while walking along the route, where should you position yourself?",
+        options: ["A) As close to the fog line as possible so drivers can see you", "B) In the center of the shoulder", "C) As far from the road and fog line as possible", "D) It doesn't matter as long as you're in Hi-Vis"],
+        correct: 2,
+        explanation: "When walking with your back to traffic, maximize your distance from the fog line — give yourself as much buffer as possible."
+      }
+    ]
+  }
+
+];
+
+// ─────────────────────────────────────────────
+// SET ACTIVE TOPIC
+// Change the index below to the topic you want
+// employees to see on their next login.
+// 0 = Topic 1, 1 = Topic 2, 2 = Topic 3, etc.
+// ─────────────────────────────────────────────
+const activeTopic = SAFETY_TOPICS[0];
+
+// ── Banner check (called after login) ──────────────────────
+function checkSafetyTopic() {
+  if (!activeTopic) return;
+  var doneKey = 'btSafetyDone_' + activeTopic.id;
+  if (localStorage.getItem(doneKey)) return;
+  document.getElementById('safety-banner-title').textContent = activeTopic.title;
+  document.getElementById('safety-topic-banner').classList.add('show');
+}
+
+// ── Modal state ─────────────────────────────────────────────
+var _safStep = 1;
+var _safAnswers = [];
+var _safScore = 0;
+var _quizGraded = false;
+
+function openSafetyModal() {
+  _safStep = 1;
+  _safAnswers = [];
+  _safScore = 0;
+  _quizGraded = false;
+  document.getElementById('saf-modal-title').textContent = activeTopic.title;
+  document.getElementById('saf-content-read').innerHTML = activeTopic.body;
+  document.getElementById('saf-submit-success').style.display = 'none';
+  document.getElementById('saf-sign-error').style.display = 'none';
+  renderSafetyStep();
+  document.getElementById('safety-modal-overlay').classList.add('open');
+}
+
+function closeSafetyModal() {
+  document.getElementById('safety-modal-overlay').classList.remove('open');
+}
+
+function renderSafetyStep() {
+  [1, 2, 3].forEach(function(n) {
+    var el = document.getElementById('saf-step-' + n);
+    el.classList.remove('active', 'done');
+    if (n < _safStep) el.classList.add('done');
+    else if (n === _safStep) el.classList.add('active');
+  });
+  document.getElementById('saf-content-read').style.display  = _safStep === 1 ? '' : 'none';
+  document.getElementById('saf-content-quiz').style.display  = _safStep === 2 ? '' : 'none';
+  document.getElementById('saf-content-sign').style.display  = _safStep === 3 ? '' : 'none';
+  document.getElementById('saf-btn-back').style.display      = _safStep > 1 ? '' : 'none';
+  document.getElementById('saf-btn-next').style.display      = _safStep < 3 ? '' : 'none';
+  document.getElementById('saf-btn-submit').style.display    = _safStep === 3 ? '' : 'none';
+  if (_safStep === 1) {
+    document.getElementById('saf-btn-next').textContent = "I've Read This — Take Quiz →";
+  } else if (_safStep === 2 && !_quizGraded) {
+    document.getElementById('saf-btn-next').textContent = "Submit Answers →";
+  }
+  if (_safStep === 2 && !_quizGraded) renderSafetyQuiz();
+  if (_safStep === 3) {
+    document.getElementById('saf-sig-input').value = currentEmployee || '';
+    document.getElementById('saf-submit-success').style.display = 'none';
+    document.getElementById('saf-btn-submit').disabled = false;
+    document.getElementById('saf-btn-submit').textContent = '✓ Submit & Complete';
+  }
+}
+
+function renderSafetyQuiz() {
+  var html = '';
+  activeTopic.quiz.forEach(function(item, i) {
+    html += '<div class="sq-item" id="sq-item-' + i + '">';
+    html += '<div class="sq-q">' + (i + 1) + '. ' + item.question + '</div>';
+    item.options.forEach(function(opt, j) {
+      html += '<label class="sq-opt"><input type="radio" name="sq_' + i + '" value="' + j + '"> <span>' + opt + '</span></label>';
+    });
+    html += '<div class="sq-expl" id="sq-expl-' + i + '">' + item.explanation + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('saf-content-quiz').innerHTML = html;
+}
+
+function safBack() {
+  if (_safStep === 3) { _quizGraded = false; }
+  if (_safStep > 1) { _safStep--; renderSafetyStep(); }
+}
+
+function safNext() {
+  if (_safStep === 1) {
+    _safStep = 2;
+    _quizGraded = false;
+    renderSafetyStep();
+    return;
+  }
+  if (_safStep === 2) {
+    if (_quizGraded) {
+      _safStep = 3;
+      renderSafetyStep();
+      return;
+    }
+    // Check all answered
+    var q = activeTopic.quiz;
+    var firstUnanswered = null;
+    q.forEach(function(item, i) {
+      if (!document.querySelector('input[name="sq_' + i + '"]:checked')) {
+        if (firstUnanswered === null) firstUnanswered = i;
+      }
+    });
+    if (firstUnanswered !== null) {
+      alert('Please answer all ' + q.length + ' questions. (Question ' + (firstUnanswered + 1) + ' is unanswered.)');
+      return;
+    }
+    // Grade
+    _safAnswers = [];
+    _safScore = 0;
+    q.forEach(function(item, i) {
+      var chosen = parseInt(document.querySelector('input[name="sq_' + i + '"]:checked').value);
+      var wasCorrect = chosen === item.correct;
+      if (wasCorrect) _safScore++;
+      _safAnswers.push({ question: item.question, chosen: item.options[chosen], correct: item.options[item.correct], wasCorrect: wasCorrect });
+      var itemEl = document.getElementById('sq-item-' + i);
+      var explEl = document.getElementById('sq-expl-' + i);
+      itemEl.classList.toggle('correct', wasCorrect);
+      itemEl.classList.toggle('wrong', !wasCorrect);
+      explEl.className = 'sq-expl show ' + (wasCorrect ? 'good' : 'bad');
+      document.querySelectorAll('input[name="sq_' + i + '"]').forEach(function(r) { r.disabled = true; });
+    });
+    _quizGraded = true;
+    document.getElementById('saf-btn-next').textContent = 'Continue to Sign (' + _safScore + '/' + q.length + ' correct) →';
+  }
+}
+
+function safSubmit() {
+  var sig = (document.getElementById('saf-sig-input').value || '').trim();
+  var errEl = document.getElementById('saf-sign-error');
+  if (!sig) { errEl.style.display = 'block'; errEl.textContent = 'Please type your full name to sign.'; return; }
+  errEl.style.display = 'none';
+  var btn = document.getElementById('saf-btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  var q = activeTopic.quiz;
+  var now = new Date();
+  var answerSummary = _safAnswers.map(function(a, i) {
+    return (i + 1) + '. ' + a.question + '\n   Selected: ' + a.chosen + (a.wasCorrect ? ' ✓' : ' ✗') + '\n   Correct: ' + a.correct;
+  }).join('\n\n');
+  var payload = {
+    action: 'submitSafetyTopic',
+    employee: sig,
+    topicId: activeTopic.id,
+    topicTitle: activeTopic.title,
+    date: now.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }),
+    time: now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    score: _safScore + '/' + q.length,
+    answers: answerSummary,
+    signature: sig
+  };
+  fetch(NURSERY_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function() {
+    markSafetyDone(sig);
+  }).catch(function() {
+    markSafetyDone(sig);
+  });
+}
+
+function markSafetyDone(sig) {
+  localStorage.setItem('btSafetyDone_' + activeTopic.id, '1');
+  document.getElementById('safety-topic-banner').classList.remove('show');
+  var q = activeTopic.quiz;
+  document.getElementById('saf-submit-success').innerHTML =
+    '✅ <strong>' + sig + '</strong>, your completion has been recorded.<br>' +
+    'Score: <strong>' + _safScore + '/' + q.length + '</strong> &nbsp;·&nbsp; ' + activeTopic.title + '<br>' +
+    '<span style="font-size:0.82rem;color:#555;font-weight:400;">A copy has been sent to Payroll@1BellaTerra.com.</span>';
+  document.getElementById('saf-submit-success').style.display = 'block';
+  document.getElementById('saf-btn-submit').style.display = 'none';
+  document.getElementById('saf-btn-back').style.display = 'none';
 }
 
 // ── PWA Install Button ──────────────────────────────────────
