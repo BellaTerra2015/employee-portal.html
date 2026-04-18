@@ -4290,15 +4290,19 @@ function getMergedProfile(emp){
   };
 }
 
-// Load all profiles from Google Sheet, then run callback
+// Load all profiles from Google Sheet, then run callback.
+// Returns full employee data (name, role, phone, notes, leader, ecName, ecPhone)
+// keyed by name — sheet is the source of truth, TEAM_DATA is offline fallback only.
 function loadTeamProfiles(cb){
   fetch(NURSERY_URL+'?action=employeeProfiles')
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if(data.profiles) tdSheetProfiles = data.profiles;
+      if(data.profiles && Object.keys(data.profiles).length > 0){
+        tdSheetProfiles = data.profiles;
+      }
       if(cb) cb();
     })
-    .catch(function(){ if(cb) cb(); }); // fail gracefully — show cached/default data
+    .catch(function(){ if(cb) cb(); });
 }
 
 function showTeamDir(scrollToSelf){
@@ -4328,34 +4332,47 @@ function hideTeamDir(){
 function buildTeamDir(){
   var grid=document.getElementById('td-cards');
   if(!grid) return;
-  grid.innerHTML=TEAM_DATA.filter(function(e){return e.active;}).map(function(emp){
-    var p=getMergedProfile(emp);
+  // Use sheet data as primary source (names, roles, EC all come from the sheet).
+  // Fall back to TEAM_DATA only if sheet failed to load (offline mode).
+  var sheetKeys=Object.keys(tdSheetProfiles);
+  var employees = sheetKeys.length > 0
+    ? sheetKeys.map(function(k){ return tdSheetProfiles[k]; })
+    : TEAM_DATA.filter(function(e){ return e.active; });
+  // Leaders first, then alphabetical
+  employees.sort(function(a,b){
+    if(a.leader&&!b.leader) return -1;
+    if(!a.leader&&b.leader) return 1;
+    return a.name.localeCompare(b.name);
+  });
+  grid.innerHTML=employees.map(function(emp){
     var isMe=currentEmployee&&currentEmployee.trim().toLowerCase()===emp.name.toLowerCase();
     var cardId='td-card-'+tdKey(emp.name);
     var leaderBadge=emp.leader?'<span class="td-leader-badge">Leadership</span>':'';
-    var ecHtml=(p.ecName||p.ecPhone)
-      ?'<div class="td-ec-row">🆘 EC: '+(p.ecName||'')+(p.ecPhone?' · <a href="tel:'+p.ecPhone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(p.ecPhone)+'</a>':'')+'</div>'
+    var ecHtml=(emp.ecName||emp.ecPhone)
+      ?'<div class="td-ec-row">🆘 EC: '+(emp.ecName||'')+(emp.ecPhone?' · <a href="tel:'+emp.ecPhone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(emp.ecPhone)+'</a>':'')+'</div>'
       :'<div class="td-ec-row td-ec-empty">⚠️ Emergency contact not yet added</div>';
     var notesHtml=emp.notes?'<div class="td-card-row" style="color:#7a5c00;font-size:0.82rem;margin-top:0.2rem;">📝 '+emp.notes+'</div>':'';
-    var emailHtml=p.email?'<div class="td-card-row">✉️ '+p.email+'</div>':'';
     var editBtn=isMe?'<button class="td-edit-btn" onclick="openTdEdit()">✏️ Update My Info</button>':'';
     return '<div class="td-card'+(emp.leader?' is-leader':'')+'" id="'+cardId+'">'
       +leaderBadge
       +'<div class="td-card-name">'+emp.name+'</div>'
       +'<div class="td-card-role">'+emp.role+'</div>'
-      +'<div class="td-card-row">📞 <a href="tel:'+p.phone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(p.phone)+'</a></div>'
-      +emailHtml+notesHtml+ecHtml+editBtn
+      +'<div class="td-card-row">📞 <a href="tel:'+emp.phone+'" style="color:var(--green-dark);text-decoration:none;font-weight:600;">'+fmtPhone(emp.phone)+'</a></div>'
+      +notesHtml+ecHtml+editBtn
       +'</div>';
   }).join('');
 }
 
 function openTdEdit(){
-  var emp=TEAM_DATA.find(function(e){return e.name.toLowerCase()===currentEmployee.trim().toLowerCase();});
-  var p=getMergedProfile(emp||{name:currentEmployee,phone:''});
-  document.getElementById('td-edit-phone').value=p.phone;
-  document.getElementById('td-edit-email').value=p.email;
-  document.getElementById('td-edit-ec-name').value=p.ecName;
-  document.getElementById('td-edit-ec-phone').value=p.ecPhone;
+  // Find current employee in sheet data first, fall back to TEAM_DATA
+  var sheetEmp = tdSheetProfiles[currentEmployee]
+    || Object.values(tdSheetProfiles).find(function(e){ return e.name.toLowerCase()===currentEmployee.trim().toLowerCase(); })
+    || {};
+  var tdEmp = TEAM_DATA.find(function(e){ return e.name.toLowerCase()===currentEmployee.trim().toLowerCase(); }) || {};
+  document.getElementById('td-edit-phone').value   = sheetEmp.phone   || tdEmp.phone   || '';
+  document.getElementById('td-edit-email').value   = sheetEmp.email   || '';
+  document.getElementById('td-edit-ec-name').value  = sheetEmp.ecName  || '';
+  document.getElementById('td-edit-ec-phone').value = sheetEmp.ecPhone || '';
   document.getElementById('td-save-ok').classList.remove('show');
   document.getElementById('td-edit-modal').classList.add('open');
 }
