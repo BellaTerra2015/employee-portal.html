@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BusyBusy Instructions — Bella Terra</title>
+<meta name="theme-color" content="#2d5a27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:#2d5a27;--green-mid:#4a7c3f;--green-light:#7ab648;
+  --green-pale:#e8f5e2;--gold:#c8961e;
+  --white:#ffffff;--gray-light:#f5f5f2;--gray-mid:#888;
+  --text:#2a2a2a;--border:#d0dcc8;--red:#c0392b;
+  --shadow:0 2px 12px rgba(45,90,39,0.10);
+  --orange-dark:#b85c00;--orange-border:#e07c30;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+.page-header{
+  background:var(--green-dark);
+  padding:1rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.page-header h2{
+  font-family:'Playfair Display',serif;
+  color:white;font-size:1.2rem;margin:0;flex:1;
+}
+.btn-back{
+  background:transparent;color:rgba(255,255,255,0.85);
+  border:1px solid rgba(255,255,255,0.35);
+  padding:0.4rem 0.9rem;border-radius:6px;
+  cursor:pointer;font-size:0.85rem;
+  font-family:'Source Sans 3',sans-serif;
+  white-space:nowrap;transition:all 0.15s;
+}
+.btn-back:hover{background:rgba(255,255,255,0.12);color:white;}
+
+/* ── BODY ── */
+.page-body{padding:1.5rem;max-width:760px;margin:0 auto;}
+
+/* ── INTRO CARD ── */
+.bb-intro{
+  background:white;border-radius:12px;
+  padding:1.25rem 1.5rem;margin-bottom:1.5rem;
+  box-shadow:var(--shadow);
+  display:flex;align-items:flex-start;gap:1rem;
+}
+.bb-intro-icon{font-size:2.25rem;flex-shrink:0;}
+.bb-intro p{font-size:0.9rem;line-height:1.7;color:var(--text);margin:0;}
+.bb-intro p strong{color:var(--green-dark);}
+
+/* ── SECTION HEADING ── */
+.bb-section-heading{
+  display:flex;align-items:center;gap:0.75rem;
+  margin:2rem 0 1rem;
+}
+.bb-section-heading h4{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;color:var(--green-dark);margin:0;
+  white-space:nowrap;
+}
+.bb-sh-line{flex:1;height:1px;background:var(--border);}
+
+/* ── ACCORDION ── */
+.bb-accordion{
+  background:white;border-radius:12px;
+  margin-bottom:0.85rem;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  border:2px solid transparent;
+  transition:border-color 0.18s;
+}
+.bb-accordion.open{border-color:var(--green-light);}
+
+.bb-acc-head{
+  display:flex;align-items:center;gap:0.85rem;
+  padding:1rem 1.25rem;cursor:pointer;
+  user-select:none;transition:background 0.15s;
+}
+.bb-acc-head:hover{background:var(--green-pale);}
+
+.bb-acc-num{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--green-pale);color:var(--green-dark);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:0.9rem;flex-shrink:0;
+  transition:background 0.18s,color 0.18s;
+}
+.bb-accordion.open .bb-acc-num{background:var(--green-dark);color:white;}
+.bb-acc-title{flex:1;font-weight:600;font-size:0.97rem;}
+.bb-acc-arrow{color:var(--gray-mid);font-size:1rem;transition:transform 0.22s;}
+.bb-accordion.open .bb-acc-arrow{transform:rotate(180deg);}
+
+.bb-acc-body{
+  display:none;
+  padding:0 1.25rem 1.25rem;
+  border-top:1px solid var(--border);
+  animation:bbFadeIn 0.18s ease;
+}
+.bb-accordion.open .bb-acc-body{display:block;}
+@keyframes bbFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ── STEP LIST ── */
+.bb-steps{list-style:none;padding:0;margin:0.85rem 0 0;}
+.bb-steps li{
+  display:flex;gap:0.85rem;align-items:flex-start;
+  padding:0.6rem 0;
+  border-bottom:1px solid var(--gray-light);
+  font-size:0.9rem;line-height:1.65;
+}
+.bb-steps li:last-child{border-bottom:none;}
+.bb-steps li ul{
+  margin:0.4rem 0 0 0.25rem;
+  padding-left:1.1rem;
+  font-size:0.87rem;line-height:1.6;
+}
+.bb-steps li ul li{
+  border:none;padding:0.15rem 0;
+  display:list-item;
+}
+.bb-step-num{
+  min-width:26px;height:26px;
+  background:var(--green-dark);color:white;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:700;
+  flex-shrink:0;margin-top:1px;
+}
+
+/* ── NOTES ── */
+.bb-note{
+  border-radius:8px;padding:0.9rem 1rem;
+  font-size:0.875rem;line-height:1.65;
+  margin:1rem 0 0;display:flex;gap:0.65rem;
+  align-items:flex-start;
+}
+.bb-note-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.bb-note.info{background:var(--green-pale);border:1.5px solid var(--green-light);color:var(--green-dark);}
+.bb-note.warn{background:#fff3e8;border:1.5px solid var(--orange-border);color:var(--orange-dark);}
+.bb-note.alert{background:#fdeaea;border:1.5px solid var(--red);color:var(--red);font-weight:600;}
+
+/* ── VIDEO PLACEHOLDER ── */
+.bb-video-placeholder{
+  border:2px dashed var(--border);
+  border-radius:10px;padding:1.5rem 1rem;
+  text-align:center;background:var(--gray-light);
+  margin:1.1rem 0 0;
+}
+.bb-vp-icon{font-size:1.75rem;margin-bottom:0.45rem;}
+.bb-video-placeholder p{
+  font-size:0.82rem;color:var(--gray-mid);
+  margin:0;line-height:1.5;
+}
+.bb-video-placeholder p strong{color:#555;}
+
+/* ── FOOTER SPACER ── */
+.page-footer{height:3rem;}
+
+@media(max-width:600px){
+  .page-body{padding:1rem;}
+  .bb-acc-head{padding:0.85rem 1rem;}
+  .bb-acc-body{padding:0 1rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <button class="btn-back" onclick="window.location.href='index.html'">← Portal Home</button>
+  <h2>⏱️ BusyBusy Instructions</h2>
+</div>
+
+<div class="page-body">
+
+  <!-- INTRO -->
+  <div class="bb-intro">
+    <div class="bb-intro-icon">📱</div>
+    <p><strong>BusyBusy is how Bella Terra tracks your time.</strong> All hours must be submitted by <strong>8:00 AM Monday</strong>. Use the guides below to clock in, clock out, take breaks, switch jobs, and fix any mistakes. If you have questions after reviewing these instructions, contact Emily.</p>
+  </div>
+
+  <!-- ════════════════════════════
+       SECTION 1: CLOCKING IN & OUT
+  ════════════════════════════ -->
+  <div class="bb-section-heading">
+    <h4>🟢 Clocking In &amp; Out</h4>
+    <div class="bb-sh-line"></div>
+  </div>
+
+  <!-- 1. HOW TO CLOCK IN -->
+  <div class="bb-accordion" id="bb-1">
+    <div class="bb-acc-head" onclick="bbToggle('bb-1')">
+      <div class="bb-acc-num">1</div>
+      <div class="bb-acc-title">How to Clock In</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Open BusyBusy and make sure you are on your <strong>Dashboard</strong>.</li>
+        <li><span class="bb-step-num">2</span>Press the <strong>Clock In</strong> button.</li>
+        <li><span class="bb-step-num">3</span>Choose your <strong>Project</strong> from the list.</li>
+        <li><span class="bb-step-num">4</span>Choose your <strong>Cost Code</strong>.</li>
+        <li><span class="bb-step-num">5</span>Check that the <strong>wage</strong> shown is correct:
+          <ul>
+            <li>Government job → <strong>Prevailing Wage</strong> (unless it's a maintenance job)</li>
+            <li>Residential job → <strong>Base Wage</strong></li>
+          </ul>
+        </li>
+        <li><span class="bb-step-num">6</span>If your jobsite is not listed or you are unsure what job you're on, press <strong>140</strong> and add detailed notes — what you did, your address, and any other key details.</li>
+        <li><span class="bb-step-num">7</span>Press <strong>Done</strong> — the clock will start running.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: How to Clock In</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. HOW TO CLOCK OUT -->
+  <div class="bb-accordion" id="bb-2">
+    <div class="bb-acc-head" onclick="bbToggle('bb-2')">
+      <div class="bb-acc-num">2</div>
+      <div class="bb-acc-title">How to Clock Out</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Open BusyBusy and press the <strong>red Clock Out</strong> button.</li>
+        <li><span class="bb-step-num">2</span>Answer the <strong>"Were you hurt?"</strong> prompt.</li>
+        <li><span class="bb-step-num">3</span>Confirm whether your timecard is correct:
+          <ul>
+            <li><strong>Yes, it's correct</strong> → press Yes and continue.</li>
+            <li><strong>No, it's not correct</strong> (e.g. forgot to clock out earlier) → press No, add the correct details in the notes, then text or email Emily with what needs to be fixed. You can also fix it yourself — see the Fix Timecards section below.</li>
+          </ul>
+        </li>
+        <li><span class="bb-step-num">4</span>Press <strong>Submit</strong> in the top-right corner. You're all clocked out.</li>
+      </ol>
+      <div class="bb-note info">
+        <div class="bb-note-icon">📅</div>
+        <div><strong>All hours must be submitted by 8:00 AM Monday.</strong> To submit: review your hours and sign your timecard. If you miss the deadline, contact Emily with your corrections and update BusyBusy accordingly.</div>
+      </div>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: How to Clock Out</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       SECTION 2: BREAKS & SWITCHING
+  ════════════════════════════ -->
+  <div class="bb-section-heading">
+    <h4>☕ Breaks &amp; Switching Jobs</h4>
+    <div class="bb-sh-line"></div>
+  </div>
+
+  <!-- 3. HOW TO TAKE A BREAK -->
+  <div class="bb-accordion" id="bb-3">
+    <div class="bb-acc-head" onclick="bbToggle('bb-3')">
+      <div class="bb-acc-num">3</div>
+      <div class="bb-acc-title">How to Take a Break</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>While clocked in, you will see a <strong>Take a Break</strong> button — press it.</li>
+        <li><span class="bb-step-num">2</span>Your job will stay logged during the break, and a <strong>break timer</strong> will run.</li>
+        <li><span class="bb-step-num">3</span>When you are done with your break, press the <strong>End Break</strong> button.</li>
+        <li><span class="bb-step-num">4</span>Your original job clock resumes automatically.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: How to Take a Break</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. HOW TO SWITCH JOBS -->
+  <div class="bb-accordion" id="bb-4">
+    <div class="bb-acc-head" onclick="bbToggle('bb-4')">
+      <div class="bb-acc-num">4</div>
+      <div class="bb-acc-title">How to Switch Jobs</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>While clocked in, press the <strong>Switch Jobs</strong> button.</li>
+        <li><span class="bb-step-num">2</span>Select the new <strong>project</strong> and <strong>cost code</strong>.</li>
+        <li><span class="bb-step-num">3</span>Press Done — your time will immediately start logging under the new job.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: How to Switch Jobs</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════
+       SECTION 3: FIXING TIMECARDS
+  ════════════════════════════ -->
+  <div class="bb-section-heading">
+    <h4>🛠️ Fixing Timecards</h4>
+    <div class="bb-sh-line"></div>
+  </div>
+
+  <div class="bb-note alert" style="margin-bottom:1rem;">
+    <div class="bb-note-icon">⚠️</div>
+    <div>IF YOU MAKE ADJUSTMENTS AFTER SUBMITTING YOUR TIME (AFTER MONDAY @ 8:00 AM) YOU MUST NOTIFY EMILY — email, text, or a sticky note. If you don't, your time will not be corrected and you will not be paid accurately.</div>
+  </div>
+
+  <!-- 5. FORGOT TO CLOCK OUT -->
+  <div class="bb-accordion" id="bb-5">
+    <div class="bb-acc-head" onclick="bbToggle('bb-5')">
+      <div class="bb-acc-num">5</div>
+      <div class="bb-acc-title">Forgot to Clock Out</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Open the app to the <strong>Clock screen</strong>.</li>
+        <li><span class="bb-step-num">2</span>Press the red <strong>Clock Out</strong> button.</li>
+        <li><span class="bb-step-num">3</span>Answer the "Were you hurt?" prompt.</li>
+        <li><span class="bb-step-num">4</span>Press <strong>No, it was not correct</strong> and type in what happened — for example: <em>"Forgot to clock out, should have been 4:30 PM."</em></li>
+        <li><span class="bb-step-num">5</span>Press <strong>Submit</strong>.</li>
+        <li><span class="bb-step-num">6</span>Go to your <strong>Entries</strong> for that day.</li>
+        <li><span class="bb-step-num">7</span>Press the <strong>✏️ pencil icon</strong> to edit the entry.</li>
+        <li><span class="bb-step-num">8</span>Change the end time to what it should have been and save.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: Forgot to Clock Out</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. FORGOT TO CLOCK IN -->
+  <div class="bb-accordion" id="bb-6">
+    <div class="bb-acc-head" onclick="bbToggle('bb-6')">
+      <div class="bb-acc-num">6</div>
+      <div class="bb-acc-title">Forgot to Clock In</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Open BusyBusy and press <strong>Clock In</strong>, selecting the job as normal.</li>
+        <li><span class="bb-step-num">2</span>Once you press OK and the clock starts, go to your <strong>Entries</strong>.</li>
+        <li><span class="bb-step-num">3</span>Press on the current entry.</li>
+        <li><span class="bb-step-num">4</span>Press the <strong>✏️ pencil icon</strong>.</li>
+        <li><span class="bb-step-num">5</span>Update the <strong>start time</strong> to when you actually began work.</li>
+        <li><span class="bb-step-num">6</span>Save.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: Forgot to Clock In</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. ADJUST A PAST ENTRY -->
+  <div class="bb-accordion" id="bb-7">
+    <div class="bb-acc-head" onclick="bbToggle('bb-7')">
+      <div class="bb-acc-num">7</div>
+      <div class="bb-acc-title">Adjust Time on a Past Entry</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Press the <strong>Entries</strong> tab.</li>
+        <li><span class="bb-step-num">2</span>Select the <strong>day</strong> you need to edit.</li>
+        <li><span class="bb-step-num">3</span>Press the <strong>✏️ pencil icon</strong>.</li>
+        <li><span class="bb-step-num">4</span>Adjust the time to be correct.</li>
+        <li><span class="bb-step-num">5</span>Press <strong>Submit</strong>.</li>
+      </ol>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: Adjust a Past Entry</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. ADD A MISSING DAY -->
+  <div class="bb-accordion" id="bb-8">
+    <div class="bb-acc-head" onclick="bbToggle('bb-8')">
+      <div class="bb-acc-num">8</div>
+      <div class="bb-acc-title">Add a Missing Day or Missing Time</div>
+      <div class="bb-acc-arrow">▼</div>
+    </div>
+    <div class="bb-acc-body">
+      <ol class="bb-steps">
+        <li><span class="bb-step-num">1</span>Press the <strong>Timecards</strong> button at the bottom of the screen.</li>
+        <li><span class="bb-step-num">2</span>At the top, press the <strong>+ next to the word "Time Card"</strong>.</li>
+        <li><span class="bb-step-num">3</span>Fill in all applicable information as you normally would when clocking in.</li>
+        <li><span class="bb-step-num">4</span>Press <strong>Submit</strong>.</li>
+      </ol>
+      <div class="bb-note warn">
+        <div class="bb-note-icon">📌</div>
+        <div>Making this correction after Monday 8:00 AM? Don't forget to notify Emily so she knows what changed.</div>
+      </div>
+      <div class="bb-video-placeholder">
+        <div class="bb-vp-icon">🎬</div>
+        <p><strong>Video: Add a Missing Day or Time</strong><br>Coming soon — video walkthrough will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer"></div>
+</div><!-- /page-body -->
+
+<script>
+function bbToggle(id) {
+  var acc = document.getElementById(id);
+  if (!acc) return;
+  var wasOpen = acc.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.bb-accordion').forEach(function(el) {
+    el.classList.remove('open');
+  });
+  // Open clicked one if it was closed
+  if (!wasOpen) acc.classList.add('open');
+}
+</script>
+</body>
+</html>
