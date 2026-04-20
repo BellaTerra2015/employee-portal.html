@@ -162,6 +162,7 @@ var _project      = null;
 var _herbLogs     = [];
 var _plantRows    = [];
 var _hydroRows    = [];
+var _barkRows     = [];
 var _shipRows     = [];
 var _currentUser  = localStorage.getItem('bt_employee_name')  || '';
 var _userEmail    = localStorage.getItem('bt_employee_email') || '';
@@ -267,6 +268,9 @@ function buildTabsAndPanels(p) {
     }
   }
 
+  // Always add Plans tab (before Job Complete)
+  panels.push({ scope:'Plans', cfg:{ icon:'📋', label:'Plans', panel:'plans' } });
+
   // Always add Job Complete last
   panels.push({ scope:'Complete', cfg:{ icon:'✅', label:'Job Complete', panel:'complete', danger:true } });
 
@@ -300,6 +304,8 @@ function showTab(panelId, btn) {
   var panel = document.getElementById('panel-' + panelId);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
+  // Lazy-load plans when that tab is first opened
+  if (panelId === 'plans') loadProjectPlans();
 }
 
 function initDate() {
@@ -323,6 +329,7 @@ function buildPanelContent(panelId, scopeName) {
     case 'maintenance':  return buildMaintenancePanel();
     case 'safety':       return buildSafetyPanel();
     case 'herbicide':    return buildHerbicidePanel();
+    case 'plans':        return buildPlansPanel();
     case 'complete':     return buildCompletePanel();
     default:             return buildPlaceholderPanel(scopeName);
   }
@@ -366,22 +373,28 @@ function buildPlantingPanel() {
 
 // ── CAD BARK ──────────────────────────────────────────────────
 function buildBarkPanel() {
-  return '<div class="card"><h4>🌬️ CAD Bark Daily Report</h4>' +
+  return '<div class="card"><h4>🌬️ CAD / Bark Blowing Daily Report</h4>' +
     '<div class="g2"><div class="f"><label>Date</label><input type="date" id="bark-date"></div>' +
     '<div class="f"><label>Crew Lead</label><input type="text" id="bark-lead" readonly></div></div>' +
-    '<div class="f"><label>Crew Members on Site</label><input type="text" id="bark-crew" placeholder="Comma-separated names"></div>' +
-    '<div class="g2"><div class="f"><label>Hours on Site</label><input type="number" id="bark-hours" min="0" step="0.5" placeholder="0"></div>' +
-    '<div class="f"><label>Cubic Yards Placed</label><input type="number" id="bark-yds" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="g2"><div class="f"><label>Crew Members on Site</label><input type="text" id="bark-crew" placeholder="Comma-separated names"></div>' +
+    '<div class="f"><label>Hours on Site</label><input type="number" id="bark-hours" min="0" step="0.5" placeholder="0"></div></div>' +
+
+    '<h4 style="font-size:.85rem;color:var(--blue-dark);margin:.75rem 0 .4rem;font-family:inherit;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Product Loads</h4>' +
+    '<div class="alert-amber" style="margin-bottom:.6rem;">Add one row per product type applied. Example: CAD Rock 45 yds, then Wood Chips 30 yds.</div>' +
+    '<div id="bark-rows"></div>' +
+    '<button class="btn-add-row" onclick="addBarkRow()">+ Add Product Load</button>' +
+
     '<div class="f"><label>Plan Sections Worked</label>' +
     '<div style="display:flex;gap:.5rem;align-items:center;">' +
     '<input type="text" id="bark-sec-input" placeholder="e.g. B1, W3, Upland Restoration" style="flex:1;">' +
     '<button onclick="addSecTag()" style="background:var(--green-dark);color:#fff;border:none;border-radius:7px;padding:.55rem 1rem;font-size:.85rem;font-weight:600;cursor:pointer;white-space:nowrap;">+ Add</button></div>' +
     '<div class="tags-wrap" id="bark-sec-tags"></div></div>' +
-    '<div class="f"><label class="gold">⚠ Field Changes / Notes</label>' +
-    '<textarea id="bark-changes" class="gold-bg" placeholder="Spacing changes, overages moved between sections, inspector notes…"></textarea></div>' +
-    '<div class="f"><label>General Notes</label><textarea id="bark-notes" placeholder="General observations, conditions, issues…"></textarea></div>' +
-    '<button class="btn-submit" onclick="submitReport(\'bark\',this)">📤 Submit Bark Report</button>' +
-    '<div class="ok-msg" id="bark-ok">✅ Report submitted successfully.</div></div>';
+
+    '<div class="f"><label class="gold">⚠ Field Changes / Deviations</label>' +
+    '<textarea id="bark-changes" class="gold-bg" placeholder="Product substitutions, GC direction, areas skipped, inspector notes…"></textarea></div>' +
+    '<div class="f"><label>General Notes</label><textarea id="bark-notes" placeholder="Equipment issues, access problems, weather, conditions…"></textarea></div>' +
+    '<button class="btn-submit" data-label="📤 Submit CAD/Bark Report" onclick="submitReport(\'bark\',this)">📤 Submit CAD/Bark Report</button>' +
+    '<div class="ok-msg" id="bark-ok">✅ Report submitted — Rena and Brydon have been notified.</div></div>';
 }
 
 // ── DELIVERY LOG ──────────────────────────────────────────────
@@ -658,6 +671,76 @@ function buildCompletePanel() {
     '<div class="ok-msg" id="complete-ok">✅ Job marked complete. Returning to board…</div></div>';
 }
 
+// ── PLANS ─────────────────────────────────────────────────────
+function buildPlansPanel() {
+  return '<div class="card"><h4>📋 Project Plans</h4>' +
+    '<p style="font-size:.85rem;color:var(--gray-mid);margin-bottom:1rem;">Plans are organized by scope. Tap a file to open it. Contact Rena if a plan is missing.</p>' +
+    '<div id="plans-loading" style="text-align:center;padding:2rem;color:var(--gray-mid);font-size:.9rem;">Loading plans…</div>' +
+    '<div id="plans-content" style="display:none;"></div>' +
+    '</div>';
+}
+
+function loadProjectPlans() {
+  var container = document.getElementById('plans-content');
+  var loading   = document.getElementById('plans-loading');
+  if (!container || !_project) return;
+
+  fetch(SCRIPT_URL + '?action=projectPlans&id=' + encodeURIComponent(_project.podioItemId))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      loading.style.display = 'none';
+      container.style.display = 'block';
+
+      if (!data.success || !data.scopes || data.scopes.length === 0) {
+        container.innerHTML =
+          '<div class="alert-amber">No plans on file yet for this project.<br>' +
+          'Ask Rena to add the Google Drive folder link to the project record.</div>' +
+          (data.folderUrl
+            ? '<a href="' + esc(data.folderUrl) + '" target="_blank" ' +
+              'style="display:inline-block;margin-top:.5rem;padding:.5rem 1rem;background:var(--green-dark);color:#fff;border-radius:6px;text-decoration:none;font-size:.85rem;">📂 Open Project Folder</a>'
+            : '');
+        return;
+      }
+
+      var html = '';
+      if (data.folderUrl) {
+        html += '<a href="' + esc(data.folderUrl) + '" target="_blank" ' +
+          'style="display:inline-block;margin-bottom:1rem;padding:.4rem .85rem;' +
+          'background:#f0f4ee;border:1px solid var(--border);border-radius:6px;' +
+          'text-decoration:none;font-size:.82rem;color:var(--green-dark);">📂 Open Full Project Folder</a>';
+      }
+
+      data.scopes.forEach(function(scope) {
+        html += '<div style="margin-bottom:1rem;">';
+        html += '<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-dark);margin-bottom:.4rem;">' +
+                esc(scope.label) + '</div>';
+
+        if (!scope.files || scope.files.length === 0) {
+          html += '<div style="font-size:.82rem;color:var(--gray-mid);padding:.4rem .5rem;">No files in this section</div>';
+        } else {
+          scope.files.forEach(function(f) {
+            var icon = f.mimeType && f.mimeType.indexOf('pdf') !== -1 ? '📄' :
+                       f.mimeType && f.mimeType.indexOf('image') !== -1 ? '🖼️' : '📁';
+            html += '<a href="' + esc(f.url) + '" target="_blank" ' +
+              'style="display:flex;align-items:center;gap:.5rem;padding:.55rem .75rem;' +
+              'background:#f8f9f5;border:1px solid var(--border);border-radius:7px;' +
+              'margin-bottom:.35rem;text-decoration:none;color:var(--text);font-size:.88rem;">' +
+              icon + ' <span style="flex:1;">' + esc(f.name) + '</span>' +
+              '<span style="font-size:.72rem;color:var(--gray-mid);">Open ›</span></a>';
+          });
+        }
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    })
+    .catch(function() {
+      loading.style.display = 'none';
+      container.style.display = 'block';
+      container.innerHTML = '<div class="alert-amber">Could not load plans. Check your connection and try again.</div>';
+    });
+}
+
 // ── PLACEHOLDER ───────────────────────────────────────────────
 function buildPlaceholderPanel(scopeName) {
   var msgs = {
@@ -682,6 +765,38 @@ function addHydroRow() {
     '<div class="g2"><div class="f"><label>Mulch Rate (lbs/acre)</label><input type="text" id="hydro-mulch-'+idx+'" placeholder="e.g. 2000"></div>' +
     '<div class="f"><label>Seed Rate (lbs/acre)</label><input type="text" id="hydro-seed-'+idx+'" placeholder="e.g. 40"></div></div>';
   document.getElementById('hydro-rows').appendChild(div);
+}
+
+function addBarkRow() {
+  var idx = _barkRows.length;
+  _barkRows.push({});
+  var div = document.createElement('div');
+  div.className = 'row-card';
+  div.id = 'bark-row-' + idx;
+  div.innerHTML =
+    '<button class="btn-remove" onclick="removeRow(\'bark\','+idx+')">×</button>' +
+    '<div class="g2"><div class="f"><label>Product Type</label>' +
+    '<select id="bark-prod-'+idx+'">' +
+    '<option value="">— Select product —</option>' +
+    '<option value="CAD Rock">CAD Rock</option>' +
+    '<option value="Wood Chips">Wood Chips</option>' +
+    '<option value="Bark">Bark</option>' +
+    '<option value="Compost">Compost</option>' +
+    '<option value="Other">Other (specify in notes)</option>' +
+    '</select></div>' +
+    '<div class="f"><label>Cubic Yards This Load</label>' +
+    '<input type="number" id="bark-yds-'+idx+'" min="0" step="0.5" placeholder="0" oninput="updateBarkTotal()"></div></div>';
+  document.getElementById('bark-rows').appendChild(div);
+}
+
+function updateBarkTotal() {
+  // Show running total in a summary line if it exists
+  var total = 0;
+  document.querySelectorAll('[id^="bark-yds-"]').forEach(function(el){
+    total += parseFloat(el.value) || 0;
+  });
+  var t = document.getElementById('bark-total-display');
+  if (t) t.textContent = 'Total: ' + total.toFixed(1) + ' yds';
 }
 
 function addPlantRow() {
@@ -773,14 +888,15 @@ function submitReport(type, btn) {
       data.plantRows   = collectRows('plant', ['sp','qty','sec','note']);
       break;
     case 'bark':
-      data.date        = v('bark-date');
-      data.crewLead    = v('bark-lead');
-      data.crew        = v('bark-crew');
-      data.hours       = v('bark-hours');
-      data.cubicYards  = v('bark-yds');
-      data.sections    = Array.from(document.querySelectorAll('#bark-sec-tags .sec-tag')).map(function(t){ return t.textContent.replace('×','').trim(); });
-      data.fieldChanges= v('bark-changes');
-      data.notes       = v('bark-notes');
+      data.date         = v('bark-date');
+      data.crewLead     = v('bark-lead');
+      data.crew         = v('bark-crew');
+      data.hours        = v('bark-hours');
+      data.productLoads = collectRows('bark', ['prod','yds']);
+      data.totalYards   = data.productLoads.reduce(function(s,r){ return s + (parseFloat(r.yds) || 0); }, 0).toFixed(1);
+      data.sections     = Array.from(document.querySelectorAll('#bark-sec-tags .sec-tag')).map(function(t){ return t.textContent.replace('×','').trim(); });
+      data.fieldChanges = v('bark-changes');
+      data.notes        = v('bark-notes');
       break;
     case 'delivery':
       data.date        = v('ship-date');
