@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Estimator — Bella Terra LLC</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil: #2C2416;
+    --bark: #5C3D1E;
+    --bark-light: #7A5230;
+    --moss: #4A6741;
+    --moss-light: #5C8252;
+    --sage: #7A9970;
+    --straw: #D4B896;
+    --straw-light: #E8D5B8;
+    --gold: #C9893A;
+    --gold-light: #E0A050;
+    --cream: #F5EFE4;
+    --cream-dark: #EDE4D5;
+    --white: #FDFAF6;
+    --red: #C0392B;
+    --red-light: #E74C3C;
+    --shadow: rgba(44,36,22,0.15);
+    --shadow-deep: rgba(44,36,22,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--soil);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--soil) 0%, var(--bark) 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px var(--shadow-deep);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--soil);
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--straw-light);
+    letter-spacing: 0.02em;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--sage);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    background: var(--moss);
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    background: var(--bark);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(212,184,150,0.15);
+  }
+
+  .progress-step {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sage);
+    border-bottom: 3px solid transparent;
+    cursor: default;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .progress-step.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .progress-step.complete {
+    color: var(--moss-light);
+    border-bottom-color: var(--moss);
+  }
+
+  .step-num {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    background: currentColor;
+    color: var(--soil);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    background: linear-gradient(135deg, rgba(92,61,30,0.3) 0%, rgba(44,36,22,0.5) 100%);
+    border: 1px solid rgba(212,184,150,0.2);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(4px);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(212,184,150,0.15);
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--straw-light);
+  }
+
+  .section-desc {
+    font-size: 12px;
+    color: var(--sage);
+    margin-top: 2px;
+  }
+
+  /* ── FORM GRID ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-grid.three-col {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .form-grid.full {
+    grid-template-columns: 1fr;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.span2 { grid-column: span 2; }
+  .field.span3 { grid-column: span 3; }
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--straw);
+  }
+
+  label .required {
+    color: var(--gold);
+    margin-left: 2px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    background: rgba(44,36,22,0.6);
+    border: 1px solid rgba(212,184,150,0.25);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    background: rgba(44,36,22,0.8);
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(212,184,150,0.35);
+  }
+
+  select option {
+    background: var(--bark);
+    color: var(--cream);
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* ── JOB TYPE TOGGLE ── */
+  .type-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .type-btn {
+    border: 2px solid rgba(212,184,150,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(44,36,22,0.4);
+    text-align: left;
+  }
+
+  .type-btn:hover {
+    border-color: var(--gold);
+    background: rgba(201,137,58,0.1);
+  }
+
+  .type-btn.selected {
+    border-color: var(--gold);
+    background: rgba(201,137,58,0.15);
+  }
+
+  .type-btn.selected.gov {
+    border-color: var(--moss-light);
+    background: rgba(74,103,65,0.2);
+  }
+
+  .type-btn-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--straw-light);
+    margin-bottom: 3px;
+  }
+
+  .type-btn-desc {
+    font-size: 11px;
+    color: var(--sage);
+  }
+
+  .type-btn-icon { font-size: 20px; margin-bottom: 6px; }
+
+  /* ── SCOPE CHECKBOXES ── */
+  .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .scope-item {
+    border: 1px solid rgba(212,184,150,0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(44,36,22,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+
+  .scope-item:hover {
+    border-color: rgba(201,137,58,0.5);
+    background: rgba(201,137,58,0.08);
+  }
+
+  .scope-item.checked {
+    border-color: var(--gold);
+    background: rgba(201,137,58,0.12);
+  }
+
+  .scope-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(212,184,150,0.3);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 11px;
+  }
+
+  .scope-item.checked .scope-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--soil);
+  }
+
+  .scope-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--straw-light);
+  }
+
+  .scope-unit {
+    font-size: 11px;
+    color: var(--sage);
+    margin-top: 1px;
+  }
+
+  /* ── SITE CONDITIONS ── */
+  .conditions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .condition-item {
+    border: 1px solid rgba(212,184,150,0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(44,36,22,0.3);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    user-select: none;
+  }
+
+  .condition-item:hover { border-color: rgba(201,137,58,0.4); }
+
+  .condition-item.checked {
+    border-color: var(--gold);
+    background: rgba(201,137,58,0.1);
+  }
+
+  .condition-item.checked.warning {
+    border-color: var(--red-light);
+    background: rgba(192,57,43,0.1);
+  }
+
+  .condition-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(212,184,150,0.3);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 11px;
+  }
+
+  .condition-item.checked .condition-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--soil);
+  }
+
+  .condition-item.checked.warning .condition-check {
+    background: var(--red-light);
+    border-color: var(--red-light);
+  }
+
+  .condition-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--straw-light);
+  }
+
+  .condition-sub {
+    font-size: 11px;
+    color: var(--sage);
+    margin-top: 2px;
+  }
+
+  /* ── MARKUP ENGINE ── */
+  .markup-engine {
+    background: rgba(44,36,22,0.5);
+    border: 1px solid rgba(201,137,58,0.3);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .markup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(212,184,150,0.08);
+    font-size: 13px;
+  }
+
+  .markup-row:last-child { border-bottom: none; }
+
+  .markup-label { color: var(--straw); }
+  .markup-label.base { font-weight: 600; }
+
+  .markup-adder {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+
+  .markup-adder.active {
+    background: rgba(201,137,58,0.2);
+    color: var(--gold-light);
+  }
+
+  .markup-adder.inactive {
+    background: rgba(212,184,150,0.06);
+    color: rgba(212,184,150,0.3);
+  }
+
+  .markup-adder.warning {
+    background: rgba(192,57,43,0.2);
+    color: var(--red-light);
+  }
+
+  .markup-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 2px solid rgba(201,137,58,0.3);
+  }
+
+  .markup-total-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--straw-light);
+  }
+
+  .markup-total-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .markup-override {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(74,103,65,0.15);
+    border: 1px solid rgba(74,103,65,0.3);
+    border-radius: 8px;
+  }
+
+  .markup-override label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sage);
+    white-space: nowrap;
+  }
+
+  .markup-override input {
+    width: 90px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--gold);
+    border-color: rgba(74,103,65,0.4);
+  }
+
+  .markup-override-note {
+    font-size: 11px;
+    color: var(--sage);
+    flex: 1;
+  }
+
+  /* ── WAGE PANEL ── */
+  .wage-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .wage-card {
+    background: rgba(44,36,22,0.4);
+    border: 1px solid rgba(212,184,150,0.15);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .wage-card.active {
+    border-color: var(--gold);
+    background: rgba(201,137,58,0.08);
+  }
+
+  .wage-card.gov-active {
+    border-color: var(--moss-light);
+    background: rgba(74,103,65,0.15);
+  }
+
+  .wage-type {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .wage-type .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+  }
+
+  .wage-card.active .wage-type .dot { background: var(--gold); }
+  .wage-card.gov-active .wage-type .dot { background: var(--moss-light); }
+
+  .wage-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(212,184,150,0.06);
+  }
+
+  .wage-line:last-child { border-bottom: none; }
+  .wage-line-label { color: var(--sage); }
+  .wage-line-value { font-weight: 600; color: var(--straw-light); }
+
+  /* ── GO/NOGO BANNER ── */
+  .gonogo-banner {
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .gonogo-banner.go {
+    background: rgba(74,103,65,0.2);
+    border: 1px solid var(--moss-light);
+    display: flex;
+  }
+
+  .gonogo-banner.nogo {
+    background: rgba(192,57,43,0.15);
+    border: 1px solid var(--red-light);
+    display: flex;
+  }
+
+  .gonogo-banner.review {
+    background: rgba(201,137,58,0.12);
+    border: 1px solid var(--gold);
+    display: flex;
+  }
+
+  .gonogo-icon { font-size: 24px; flex-shrink: 0; }
+
+  .gonogo-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .gonogo-banner.go .gonogo-title { color: var(--moss-light); }
+  .gonogo-banner.nogo .gonogo-title { color: var(--red-light); }
+  .gonogo-banner.review .gonogo-title { color: var(--gold); }
+
+  .gonogo-reasons { font-size: 12px; color: var(--sage); }
+  .gonogo-reasons li { margin-top: 3px; margin-left: 14px; }
+
+  /* ── MIN BID NOTICE ── */
+  .min-bid-notice {
+    background: rgba(74,103,65,0.15);
+    border: 1px solid rgba(74,103,65,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--sage);
+    margin-top: 12px;
+    display: none;
+  }
+
+  .min-bid-notice.show { display: block; }
+  .min-bid-notice strong { color: var(--moss-light); }
+
+  /* ── APPROVAL SECTION ── */
+  .approval-section {
+    background: rgba(74,103,65,0.1);
+    border: 1px solid rgba(74,103,65,0.25);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .approval-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sage);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .approver-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .approver-btn {
+    border: 1px solid rgba(212,184,150,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(44,36,22,0.4);
+    text-align: center;
+    user-select: none;
+  }
+
+  .approver-btn:hover { border-color: var(--moss-light); }
+
+  .approver-btn.selected {
+    border-color: var(--moss-light);
+    background: rgba(74,103,65,0.2);
+  }
+
+  .approver-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--straw-light);
+  }
+
+  .approver-role {
+    font-size: 11px;
+    color: var(--sage);
+    margin-top: 2px;
+  }
+
+  /* ── PROCEED BUTTON ── */
+  .proceed-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--bark-light) 100%);
+    color: var(--soil);
+    border: none;
+    border-radius: 10px;
+    padding: 16px 24px;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 24px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .proceed-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(201,137,58,0.35);
+  }
+
+  .proceed-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: rgba(212,184,150,0.1);
+    margin: 20px 0;
+  }
+
+  /* ── HELPER TEXT ── */
+  .helper {
+    font-size: 11px;
+    color: var(--sage);
+    margin-top: 4px;
+  }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tag.gov { background: rgba(74,103,65,0.3); color: var(--moss-light); }
+  .tag.comm { background: rgba(201,137,58,0.2); color: var(--gold); }
+  .tag.pending { background: rgba(201,137,58,0.15); color: var(--gold); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .form-grid, .form-grid.three-col { grid-template-columns: 1fr; }
+    .field.span2, .field.span3 { grid-column: span 1; }
+    .scope-grid { grid-template-columns: 1fr 1fr; }
+    .wage-panel, .conditions-grid, .approver-grid { grid-template-columns: 1fr; }
+    .type-toggle { grid-template-columns: 1fr; }
+    .progress-step { font-size: 9px; padding: 10px 6px; }
+    .header { padding: 14px 16px; }
+    .main { padding: 20px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">BT</div>
+    <div>
+      <div class="header-title">Plan Estimator</div>
+      <div class="header-sub">Bella Terra LLC · Commercial & Government Bids</div>
+    </div>
+  </div>
+  <div class="header-badge">Phase 1 · Intake</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-step active" id="step1"><span class="step-num">1</span>Job Intake</div>
+  <div class="progress-step" id="step2"><span class="step-num">2</span>Plan Screener</div>
+  <div class="progress-step" id="step3"><span class="step-num">3</span>Takeoff</div>
+  <div class="progress-step" id="step4"><span class="step-num">4</span>Estimate</div>
+  <div class="progress-step" id="step5"><span class="step-num">5</span>Output</div>
+</div>
+
+<div class="main">
+
+  <!-- GO/NO-GO BANNER (dynamic) -->
+  <div class="gonogo-banner" id="goNogoBanner">
+    <div class="gonogo-icon" id="goNogoIcon">⚠️</div>
+    <div>
+      <div class="gonogo-title" id="goNogoTitle">Reviewing job criteria…</div>
+      <ul class="gonogo-reasons" id="goNogoReasons"></ul>
+    </div>
+  </div>
+
+  <!-- SECTION 1: JOB INFO -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div>
+        <div class="section-title">Job Information</div>
+        <div class="section-desc">Project details, bidding agency, and key dates</div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="field span2">
+        <label>Job Name <span class="required">*</span></label>
+        <input type="text" id="jobName" placeholder="Complete project / bid name" oninput="updateGoNogo()">
+      </div>
+      <div class="field">
+        <label>Job Number</label>
+        <input type="text" id="jobNumber" placeholder="Bid / project number if available">
+      </div>
+      <div class="field">
+        <label>Bidding Agency / Company <span class="required">*</span></label>
+        <input type="text" id="biddingAgency" placeholder="Agency or prime contractor name" oninput="updateGoNogo()">
+      </div>
+      <div class="field">
+        <label>Jobsite Address <span class="required">*</span></label>
+        <input type="text" id="jobAddress" placeholder="Street address" oninput="updateGoNogo()">
+      </div>
+      <div class="field">
+        <label>City <span class="required">*</span></label>
+        <input type="text" id="jobCity" placeholder="City" oninput="updateGoNogo()">
+      </div>
+      <div class="field">
+        <label>County</label>
+        <input type="text" id="jobCounty" placeholder="County project site is in">
+      </div>
+      <div class="field">
+        <label>Zip Code</label>
+        <input type="text" id="jobZip" placeholder="Zip (for sales tax)">
+      </div>
+      <div class="field">
+        <label>Bid Due to Agency</label>
+        <input type="date" id="bidDueAgency">
+      </div>
+      <div class="field">
+        <label>Bid Due to Prime</label>
+        <input type="date" id="bidDuePrime">
+      </div>
+      <div class="field">
+        <label>Questions Due</label>
+        <input type="date" id="questionsDue">
+      </div>
+      <div class="field">
+        <label>Anticipated NTP</label>
+        <input type="date" id="ntpDate">
+      </div>
+      <div class="field">
+        <label>Substantial Completion</label>
+        <input type="date" id="completionDate">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Prime Contractor</label>
+        <input type="text" id="primeContractor" placeholder="Prime contractor name">
+      </div>
+      <div class="field">
+        <label>Prime Contact</label>
+        <input type="text" id="primeContact" placeholder="Contact person">
+      </div>
+      <div class="field">
+        <label>Prime Phone</label>
+        <input type="text" id="primePhone" placeholder="Phone number">
+      </div>
+      <div class="field">
+        <label>Prime Email</label>
+        <input type="text" id="primeEmail" placeholder="Email address">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: JOB TYPE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🏛️</div>
+      <div>
+        <div class="section-title">Job Type</div>
+        <div class="section-desc">Determines wage rates, minimum bid floors, and certified payroll requirements</div>
+      </div>
+    </div>
+
+    <div class="type-toggle">
+      <div class="type-btn selected" id="typeCommercial" onclick="setJobType('commercial')">
+        <div class="type-btn-icon">🏢</div>
+        <div class="type-btn-label">Commercial</div>
+        <div class="type-btn-desc">Standard wage rates · No certified payroll</div>
+      </div>
+      <div class="type-btn" id="typeGovernment" onclick="setJobType('government')">
+        <div class="type-btn-icon">🏛️</div>
+        <div class="type-btn-label">Government / WSDOT</div>
+        <div class="type-btn-desc">Prevailing wages · Certified payroll · $1,200 min bid</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- WAGE DISPLAY -->
+    <div style="margin-bottom: 10px;">
+      <label>Active Wage Rates</label>
+    </div>
+    <div class="wage-panel">
+      <div class="wage-card active" id="wageCardStd">
+        <div class="wage-type"><div class="dot"></div> Standard Rates</div>
+        <div class="wage-line"><span class="wage-line-label">Planter (base)</span><span class="wage-line-value">$40.00/hr</span></div>
+        <div class="wage-line"><span class="wage-line-label">Planter (burdened)</span><span class="wage-line-value">$44.86/hr</span></div>
+        <div class="wage-line"><span class="wage-line-label">Equipment Op (base)</span><span class="wage-line-value">$60.00/hr</span></div>
+        <div class="wage-line"><span class="wage-line-label">Equipment Op (burdened)</span><span class="wage-line-value">$67.10/hr</span></div>
+        <div class="wage-line"><span class="wage-line-label">CDL Driver (burdened)</span><span class="wage-line-value">$45.31/hr</span></div>
+      </div>
+      <div class="wage-card" id="wageCardGov">
+        <div class="wage-type"><div class="dot"></div> Prevailing Wage Rates</div>
+        <div class="wage-line"><span class="wage-line-label">Planter (prevailing)</span><span class="wage-line-value" id="pwPlanter">— Set from L&I</span></div>
+        <div class="wage-line"><span class="wage-line-label">Equipment Op (prevailing)</span><span class="wage-line-value" id="pwEquipOp">— Set from L&I</span></div>
+        <div class="wage-line"><span class="wage-line-label">CDL Driver (prevailing)</span><span class="wage-line-value" id="pwCDL">— Set from L&I</span></div>
+        <div class="wage-line"><span class="wage-line-label">Certified payroll adder</span><span class="wage-line-value">+5% markup</span></div>
+        <div class="wage-line"><span class="wage-line-label">Min bid floor</span><span class="wage-line-value">$1,200</span></div>
+      </div>
+    </div>
+
+    <div class="min-bid-notice" id="minBidNotice">
+      <strong>⚠️ Government Minimum Bid Floor Active</strong> — Jobs under 6,000 SF and within 1 hour of Woodland, WA will be bid at a minimum of <strong>$1,200</strong> regardless of calculated total.
+    </div>
+
+    <div style="margin-top: 16px;">
+      <div class="field">
+        <label>Prevailing Wage Rates (paste from WA L&I or enter manually)</label>
+        <textarea id="prevailingWageNotes" placeholder="Paste prevailing wage rates here from WA L&I website, or enter: Planter $XX/hr, Equip Op $XX/hr, CDL $XX/hr" oninput="parsePrevailingWage(this.value)"></textarea>
+        <div class="helper">Screenshot should also be saved to the Proof tab in your bid spreadsheet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SCOPE OF WORK -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🌿</div>
+      <div>
+        <div class="section-title">Scope of Work</div>
+        <div class="section-desc">Select all scopes present in this bid. Each triggers its own takeoff and rate logic.</div>
+      </div>
+    </div>
+
+    <div class="scope-grid">
+      <div class="scope-item" id="scope-hydroseed" onclick="toggleScope('hydroseed')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Hydroseeding</div>
+          <div class="scope-unit">Priced per SF · Seed mix A–E</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-planting" onclick="toggleScope('planting')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Plant Installation</div>
+          <div class="scope-unit">Labor + material · By container size</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-bark" onclick="toggleScope('bark')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Bark / Mulch Blowing</div>
+          <div class="scope-unit">Priced per CY · By product type</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-irrigation" onclick="toggleScope('irrigation')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Irrigation</div>
+          <div class="scope-unit">Per zone · Commercial or residential</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-soils" onclick="toggleScope('soils')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Soils / Amendments</div>
+          <div class="scope-unit">Compost, sand, topsoil · Per CY</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-rock" onclick="toggleScope('rock')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Rock / Aggregate</div>
+          <div class="scope-unit">River rock, crush, pea gravel · Per CY</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-prep" onclick="toggleScope('prep')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Site Prep / Grading</div>
+          <div class="scope-unit">Skidsteer, power rake · Per hour</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-maintenance" onclick="toggleScope('maintenance')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Maintenance / PSIPE</div>
+          <div class="scope-unit">WSDOT plant establishment · Per month</div>
+        </div>
+      </div>
+      <div class="scope-item" id="scope-mobilization" onclick="toggleScope('mobilization')">
+        <div class="scope-check">✓</div>
+        <div>
+          <div class="scope-name">Mobilization</div>
+          <div class="scope-unit">Travel + setup · Per mobilization</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: SITE CONDITIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <div>
+        <div class="section-title">Site Conditions</div>
+        <div class="section-desc">These flags drive the markup calculator. Check all that apply.</div>
+      </div>
+    </div>
+
+    <div class="form-grid" style="margin-bottom: 16px;">
+      <div class="field">
+        <label>Estimated Drive Time from Woodland, WA <span class="required">*</span></label>
+        <select id="driveTime" onchange="updateMarkup()">
+          <option value="">— Select —</option>
+          <option value="under30">Under 30 min</option>
+          <option value="30to60">30 min – 1 hour</option>
+          <option value="60to90">1 – 1.5 hours</option>
+          <option value="over90">Over 1.5 hours</option>
+        </select>
+        <div class="helper">Under 1.5 hrs required for hydroseed jobs under 5,000 SF</div>
+      </div>
+      <div class="field">
+        <label>Estimated Hydroseed Area (if applicable)</label>
+        <input type="number" id="hydroseedSF" placeholder="Square feet" oninput="updateMarkup(); updateGoNogo()">
+        <div class="helper">Triggers go/no-go check and markup adder for small jobs</div>
+      </div>
+    </div>
+
+    <div class="conditions-grid">
+      <div class="condition-item" id="cond-cannon" onclick="toggleCondition('cannon')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">🚛 Cannon Application Eligible</div>
+          <div class="condition-sub">Site access allows truck — no hose required</div>
+        </div>
+      </div>
+      <div class="condition-item warning" id="cond-hose" onclick="toggleCondition('hose')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">🚿 Hose Work Required</div>
+          <div class="condition-sub">Adds markup — $105/15 min (gov) or % adder (comm)</div>
+        </div>
+      </div>
+      <div class="condition-item" id="cond-water" onclick="toggleCondition('water')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">💧 Water Fillup Within 4 Miles</div>
+          <div class="condition-sub">No high traffic · Efficient refill cycle</div>
+        </div>
+      </div>
+      <div class="condition-item warning" id="cond-slope" onclick="toggleCondition('slope')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">⛰️ Slope Steeper Than 4H:1V</div>
+          <div class="condition-sub">Higher mulch rate · More time · Adds markup</div>
+        </div>
+      </div>
+      <div class="condition-item warning" id="cond-traffic" onclick="toggleCondition('traffic')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">🚦 High Traffic Route to Water</div>
+          <div class="condition-sub">Affects cannon eligibility for comm jobs</div>
+        </div>
+      </div>
+      <div class="condition-item" id="cond-multiload" onclick="toggleCondition('multiload')">
+        <div class="condition-check">✓</div>
+        <div>
+          <div class="condition-label">🔄 Multi-Load Job (18,001+ SF)</div>
+          <div class="condition-sub">Multiple truck loads required</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <div class="field">
+        <label>Site Notes</label>
+        <textarea id="siteNotes" placeholder="Any access issues, terrain notes, or site-specific conditions Kevin / Rena / Brydon should know about…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: MARKUP ENGINE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-title">Markup Calculator</div>
+        <div class="section-desc">Calculated from site conditions above. Override requires approver sign-off.</div>
+      </div>
+    </div>
+
+    <div class="markup-engine">
+      <div class="markup-row">
+        <span class="markup-label base">Base Markup</span>
+        <span class="markup-adder active">+25%</span>
+      </div>
+      <div class="markup-row" id="mr-smalljob">
+        <span class="markup-label">Small Job (&lt;5,000 SF)</span>
+        <span class="markup-adder inactive" id="ma-smalljob">+0%</span>
+      </div>
+      <div class="markup-row" id="mr-drive">
+        <span class="markup-label">Drive Time Over 1 Hour</span>
+        <span class="markup-adder inactive" id="ma-drive">+0%</span>
+      </div>
+      <div class="markup-row" id="mr-hose">
+        <span class="markup-label">Hose Work Required</span>
+        <span class="markup-adder inactive" id="ma-hose">+0%</span>
+      </div>
+      <div class="markup-row" id="mr-slope">
+        <span class="markup-label">Slope Steeper Than 4H:1V</span>
+        <span class="markup-adder inactive" id="ma-slope">+0%</span>
+      </div>
+      <div class="markup-row" id="mr-gov">
+        <span class="markup-label">Government / Certified Payroll</span>
+        <span class="markup-adder inactive" id="ma-gov">+0%</span>
+      </div>
+      <div class="markup-row" id="mr-multiload">
+        <span class="markup-label">Multi-Load Efficiency Discount</span>
+        <span class="markup-adder inactive" id="ma-multiload">+0%</span>
+      </div>
+
+      <div class="markup-total-row">
+        <span class="markup-total-label">Calculated Markup</span>
+        <span class="markup-total-value" id="totalMarkup">25%</span>
+      </div>
+    </div>
+
+    <!-- OVERRIDE -->
+    <div class="markup-override">
+      <label>Override Markup</label>
+      <input type="number" id="markupOverride" placeholder="25" min="1" max="500" oninput="setOverride(this.value)">
+      <span style="color: var(--sage); font-size: 13px;">%</span>
+      <span class="markup-override-note">Approver must sign off below when overriding calculated markup.</span>
+    </div>
+
+    <!-- APPROVER -->
+    <div class="approval-section">
+      <div class="approval-title">Markup Approved By</div>
+      <div class="approver-grid">
+        <div class="approver-btn" id="approver-kevin" onclick="setApprover('kevin')">
+          <div class="approver-name">Kevin Wilber</div>
+          <div class="approver-role">Bids</div>
+        </div>
+        <div class="approver-btn" id="approver-rena" onclick="setApprover('rena')">
+          <div class="approver-name">Rena</div>
+          <div class="approver-role">Owner / Scheduler</div>
+        </div>
+        <div class="approver-btn" id="approver-brydon" onclick="setApprover('brydon')">
+          <div class="approver-name">Brydon</div>
+          <div class="approver-role">Co-Owner / Field</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCEED BUTTON -->
+  <button class="proceed-btn" id="proceedBtn" onclick="proceedToScreener()" disabled>
+    <span>📄</span>
+    <span>Upload Plans & Run Go/No-Go Screener</span>
+  </button>
+
+</div>
+
+<script>
+  // ── STATE ──
+  const state = {
+    jobType: 'commercial',
+    scopes: new Set(),
+    conditions: new Set(),
+    approver: null,
+    overrideMarkup: null,
+    driveTime: '',
+    hydroseedSF: 0
+  };
+
+  // ── MARKUP ADDER TABLE ──
+  const adders = {
+    smalljob:  { label: 'Small Job (<5,000 SF)',        pct: 75  },
+    drive:     { label: 'Drive Time Over 1 Hour',       pct: 25  },
+    hose:      { label: 'Hose Work Required',           pct: 50  },
+    slope:     { label: 'Slope Steeper Than 4H:1V',     pct: 25  },
+    gov:       { label: 'Government / Certified Payroll', pct: 5  },
+    multiload: { label: 'Multi-Load Efficiency Discount', pct: -5 }
+  };
+
+  // ── JOB TYPE ──
+  function setJobType(type) {
+    state.jobType = type;
+    document.getElementById('typeCommercial').classList.toggle('selected', type === 'commercial');
+    document.getElementById('typeGovernment').classList.toggle('selected', type === 'government');
+    document.getElementById('typeGovernment').classList.toggle('gov', type === 'government');
+    document.getElementById('wageCardStd').classList.toggle('active', type === 'commercial');
+    document.getElementById('wageCardStd').classList.toggle('gov-active', false);
+    document.getElementById('wageCardGov').classList.toggle('gov-active', type === 'government');
+    document.getElementById('wageCardGov').classList.toggle('active', false);
+    document.getElementById('minBidNotice').classList.toggle('show', type === 'government');
+    updateMarkup();
+    updateGoNogo();
+  }
+
+  // ── SCOPE TOGGLE ──
+  function toggleScope(scope) {
+    const el = document.getElementById('scope-' + scope);
+    if (state.scopes.has(scope)) {
+      state.scopes.delete(scope);
+      el.classList.remove('checked');
+    } else {
+      state.scopes.add(scope);
+      el.classList.add('checked');
+    }
+    updateProceedBtn();
+  }
+
+  // ── CONDITION TOGGLE ──
+  function toggleCondition(cond) {
+    const el = document.getElementById('cond-' + cond);
+    if (state.conditions.has(cond)) {
+      state.conditions.delete(cond);
+      el.classList.remove('checked');
+    } else {
+      state.conditions.add(cond);
+      el.classList.add('checked');
+    }
+    // cannon and hose are mutually exclusive
+    if (cond === 'cannon' && state.conditions.has('hose')) {
+      state.conditions.delete('hose');
+      document.getElementById('cond-hose').classList.remove('checked');
+    }
+    if (cond === 'hose' && state.conditions.has('cannon')) {
+      state.conditions.delete('cannon');
+      document.getElementById('cond-cannon').classList.remove('checked');
+    }
+    updateMarkup();
+  }
+
+  // ── MARKUP CALCULATION ──
+  function updateMarkup() {
+    state.driveTime = document.getElementById('driveTime').value;
+    state.hydroseedSF = parseFloat(document.getElementById('hydroseedSF').value) || 0;
+
+    // Determine which adders fire
+    const active = {
+      smalljob:  state.hydroseedSF > 0 && state.hydroseedSF < 5000,
+      drive:     state.driveTime === '60to90' || state.driveTime === 'over90',
+      hose:      state.conditions.has('hose'),
+      slope:     state.conditions.has('slope'),
+      gov:       state.jobType === 'government',
+      multiload: state.conditions.has('multiload')
+    };
+
+    let total = 25;
+    for (const [key, isActive] of Object.entries(active)) {
+      const pct = adders[key].pct;
+      const el = document.getElementById('ma-' + key);
+      if (isActive) {
+        total += pct;
+        el.className = pct < 0 ? 'markup-adder active' : 'markup-adder active';
+        el.style.background = pct < 0 ? 'rgba(74,103,65,0.2)' : 'rgba(201,137,58,0.2)';
+        el.style.color = pct < 0 ? 'var(--moss-light)' : 'var(--gold-light)';
+        el.textContent = (pct > 0 ? '+' : '') + pct + '%';
+      } else {
+        el.className = 'markup-adder inactive';
+        el.style.background = '';
+        el.style.color = '';
+        el.textContent = '+0%';
+      }
+    }
+
+    const display = state.overrideMarkup !== null ? state.overrideMarkup : total;
+    document.getElementById('totalMarkup').textContent = display + '%';
+    if (state.overrideMarkup !== null) {
+      document.getElementById('totalMarkup').style.color = 'var(--moss-light)';
+    } else {
+      document.getElementById('totalMarkup').style.color = 'var(--gold)';
+    }
+
+    updateGoNogo();
+    updateProceedBtn();
+  }
+
+  function setOverride(val) {
+    state.overrideMarkup = val ? parseFloat(val) : null;
+    updateMarkup();
+  }
+
+  // ── APPROVER ──
+  function setApprover(person) {
+    state.approver = person;
+    ['kevin','rena','brydon'].forEach(p => {
+      document.getElementById('approver-' + p).classList.toggle('selected', p === person);
+    });
+    updateProceedBtn();
+  }
+
+  // ── GO/NO-GO LOGIC ──
+  function updateGoNogo() {
+    const sf = parseFloat(document.getElementById('hydroseedSF').value) || 0;
+    const drive = document.getElementById('driveTime').value;
+    const hasHydroseed = state.scopes.has('hydroseed') || sf > 0;
+    const banner = document.getElementById('goNogoBanner');
+    const icon = document.getElementById('goNogoIcon');
+    const title = document.getElementById('goNogoTitle');
+    const reasons = document.getElementById('goNogoReasons');
+
+    const noGoReasons = [];
+    const reviewReasons = [];
+
+    // Hydroseed small + far
+    if (hasHydroseed && sf > 0 && sf < 5000 && (drive === 'over90')) {
+      noGoReasons.push('Hydroseed area under 5,000 SF and drive time over 1.5 hours — not worth bidding.');
+    }
+
+    // Over 1.5 hrs any job
+    if (drive === 'over90' && sf === 0) {
+      reviewReasons.push('Drive time over 1.5 hours — confirm job size justifies travel.');
+    }
+
+    // Small hydroseed in review zone
+    if (hasHydroseed && sf > 0 && sf < 5000 && drive === '60to90') {
+      reviewReasons.push('Small hydroseed job (under 5,000 SF) with 1–1.5 hr drive — review before bidding.');
+    }
+
+    const jobName = document.getElementById('jobName').value;
+    const agency = document.getElementById('biddingAgency').value;
+    const city = document.getElementById('jobCity').value;
+
+    if (!jobName || !agency || !city) {
+      banner.className = 'gonogo-banner';
+      return;
+    }
+
+    if (noGoReasons.length > 0) {
+      banner.className = 'gonogo-banner nogo';
+      icon.textContent = '🚫';
+      title.textContent = 'No-Go — Not Recommended to Bid';
+      reasons.innerHTML = noGoReasons.map(r => `<li>${r}</li>`).join('');
+    } else if (reviewReasons.length > 0) {
+      banner.className = 'gonogo-banner review';
+      icon.textContent = '⚠️';
+      title.textContent = 'Review Before Proceeding';
+      reasons.innerHTML = reviewReasons.map(r => `<li>${r}</li>`).join('');
+    } else if (jobName && agency && city && drive) {
+      banner.className = 'gonogo-banner go';
+      icon.textContent = '✅';
+      title.textContent = 'Go — Job Passes Initial Criteria';
+      const positives = [];
+      if (sf >= 5000) positives.push(`Hydroseed area ${sf.toLocaleString()} SF meets minimum threshold.`);
+      if (drive !== 'over90') positives.push('Drive time within acceptable range.');
+      if (state.jobType === 'government') positives.push('Government job — prevailing wages and $1,200 floor applied.');
+      reasons.innerHTML = positives.map(r => `<li>${r}</li>`).join('');
+    } else {
+      banner.className = 'gonogo-banner';
+    }
+
+    updateProceedBtn();
+  }
+
+  // ── PROCEED BUTTON ──
+  function updateProceedBtn() {
+    const jobName = document.getElementById('jobName').value;
+    const agency = document.getElementById('biddingAgency').value;
+    const city = document.getElementById('jobCity').value;
+    const drive = document.getElementById('driveTime').value;
+    const hasScope = state.scopes.size > 0;
+    const banner = document.getElementById('goNogoBanner');
+    const isNogo = banner.classList.contains('nogo');
+
+    const ready = jobName && agency && city && drive && hasScope && !isNogo;
+    document.getElementById('proceedBtn').disabled = !ready;
+  }
+
+  // ── PREVAILING WAGE PARSER ──
+  function parsePrevailingWage(text) {
+    // Simple pattern matching for common formats
+    const planterMatch = text.match(/planter[^$]*\$\s*([\d.]+)/i);
+    const equipMatch = text.match(/equip(?:ment)?\s*op[^$]*\$\s*([\d.]+)/i);
+    const cdlMatch = text.match(/(?:cdl|driver|truck)[^$]*\$\s*([\d.]+)/i);
+    if (planterMatch) document.getElementById('pwPlanter').textContent = '$' + planterMatch[1] + '/hr';
+    if (equipMatch) document.getElementById('pwEquipOp').textContent = '$' + equipMatch[1] + '/hr';
+    if (cdlMatch) document.getElementById('pwCDL').textContent = '$' + cdlMatch[1] + '/hr';
+  }
+
+  // ── PROCEED TO SCREENER ──
+  function proceedToScreener() {
+    const markup = state.overrideMarkup !== null
+      ? state.overrideMarkup
+      : parseInt(document.getElementById('totalMarkup').textContent);
+
+    alert(`✅ Job intake saved.\n\nJob: ${document.getElementById('jobName').value}\nType: ${state.jobType.toUpperCase()}\nScopes: ${[...state.scopes].join(', ')}\nMarkup: ${markup}%\nApprover: ${state.approver || 'Pending'}\n\n📄 Phase 2 — Plan Screener coming next session.\nUpload your PDF plan set to continue.`);
+
+    // Mark step 1 complete, activate step 2
+    document.getElementById('step1').className = 'progress-step complete';
+    document.getElementById('step2').className = 'progress-step active';
+  }
+
+  // ── INIT ──
+  updateMarkup();
+</script>
+</body>
+</html>
