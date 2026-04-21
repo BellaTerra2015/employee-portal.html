@@ -90,6 +90,8 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--gray-light);color:v
 .btn-hold.active{background:var(--orange);color:#fff;}
 .btn-open{background:var(--green-dark);color:#fff;border:none;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
 .btn-open:hover{background:var(--green-mid);}
+.btn-recheck{background:#f9f0ff;color:#6b21a8;border:1px solid #d8b4fe;padding:.3rem .65rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;}
+.btn-recheck:hover{background:#ede9fe;}
 
 /* move buttons */
 .move-row{display:flex;justify-content:space-between;margin-top:.65rem;border-top:1px solid #f0f0f0;padding-top:.5rem;}
@@ -601,6 +603,7 @@ function buildCard(p, stage) {
       holdBtn +
       setupBtn +
       '<button class="btn-financial" onclick="openFinancial(\'' + p.podioItemId + '\')">💰</button>' +
+      (p.bidSheetUrl ? '<button class="btn-recheck" onclick="recheckBidName(\'' + p.podioItemId + '\')">🔁 Re-Check Bid Name</button>' : '') +
     '</div>' +
     moveHtml;
 
@@ -622,6 +625,32 @@ function moveProject(podioItemId, newStage) {
     headers: {'Content-Type':'text/plain'},
     body: JSON.stringify({ action:'moveProject', podioItemId:podioItemId, newStage:newStage, email:_currentUserEmail })
   }).catch(function(e){ console.error('Move error:', e); });
+}
+
+// ── RE-CHECK BID NAME ─────────────────────────────────────────
+
+function recheckBidName(podioItemId) {
+  var btn = document.querySelector('[onclick*="recheckBidName(\'' + podioItemId + '\')"]');
+  if (btn) { btn.textContent = '⏳ Checking…'; btn.disabled = true; }
+
+  fetch(SCRIPT_URL + '?action=recheckBidName&id=' + encodeURIComponent(podioItemId))
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (btn) { btn.textContent = '🔁 Re-Check Bid Name'; btn.disabled = false; }
+      if (!data.ok && data.message) {
+        alert('⚠️ ' + data.message);
+      } else if (data.resolved === false) {
+        alert('⚠️ Names still do not match.\n\nPodio name: ' + data.podioName + '\nSpreadsheet: ' + data.sheetTitle + '\n\nCorrect one or the other, then try again.');
+      } else if (data.resolved === true) {
+        alert('✅ ' + (data.message || 'Names match — planting template updated.'));
+      } else {
+        alert('✅ ' + JSON.stringify(data));
+      }
+    })
+    .catch(function(e) {
+      if (btn) { btn.textContent = '🔁 Re-Check Bid Name'; btn.disabled = false; }
+      alert('Network error — try again.');
+    });
 }
 
 // ── ON HOLD ───────────────────────────────────────────────────
