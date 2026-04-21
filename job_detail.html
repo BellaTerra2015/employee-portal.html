@@ -166,6 +166,7 @@ var _barkRows     = [];
 var _shipRows     = [];
 var _currentUser  = localStorage.getItem('bt_employee_name')  || '';
 var _userEmail    = localStorage.getItem('bt_employee_email') || '';
+var PLANT_RATES   = { '#1':3,'#2':3.5,'#5':4.5,'#10':5.5,'#15':6,'#25':8,'1 Gal':3,'2 Gal':4,'4in Pot':1.5,'Pole':2,'Bare Root':1.5,'Plug':1 };
 
 // ── SCOPE → TAB CONFIG ───────────────────────────────────────
 
@@ -361,10 +362,19 @@ function buildPlantingPanel() {
     '<div class="g2"><div class="f"><label>Date</label><input type="date" id="plant-date"></div>' +
     '<div class="f"><label>Crew Lead</label><input type="text" id="plant-lead" placeholder="Enter crew lead name"></div></div>' +
     '<div class="g2"><div class="f"><label>Crew Members on Site</label><input type="text" id="plant-crew" placeholder="Comma-separated names"></div>' +
-    '<div class="f"><label>Hours on Site</label><input type="number" id="plant-hours" min="0" step="0.5" placeholder="0"></div></div>' +
+    '<div class="f"><label>Hours on Site</label><input type="number" id="plant-hours" min="0" step="0.5" placeholder="0" oninput="updatePlantTotal()"></div></div>' +
     '<div class="f"><label>Total Plants Today</label><input type="number" id="plant-total" value="0" style="font-weight:700;color:var(--green-dark);"></div></div>' +
     '<div id="plant-rows"></div>' +
     '<button class="btn-add-row" onclick="addPlantRow()">＋ Add Plant Species Row</button>' +
+    '<div id="plant-pace" style="display:none;background:#f0f4ee;border:1px solid var(--border);border-radius:10px;padding:1rem;margin:.25rem 0 1rem;">' +
+    '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green-dark);margin-bottom:.65rem;">📊 Pace Tracker</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;text-align:center;margin-bottom:.65rem;">' +
+    '<div><div id="pace-plants" style="font-size:1.5rem;font-weight:700;color:var(--text);">0</div><div style="font-size:.68rem;color:var(--gray-mid);text-transform:uppercase;">Plants</div></div>' +
+    '<div><div id="pace-bid" style="font-size:1.5rem;font-weight:700;color:var(--text);">—</div><div style="font-size:.68rem;color:var(--gray-mid);text-transform:uppercase;">Bid Hrs</div></div>' +
+    '<div><div id="pace-site" style="font-size:1.5rem;font-weight:700;color:var(--text);">—</div><div style="font-size:.68rem;color:var(--gray-mid);text-transform:uppercase;">Site Hrs</div></div>' +
+    '</div>' +
+    '<div id="pace-status" style="text-align:center;padding:.35rem .75rem;border-radius:6px;font-size:.85rem;font-weight:700;background:#e8f0fb;color:var(--blue-dark);">Enter hours on site to see pace</div>' +
+    '</div>' +
     '<div class="card"><div class="f"><label class="gold">⚠ Field Changes / Deviations</label>' +
     '<textarea id="plant-changes" class="gold-bg" placeholder="Spacing changes, GC direction, plants moved between sections…"></textarea></div>' +
     '<div class="f"><label>General Notes</label><textarea id="plant-notes" placeholder="General observations…"></textarea></div>' +
@@ -808,8 +818,23 @@ function addPlantRow() {
   div.id = 'plant-row-' + idx;
   div.innerHTML =
     '<button class="btn-remove" onclick="removeRow(\'plant\','+idx+')">×</button>' +
-    '<div class="g3"><div class="f"><label>Species</label><input type="text" id="plant-sp-'+idx+'" placeholder="Common or scientific name"></div>' +
-    '<div class="f"><label>Qty Planted</label><input type="number" id="plant-qty-'+idx+'" min="0" placeholder="0" oninput="updatePlantTotal()"></div>' +
+    '<div class="g2"><div class="f"><label>Species</label><input type="text" id="plant-sp-'+idx+'" placeholder="Common or scientific name"></div>' +
+    '<div class="f"><label>Container Size</label><select id="plant-size-'+idx+'" onchange="updatePlantTotal()">' +
+    '<option value="">— size —</option>' +
+    '<option value="#1">#1 · 3 min</option>' +
+    '<option value="#2">#2 · 3.5 min</option>' +
+    '<option value="#5">#5 · 4.5 min</option>' +
+    '<option value="#10">#10 · 5.5 min</option>' +
+    '<option value="#15">#15 · 6 min</option>' +
+    '<option value="#25">#25 · 8 min</option>' +
+    '<option value="1 Gal">1 Gal · 3 min</option>' +
+    '<option value="2 Gal">2 Gal · 4 min</option>' +
+    '<option value="4in Pot">4" Pot · 1.5 min</option>' +
+    '<option value="Pole">Pole · 2 min</option>' +
+    '<option value="Bare Root">Bare Root · 1.5 min</option>' +
+    '<option value="Plug">Plug · 1 min</option>' +
+    '</select></div></div>' +
+    '<div class="g2"><div class="f"><label>Qty Planted</label><input type="number" id="plant-qty-'+idx+'" min="0" placeholder="0" oninput="updatePlantTotal()"></div>' +
     '<div class="f"><label>Section / Location</label><input type="text" id="plant-sec-'+idx+'" placeholder="e.g. B3, Median"></div></div>' +
     '<div class="f"><label>Notes</label><input type="text" id="plant-note-'+idx+'" placeholder="Substitutions, damage, depth issues…"></div>';
   document.getElementById('plant-rows').appendChild(div);
@@ -838,12 +863,52 @@ function removeRow(type, idx) {
 }
 
 function updatePlantTotal() {
-  var total = 0;
-  document.querySelectorAll('[id^="plant-qty-"]').forEach(function(el){
-    total += parseInt(el.value) || 0;
+  var total = 0, bidMins = 0;
+  document.querySelectorAll('[id^="plant-qty-"]').forEach(function(el) {
+    var idx  = el.id.replace('plant-qty-', '');
+    var qty  = parseInt(el.value) || 0;
+    total += qty;
+    var sizeEl = document.getElementById('plant-size-' + idx);
+    var rate   = sizeEl ? (PLANT_RATES[sizeEl.value] || 0) : 0;
+    bidMins += qty * rate;
   });
   var t = document.getElementById('plant-total');
   if (t) t.value = total;
+
+  var pace = document.getElementById('plant-pace');
+  if (!pace) return;
+  if (total === 0) { pace.style.display = 'none'; return; }
+  pace.style.display = 'block';
+
+  var hours   = parseFloat(document.getElementById('plant-hours').value) || 0;
+  var bidHrs  = bidMins / 60;
+  var statusEl = document.getElementById('pace-status');
+  document.getElementById('pace-plants').textContent = total;
+  document.getElementById('pace-bid').textContent    = bidMins > 0 ? bidHrs.toFixed(1) : '—';
+  document.getElementById('pace-site').textContent   = hours > 0  ? hours.toFixed(1)  : '—';
+
+  if (hours > 0 && bidMins > 0) {
+    var actualMPP = (hours * 60) / total;
+    var bidMPP    = bidMins / total;
+    var pct       = ((actualMPP - bidMPP) / bidMPP) * 100;
+    var diff      = Math.abs(bidHrs - hours).toFixed(1);
+    if (pct < -10) {
+      statusEl.style.background = '#e8f5e2'; statusEl.style.color = '#2d5a27';
+      statusEl.textContent = '🟢 AHEAD — ' + diff + ' hrs under bid';
+    } else if (pct > 15) {
+      statusEl.style.background = '#fdeaea'; statusEl.style.color = '#c0392b';
+      statusEl.textContent = '🔴 BEHIND — ' + diff + ' hrs over bid';
+    } else {
+      statusEl.style.background = '#fff8e1'; statusEl.style.color = '#8b6914';
+      statusEl.textContent = '🟡 ON TRACK';
+    }
+  } else if (hours === 0) {
+    statusEl.style.background = '#e8f0fb'; statusEl.style.color = '#1a4b8c';
+    statusEl.textContent = 'Enter hours on site to see pace';
+  } else {
+    statusEl.style.background = '#e8f0fb'; statusEl.style.color = '#1a4b8c';
+    statusEl.textContent = 'Select container sizes to see bid time';
+  }
 }
 
 // ── SECTION TAGS (bark) ───────────────────────────────────────
@@ -886,7 +951,7 @@ function submitReport(type, btn) {
       data.totalPlants = v('plant-total');
       data.fieldChanges= v('plant-changes');
       data.notes       = v('plant-notes');
-      data.plantRows   = collectRows('plant', ['sp','qty','sec','note']);
+      data.plantRows   = collectRows('plant', ['sp','size','qty','sec','note']);
       break;
     case 'bark':
       data.date         = v('bark-date');
